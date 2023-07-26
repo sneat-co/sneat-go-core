@@ -6,11 +6,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
-	emails2 "github.com/sneat-co/sneat-go/src/core/emails"
+	"github.com/sneat-co/sneat-go/src/core/emails"
 )
 
 // NewEmailClient creates new client
-func NewEmailClient(awsRegion string, credentials *credentials.Credentials) emails2.Client {
+func NewEmailClient(awsRegion string, credentials *credentials.Credentials) emails.Client {
 	return &sesClient{region: awsRegion, credentials: credentials}
 }
 
@@ -21,7 +21,7 @@ type sesClient struct {
 
 // Send create and send text or html email to single recipient.
 // @returns (resp emails.Sent, err error)
-func (client *sesClient) Send(email emails2.Email) (emails2.Sent, error) {
+func (client *sesClient) Send(email emails.Email) (emails.Sent, error) {
 	// start a new aws session
 	config := &aws.Config{
 		Credentials: client.credentials,
@@ -31,7 +31,7 @@ func (client *sesClient) Send(email emails2.Email) (emails2.Sent, error) {
 	}
 	sess, err := session.NewSession(config)
 	if err != nil {
-		return nil, emails2.NewSendEmailError("failed to create AWS session", err)
+		return nil, emails.NewSendEmailError("failed to create AWS session", err)
 	}
 
 	// start a new ses session
@@ -83,7 +83,7 @@ func (client *sesClient) Send(email emails2.Email) (emails2.Sent, error) {
 
 	output, err := svc.SendEmail(params)
 	if err != nil {
-		return nil, emails2.NewSendEmailError("failed to send email throw AWS SES", err)
+		return nil, emails.NewSendEmailError("failed to send email throw AWS SES", err)
 	}
 	return sent{messageID: *output.MessageId}, nil
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	facade2 "github.com/sneat-co/sneat-go/src/core/facade"
+	"github.com/sneat-co/sneat-go/src/core/facade"
 	"github.com/sneat-co/sneat-go/src/core/httpserver"
 	"net/http"
 	"strings"
@@ -25,29 +25,29 @@ var ContextWithFirebaseToken = func(r *http.Request, authRequired bool) (ctx con
 		if err != nil {
 			return ctx, fmt.Errorf("failed to get bearer token from authorization header: %w", err)
 		}
-		token, err := facade2.NewFirebaseAuthToken(ctx, func() (string, error) {
+		token, err := facade.NewFirebaseAuthToken(ctx, func() (string, error) {
 			return bearerToken, nil
 		}, authRequired)
 		if err != nil {
 			return ctx, fmt.Errorf("failed to get Firebase auth toke: %w", err)
 		}
-		ctx = facade2.NewContextWithFirebaseToken(ctx, token)
+		ctx = facade.NewContextWithFirebaseToken(ctx, token)
 		//log.Println("apicore.ContextWithFirebaseToken() is OK:", ctx)
 	}
 	return ctx, err
 }
 
 // NewAuthContext creates new authentication context
-var NewAuthContext = func(r *http.Request) (facade2.AuthContext, error) {
+var NewAuthContext = func(r *http.Request) (facade.AuthContext, error) {
 	fbIDToken := func() (string, error) {
 		return getBearerToken(r.Header.Get(authorizationHeaderName))
 	}
-	return facade2.NewFirebaseAuthContext(fbIDToken), nil
+	return facade.NewFirebaseAuthContext(fbIDToken), nil
 }
 
 func getBearerToken(authorizationHeader string) (token string, err error) {
 	if authorizationHeader == "" {
-		return "", facade2.ErrNoAuthHeader
+		return "", facade.ErrNoAuthHeader
 	}
 	if !strings.HasPrefix(authorizationHeader, bearerPrefix) {
 		return "", httpserver.ErrNotABearerToken

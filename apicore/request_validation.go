@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/datatug/datatug/packages/server/endpoints"
-	facade2 "github.com/sneat-co/sneat-go/src/core/facade"
+	"github.com/sneat-co/sneat-go/src/core/facade"
 	"github.com/sneat-co/sneat-go/src/core/httpserver"
 	"io"
 	"log"
@@ -27,26 +27,26 @@ const MinJSONRequestSize = 2
 const DefaultMaxJSONRequestSize = 7 * KB
 
 // NewFirestoreContext creates a context with a Firebase ContactID token
-var NewFirestoreContext = func(r *http.Request, authRequired bool) (firestoreContext *facade2.FirestoreContext, err error) {
+var NewFirestoreContext = func(r *http.Request, authRequired bool) (firestoreContext *facade.FirestoreContext, err error) {
 	var ctx context.Context
 	if ctx, err = ContextWithFirebaseToken(r, authRequired); err != nil {
 		return nil, err
 	}
-	return facade2.NewContextWithFirestoreClient(ctx)
+	return facade.NewContextWithFirestoreClient(ctx)
 }
 
 type VerifyAuthenticatedRequestAndDecodeBodyFunc = func(
 	w http.ResponseWriter, r *http.Request,
 	options endpoints.VerifyRequestOptions,
-	request facade2.Request,
-) (ctx context.Context, userContext facade2.User, err error)
+	request facade.Request,
+) (ctx context.Context, userContext facade.User, err error)
 
 // VerifyAuthenticatedRequestAndDecodeBody decodes & verifies an HTTP request
 var VerifyAuthenticatedRequestAndDecodeBody = func(
 	w http.ResponseWriter, r *http.Request,
 	options endpoints.VerifyRequestOptions,
-	request facade2.Request,
-) (ctx context.Context, userContext facade2.User, err error) {
+	request facade.Request,
+) (ctx context.Context, userContext facade.User, err error) {
 	ctx, userContext, err = VerifyRequestAndCreateUserContext(w, r, options)
 	if err != nil {
 		return
@@ -60,7 +60,7 @@ var VerifyAuthenticatedRequestAndDecodeBody = func(
 // VerifyRequestAndCreateUserContext runs common checks
 var VerifyRequestAndCreateUserContext = func(
 	w http.ResponseWriter, r *http.Request, options endpoints.VerifyRequestOptions,
-) (ctx context.Context, userContext facade2.User, err error) {
+) (ctx context.Context, userContext facade.User, err error) {
 	if r == nil {
 		panic("request is nil")
 	}
@@ -71,7 +71,7 @@ var VerifyRequestAndCreateUserContext = func(
 		panic("options is nil")
 	}
 	const from = "VerifyRequestAndCreateUserContext"
-	var authContext facade2.AuthContext
+	var authContext facade.AuthContext
 	if authContext, err = NewAuthContext(r); err != nil {
 		httpserver.HandleError(err, from, w)
 		return
@@ -92,7 +92,7 @@ var VerifyRequestAndCreateUserContext = func(
 }
 
 // UserContextProvider defines signature foe a function that provides user context
-var UserContextProvider func() facade2.User
+var UserContextProvider func() facade.User
 
 //type verifyRequestOptions struct {
 //	minimumContentLength   int64
@@ -138,7 +138,7 @@ var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options endpoin
 }
 
 // DecodeRequestBody decodes body of HTTP request into a provide struct
-func DecodeRequestBody(w http.ResponseWriter, r *http.Request, request facade2.Request) (err error) {
+func DecodeRequestBody(w http.ResponseWriter, r *http.Request, request facade.Request) (err error) {
 	if r.Method != http.MethodPost && r.Method != http.MethodDelete && r.Method != http.MethodPut {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		err = fmt.Errorf("unsupported method: %v", r.Method)
