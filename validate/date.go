@@ -5,14 +5,14 @@ import (
 	"time"
 )
 
-const ISO8601_DATE_LAYOUT = "2006-01-02"
+const Iso8601DateLayout = "2006-01-02"
 
-// ValidDateString checks if a string is in valid ISO "YYYY-MM-DD" format
-func ValidDateString(s string) (date time.Time, err error) {
-	if len(s) != 10 {
-		return date, fmt.Errorf("date field should be 10 characters long in YYYY-MM-DD format, got string of %v chars: [%v]", len(s), s)
+// DateString checks if a string is in valid ISO "YYYY-MM-DD" format
+func DateString(s string) (date time.Time, err error) {
+	if l := len(s); l != 10 {
+		return date, fmt.Errorf("should be in YYYY-MM-DD format, got %d chars", l)
 	}
-	if date, err = time.Parse(ISO8601_DATE_LAYOUT, s); err != nil {
+	if date, err = time.Parse(Iso8601DateLayout, s); err != nil {
 		return date, err
 	}
 	return date, nil
