@@ -14,9 +14,9 @@ import (
 )
 
 // IfNoErrorReturnOK returns HTTP status OK and empty response body
-func IfNoErrorReturnOK(_ context.Context, w http.ResponseWriter, err error) {
+func IfNoErrorReturnOK(_ context.Context, w http.ResponseWriter, r *http.Request, err error) {
 	if err != nil {
-		httpserver.HandleError(err, "IfNoErrorReturnOK", w)
+		httpserver.HandleError(err, "IfNoErrorReturnOK", w, r)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -24,9 +24,9 @@ func IfNoErrorReturnOK(_ context.Context, w http.ResponseWriter, err error) {
 }
 
 // IfNoErrorReturnCreatedOK returns HTTP status OK and empty response body
-func IfNoErrorReturnCreatedOK(_ context.Context, w http.ResponseWriter, err error) {
+func IfNoErrorReturnCreatedOK(_ context.Context, w http.ResponseWriter, r *http.Request, err error) {
 	if err != nil {
-		httpserver.HandleError(err, "IfNoErrorReturnOK", w)
+		httpserver.HandleError(err, "IfNoErrorReturnOK", w, r)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
@@ -34,33 +34,33 @@ func IfNoErrorReturnCreatedOK(_ context.Context, w http.ResponseWriter, err erro
 }
 
 // ReturnStatus returns provided HTTP status and empty response body
-func ReturnStatus(_ context.Context, w http.ResponseWriter, statusCode int, err error) {
+func ReturnStatus(_ context.Context, w http.ResponseWriter, r *http.Request, statusCode int, err error) {
 	if err != nil {
-		httpserver.HandleError(err, "ReturnStatus", w)
+		httpserver.HandleError(err, "ReturnStatus", w, r)
 		return
 	}
 	w.WriteHeader(statusCode)
 }
 
 // ReturnError returns provided HTTP status and empty response body
-func ReturnError(_ context.Context, w http.ResponseWriter, err error) {
-	httpserver.HandleError(err, "IfNoErrorReturnOK", w)
+func ReturnError(_ context.Context, w http.ResponseWriter, r *http.Request, err error) {
+	httpserver.HandleError(err, "ReturnError", w, r)
 }
 
 // ReturnJSON returns provided response as a JSON and sets "Content-Role" as "application/json"
-func ReturnJSON(_ context.Context, w http.ResponseWriter, successStatusCode int, err error, response interface{}) {
+func ReturnJSON(_ context.Context, w http.ResponseWriter, r *http.Request, successStatusCode int, err error, response interface{}) {
 	if err != nil {
 		if errors.Is(err, facade.ErrUnauthorized) {
 			w.WriteHeader(http.StatusUnauthorized)
 			_, _ = fmt.Fprint(w, err.Error())
 			return
 		}
-		httpserver.HandleError(err, "ReturnJSON", w)
+		httpserver.HandleError(err, "ReturnJSON", w, r)
 		return
 	}
 	if v, ok := response.(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			httpserver.HandleError(fmt.Errorf("response is not valid: %w", err), "ReturnJSON", w)
+			httpserver.HandleError(fmt.Errorf("response is not valid: %w", err), "ReturnJSON", w, r)
 			return
 		}
 	}
@@ -75,7 +75,7 @@ func ReturnJSON(_ context.Context, w http.ResponseWriter, successStatusCode int,
 	if response == nil && successStatusCode == http.StatusOK {
 		panic("ReturnJSON: response is nil but successStatusCode is http.StatusOK=200, expected to be http.StatusNoContent=204")
 	}
-	w.Header().Add("Content-TeamType", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 	if err = json.NewEncoder(w).Encode(response); err != nil {
 		err = fmt.Errorf("failed to encode response to JSON: %w", err)
 		sentry.CaptureException(err)

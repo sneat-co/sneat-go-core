@@ -73,15 +73,15 @@ var VerifyRequestAndCreateUserContext = func(
 	const from = "VerifyRequestAndCreateUserContext"
 	var authContext facade.AuthContext
 	if authContext, err = NewAuthContext(r); err != nil {
-		httpserver.HandleError(err, from, w)
+		httpserver.HandleError(err, from, w, r)
 		return
 	}
 	if userContext, err = authContext.User(r.Context(), options.AuthenticationRequired()); err != nil {
-		httpserver.HandleError(err, from, w)
+		httpserver.HandleError(err, from, w, r)
 		return
 	}
 	if ctx, err = VerifyRequest(w, r, options); err != nil {
-		httpserver.HandleError(err, from, w)
+		httpserver.HandleError(err, from, w, r)
 		return
 	}
 	if UserContextProvider != nil {
@@ -122,7 +122,7 @@ var UserContextProvider func() facade.User
 // VerifyRequest runs common checks
 var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options endpoints.VerifyRequestOptions) (ctx context.Context, err error) {
 	ctx = r.Context()
-	if !AccessControlAllowOrigin(w, r) {
+	if !httpserver.AccessControlAllowOrigin(w, r) {
 		err = errBadOrigin
 		return
 	}
@@ -164,7 +164,7 @@ func DecodeRequestBody(w http.ResponseWriter, r *http.Request, request facade.Re
 		}
 		if err = request.Validate(); err != nil {
 			err = fmt.Errorf("Request struct decoded from HTTP request body failed initial validation %T: %v", request, err)
-			httpserver.HandleError(err, "DecodeRequestBody", w)
+			httpserver.HandleError(err, "DecodeRequestBody", w, r)
 			return err
 		}
 	}

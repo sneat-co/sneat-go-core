@@ -26,5 +26,5 @@ func HandleAuthenticatedRequestWithBody(w http.ResponseWriter, r *http.Request,
 	}
 	var response interface{}
 	response, err = facadeHandler(ctx, userContext)
-	ReturnJSON(ctx, w, successStatusCode, err, response)
+	ReturnJSON(ctx, w, r, successStatusCode, err, response)
 }

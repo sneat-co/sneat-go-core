@@ -1,4 +1,4 @@
-package apicore
+package httpserver
 
 import (
 	"fmt"

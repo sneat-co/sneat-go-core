@@ -38,7 +38,7 @@ var Execute = func(
 	ctx, err = getContext(r)
 	if err != nil {
 		log.Printf("failed to get request context: %v", err)
-		httpserver.HandleError(err, "Execute", w)
+		httpserver.HandleError(err, "Execute", w, r)
 		return
 	}
 	response, err := handler(ctx)
@@ -46,5 +46,5 @@ var Execute = func(
 		sentry.CaptureException(err)
 		err = nil
 	}
-	ReturnJSON(ctx, w, successStatusCode, err, response)
+	ReturnJSON(ctx, w, r, successStatusCode, err, response)
 }
