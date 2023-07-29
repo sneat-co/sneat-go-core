@@ -24,7 +24,7 @@ func (e errorDetails) String() string {
 }
 
 type errorResponse struct {
-	Error errorDetails
+	Error errorDetails `json:"error"`
 }
 
 // HandleError handles error and returns appropriate HTTP status code and error details as JSON

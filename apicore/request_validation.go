@@ -163,7 +163,7 @@ func DecodeRequestBody(w http.ResponseWriter, r *http.Request, request facade.Re
 			return err
 		}
 		if err = request.Validate(); err != nil {
-			err = fmt.Errorf("Request struct decoded from HTTP request body failed initial validation %T: %v", request, err)
+			err = fmt.Errorf("request struct decoded from HTTP request body failed initial validation %T: %v", request, err)
 			httpserver.HandleError(err, "DecodeRequestBody", w, r)
 			return err
 		}

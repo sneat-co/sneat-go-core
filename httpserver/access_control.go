@@ -14,6 +14,8 @@ func AccessControlAllowOrigin(w http.ResponseWriter, r *http.Request) bool {
 		_, _ = fmt.Fprintf(w, "Unsupported origin: %v", origin)
 		return false
 	}
-	w.Header().Add("Access-Control-Allow-Origin", origin)
+	if header := w.Header(); header.Get("Access-Control-Allow-Origin") == "" {
+		header.Add("Access-Control-Allow-Origin", origin)
+	}
 	return true
 }
