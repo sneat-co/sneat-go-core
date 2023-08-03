@@ -7,7 +7,7 @@ import (
 )
 
 func TestIsAllowedContentLength(t *testing.T) {
-	req, err := http.NewRequest("POST", "/api2meetings/create-invite", new(bytes.Buffer))
+	req, err := http.NewRequest("POST", "/api4meetingus/create-invite", new(bytes.Buffer))
 	if err != nil {
 		t.Fatal(err)
 	}
