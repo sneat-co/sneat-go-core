@@ -9,7 +9,7 @@ import (
 	"github.com/datatug/datatug/packages/server/endpoints"
 	"github.com/sneat-co/sneat-go/src/core/facade"
 	"github.com/sneat-co/sneat-go/src/core/httpserver"
-	"github.com/sneat-co/sneat-go/src/sneatgae/sneatfirestore"
+	"github.com/sneat-co/sneat-go/src/sneatgae/sneatfb"
 	"io"
 	"log"
 	"net/http"
@@ -64,7 +64,7 @@ var VerifyRequestAndCreateUserContext = func(
 	}
 	const from = "VerifyRequestAndCreateUserContext"
 	var authContext facade.AuthContext
-	if authContext, err = sneatfirestore.NewAuthContext(r); err != nil {
+	if authContext, err = sneatfb.NewAuthContext(r); err != nil {
 		httpserver.HandleError(err, from, w, r)
 		return
 	}
@@ -122,7 +122,7 @@ var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options endpoin
 		return
 	}
 
-	if ctx, err = sneatfirestore.ContextWithFirebaseToken(r, options.AuthenticationRequired()); err != nil {
+	if ctx, err = sneatfb.ContextWithFirebaseToken(r, options.AuthenticationRequired()); err != nil {
 		err = fmt.Errorf("failed to create context wuth firestore client: %w", err)
 		return
 	}
