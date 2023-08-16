@@ -1,7 +1,7 @@
 package email2console
 
 import (
-	"github.com/sneat-co/sneat-go/src/core/emails"
+	"github.com/sneat-co/sneat-go-core/emails"
 	"github.com/strongo/random"
 	"log"
 )

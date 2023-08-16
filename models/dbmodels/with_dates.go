@@ -3,7 +3,7 @@ package dbmodels
 import (
 	"fmt"
 	"github.com/dal-go/dalgo/dal"
-	"github.com/sneat-co/sneat-go/src/core/validate"
+	"github.com/sneat-co/sneat-go-core/validate"
 	"github.com/strongo/validation"
 	"strings"
 )

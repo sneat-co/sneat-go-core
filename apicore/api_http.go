@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/datatug/datatug/packages/server/endpoints"
 	"github.com/getsentry/sentry-go"
-	"github.com/sneat-co/sneat-go/src/core/httpserver"
+	"github.com/sneat-co/sneat-go-core/httpserver"
 	"log"
 	"net/http"
 )

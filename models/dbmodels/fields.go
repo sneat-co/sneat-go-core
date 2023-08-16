@@ -2,7 +2,7 @@ package dbmodels
 
 import (
 	"github.com/crediterra/money"
-	"github.com/sneat-co/sneat-go/src/core/validate"
+	"github.com/sneat-co/sneat-go-core/validate"
 	"github.com/strongo/validation"
 )
 

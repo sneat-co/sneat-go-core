@@ -3,7 +3,7 @@ package httpserver
 import (
 	"errors"
 	"fmt"
-	"github.com/sneat-co/sneat-go/src/core/facade"
+	"github.com/sneat-co/sneat-go-core/facade"
 )
 
 // ErrNotABearerToken is returned when provided auth header is not a valid bearer token

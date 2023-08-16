@@ -2,8 +2,8 @@ package dbmodels
 
 import (
 	"fmt"
-	"github.com/sneat-co/sneat-go/src/core"
-	"github.com/sneat-co/sneat-go/src/core/validate"
+	"github.com/sneat-co/sneat-go-core"
+	"github.com/sneat-co/sneat-go-core/validate"
 	"github.com/strongo/slice"
 	"github.com/strongo/validation"
 	"strings"

@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/getsentry/sentry-go"
-	"github.com/sneat-co/sneat-go/src/core/capturer"
+	"github.com/sneat-co/sneat-go-core/capturer"
 	"github.com/strongo/validation"
 	"io"
 	"log"

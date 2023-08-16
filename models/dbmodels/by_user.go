@@ -1,7 +1,7 @@
 package dbmodels
 
 import (
-	"github.com/sneat-co/sneat-go/src/core"
+	"github.com/sneat-co/sneat-go-core"
 	"github.com/strongo/validation"
 )
 

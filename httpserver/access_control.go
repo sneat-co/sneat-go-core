@@ -2,7 +2,7 @@ package httpserver
 
 import (
 	"fmt"
-	"github.com/sneat-co/sneat-go/src/core/security"
+	"github.com/sneat-co/sneat-go-core/security"
 	"net/http"
 )
 

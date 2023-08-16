@@ -2,7 +2,7 @@ package apicore
 
 import (
 	"fmt"
-	"github.com/sneat-co/sneat-go/src/core/facade"
+	"github.com/sneat-co/sneat-go-core/facade"
 	"net/http"
 )
 

@@ -1,7 +1,7 @@
 package apicore
 
 import (
-	"github.com/sneat-co/sneat-go/src/core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"net/http"
 )
 

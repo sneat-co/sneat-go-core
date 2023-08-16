@@ -2,7 +2,7 @@ package dbmodels
 
 import (
 	"fmt"
-	"github.com/sneat-co/sneat-go/src/core"
+	"github.com/sneat-co/sneat-go-core"
 	"github.com/strongo/validation"
 	"strings"
 	"time"

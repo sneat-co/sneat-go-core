@@ -3,7 +3,7 @@ package apicore
 import (
 	"context"
 	"github.com/datatug/datatug/packages/server/endpoints"
-	"github.com/sneat-co/sneat-go/src/core/facade"
+	"github.com/sneat-co/sneat-go-core/facade"
 	"net/http"
 )
 
