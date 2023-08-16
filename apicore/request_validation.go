@@ -9,7 +9,6 @@ import (
 	"github.com/datatug/datatug/packages/server/endpoints"
 	"github.com/sneat-co/sneat-go/src/core/facade"
 	"github.com/sneat-co/sneat-go/src/core/httpserver"
-	"github.com/sneat-co/sneat-go/src/sneatgae/sneatfb"
 	"io"
 	"log"
 	"net/http"
@@ -49,6 +48,8 @@ var VerifyAuthenticatedRequestAndDecodeBody = func(
 	return ctx, userContext, err
 }
 
+var NewAuthContext func(r *http.Request) (facade.AuthContext, error)
+
 // VerifyRequestAndCreateUserContext runs common checks
 var VerifyRequestAndCreateUserContext = func(
 	w http.ResponseWriter, r *http.Request, options endpoints.VerifyRequestOptions,
@@ -64,7 +65,7 @@ var VerifyRequestAndCreateUserContext = func(
 	}
 	const from = "VerifyRequestAndCreateUserContext"
 	var authContext facade.AuthContext
-	if authContext, err = sneatfb.NewAuthContext(r); err != nil {
+	if authContext, err = NewAuthContext(r); err != nil {
 		httpserver.HandleError(err, from, w, r)
 		return
 	}
@@ -111,6 +112,8 @@ var UserContextProvider func() facade.User
 //
 //}
 
+var NewContextWithToken func(r *http.Request, authRequired bool) (ctx context.Context, err error)
+
 // VerifyRequest runs common checks
 var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options endpoints.VerifyRequestOptions) (ctx context.Context, err error) {
 	ctx = r.Context()
@@ -119,11 +122,15 @@ var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options endpoin
 		return
 	}
 	if err = validateContentLength(r, options.MinimumContentLength(), options.MaximumContentLength()); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte(err.Error()))
 		return
 	}
 
-	if ctx, err = sneatfb.ContextWithFirebaseToken(r, options.AuthenticationRequired()); err != nil {
+	if ctx, err = NewContextWithToken(r, options.AuthenticationRequired()); err != nil {
 		err = fmt.Errorf("failed to create context wuth firestore client: %w", err)
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = w.Write([]byte(err.Error()))
 		return
 	}
 	return
