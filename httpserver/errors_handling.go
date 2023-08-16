@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/getsentry/sentry-go"
 	"github.com/sneat-co/sneat-go-core/capturer"
+	"github.com/sneat-co/sneat-go-core/monitoring"
 	"github.com/strongo/validation"
 	"io"
 	"log"
@@ -35,7 +35,7 @@ func HandleError(err error, from string, w http.ResponseWriter, r *http.Request)
 	if isCaptured, e := capturer.IsCapturedError(err); isCaptured {
 		err = e
 	} else {
-		_ = sentry.CaptureException(err)
+		_ = monitoring.CaptureException(err)
 	}
 	AccessControlAllowOrigin(w, r)
 	if IsUnauthorizedError(err) {
@@ -58,7 +58,7 @@ func HandleError(err error, from string, w http.ResponseWriter, r *http.Request)
 	if content, err := json.Marshal(responseBody); err != nil {
 		err = fmt.Errorf("failed to encode response to JSON: %w", err)
 		log.Printf("ERROR: HandleError: %v", err)
-		_ = sentry.CaptureException(err)
+		_ = monitoring.CaptureException(err)
 		//w.WriteHeader(500) // TODO: Ask at StackOverflow: Does it make sense?
 		_, _ = io.WriteString(w, "Failed to encode error as JSON: ")
 		_, _ = io.WriteString(w, err.Error())

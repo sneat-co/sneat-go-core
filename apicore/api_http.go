@@ -2,24 +2,43 @@ package apicore
 
 import (
 	"context"
-	"github.com/datatug/datatug/packages/server/endpoints"
-	"github.com/getsentry/sentry-go"
 	"github.com/sneat-co/sneat-go-core/httpserver"
+	"github.com/sneat-co/sneat-go-core/monitoring"
 	"log"
 	"net/http"
 )
 
-var _ endpoints.Handler = Execute
+// RequestDTO defines an interface that should be implemented by request DTO struct
+type RequestDTO interface {
+	Validate() error
+}
+
+// ResponseDTO common interface for response objects
+type ResponseDTO interface {
+	// Validate validates response
+	Validate() error
+}
+
+// VerifyRequestOptions - options for request verification
+type VerifyRequestOptions interface { // TODO: move to shared Sneat package
+	MinimumContentLength() int64
+	MaximumContentLength() int64
+	AuthenticationRequired() bool
+}
+
+type ContextProvider = func(r *http.Request) (context.Context, error)
+
+type Worker = func(ctx context.Context) (responseDTO ResponseDTO, err error)
 
 // Execute is very similar to HandleAuthenticatedRequestWithBody() // TODO: consider code unification & reuse
 var Execute = func(
 	w http.ResponseWriter,
 	r *http.Request,
-	request endpoints.RequestDTO,
-	verifyOptions endpoints.VerifyRequestOptions,
+	request RequestDTO,
+	verifyOptions VerifyRequestOptions,
 	successStatusCode int,
-	getContext endpoints.ContextProvider,
-	handler endpoints.Worker,
+	getContext ContextProvider,
+	handler Worker,
 ) {
 	log.Printf("apicore.Execute(successStatusCode=%v)", successStatusCode)
 
@@ -43,7 +62,7 @@ var Execute = func(
 	}
 	response, err := handler(ctx)
 	if err != nil {
-		sentry.CaptureException(err)
+		monitoring.CaptureException(err)
 		err = nil
 	}
 	ReturnJSON(ctx, w, r, successStatusCode, err, response)

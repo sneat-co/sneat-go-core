@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/getsentry/sentry-go"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/httpserver"
+	"github.com/sneat-co/sneat-go-core/monitoring"
 	"io"
 	"log"
 	"net/http"
@@ -78,7 +78,7 @@ func ReturnJSON(_ context.Context, w http.ResponseWriter, r *http.Request, succe
 	w.Header().Add("Content-Type", "application/json")
 	if err = json.NewEncoder(w).Encode(response); err != nil {
 		err = fmt.Errorf("failed to encode response to JSON: %w", err)
-		sentry.CaptureException(err)
+		monitoring.CaptureException(err)
 		w.WriteHeader(500) // Ask StackOverflow: Does it make sense?
 		_, _ = io.WriteString(w, "Failed to encode response: ")
 		_, _ = io.WriteString(w, err.Error())

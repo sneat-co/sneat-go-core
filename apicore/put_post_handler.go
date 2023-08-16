@@ -2,7 +2,6 @@ package apicore
 
 import (
 	"context"
-	"github.com/datatug/datatug/packages/server/endpoints"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"net/http"
 )
@@ -18,7 +17,7 @@ func HandleAuthenticatedRequestWithBody(w http.ResponseWriter, r *http.Request,
 	request interface{ Validate() error },
 	facadeHandler FacadeHandler,
 	successStatusCode int,
-	options endpoints.VerifyRequest,
+	options VerifyRequestOptions,
 ) {
 	ctx, userContext, err := VerifyAuthenticatedRequestAndDecodeBody(w, r, options, request)
 	if err != nil { // The error has been handled inside the function

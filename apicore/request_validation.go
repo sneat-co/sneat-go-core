@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/datatug/datatug/packages/server/endpoints"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/httpserver"
 	"io"
@@ -28,14 +27,14 @@ const DefaultMaxJSONRequestSize = 7 * KB
 
 type VerifyAuthenticatedRequestAndDecodeBodyFunc = func(
 	w http.ResponseWriter, r *http.Request,
-	options endpoints.VerifyRequestOptions,
+	options VerifyRequestOptions,
 	request facade.Request,
 ) (ctx context.Context, userContext facade.User, err error)
 
 // VerifyAuthenticatedRequestAndDecodeBody decodes & verifies an HTTP request
 var VerifyAuthenticatedRequestAndDecodeBody = func(
 	w http.ResponseWriter, r *http.Request,
-	options endpoints.VerifyRequestOptions,
+	options VerifyRequestOptions,
 	request facade.Request,
 ) (ctx context.Context, userContext facade.User, err error) {
 	ctx, userContext, err = VerifyRequestAndCreateUserContext(w, r, options)
@@ -50,9 +49,16 @@ var VerifyAuthenticatedRequestAndDecodeBody = func(
 
 var NewAuthContext func(r *http.Request) (facade.AuthContext, error)
 
+// VerifyRequest implements VerifyRequestOptions
+type verifyRequest struct { // TODO: move to shared Sneat package
+	MinContentLength int64
+	MaxContentLength int64
+	AuthRequired     bool
+}
+
 // VerifyRequestAndCreateUserContext runs common checks
 var VerifyRequestAndCreateUserContext = func(
-	w http.ResponseWriter, r *http.Request, options endpoints.VerifyRequestOptions,
+	w http.ResponseWriter, r *http.Request, options VerifyRequestOptions,
 ) (ctx context.Context, userContext facade.User, err error) {
 	if r == nil {
 		panic("request is nil")
@@ -94,7 +100,7 @@ var UserContextProvider func() facade.User
 //	processUserID          func(uid string) error
 //}
 //
-//var _ endpoints.VerifyRequestOptions = (*verifyRequestOptions)(nil)
+//var _ VerifyRequestOptions = (*verifyRequestOptions)(nil)
 //
 //func (v verifyRequestOptions) MinimumContentLength() int64 {
 //	return v.minimumContentLength
@@ -108,14 +114,14 @@ var UserContextProvider func() facade.User
 //	return v.authenticationRequired
 //}
 //
-//func VerifyRequestOptions(opts) endpoints.VerifyRequestOptions {
+//func VerifyRequestOptions(opts) VerifyRequestOptions {
 //
 //}
 
 var NewContextWithToken func(r *http.Request, authRequired bool) (ctx context.Context, err error)
 
 // VerifyRequest runs common checks
-var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options endpoints.VerifyRequestOptions) (ctx context.Context, err error) {
+var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options VerifyRequestOptions) (ctx context.Context, err error) {
 	ctx = r.Context()
 	if !httpserver.AccessControlAllowOrigin(w, r) {
 		err = errBadOrigin
