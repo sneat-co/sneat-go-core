@@ -49,13 +49,6 @@ var VerifyAuthenticatedRequestAndDecodeBody = func(
 
 var NewAuthContext func(r *http.Request) (facade.AuthContext, error)
 
-// VerifyRequest implements VerifyRequestOptions
-type verifyRequest struct { // TODO: move to shared Sneat package
-	MinContentLength int64
-	MaxContentLength int64
-	AuthRequired     bool
-}
-
 // VerifyRequestAndCreateUserContext runs common checks
 var VerifyRequestAndCreateUserContext = func(
 	w http.ResponseWriter, r *http.Request, options VerifyRequestOptions,
