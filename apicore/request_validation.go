@@ -9,6 +9,7 @@ import (
 	"github.com/datatug/datatug/packages/server/endpoints"
 	"github.com/sneat-co/sneat-go/src/core/facade"
 	"github.com/sneat-co/sneat-go/src/core/httpserver"
+	"github.com/sneat-co/sneat-go/src/sneatgae/sneatfirestore"
 	"io"
 	"log"
 	"net/http"
@@ -25,15 +26,6 @@ const MinJSONRequestSize = 2
 
 // DefaultMaxJSONRequestSize is set as 7 kilobytes what usually should be enough
 const DefaultMaxJSONRequestSize = 7 * KB
-
-// NewFirestoreContext creates a context with a Firebase ContactID token
-var NewFirestoreContext = func(r *http.Request, authRequired bool) (firestoreContext *facade.FirestoreContext, err error) {
-	var ctx context.Context
-	if ctx, err = ContextWithFirebaseToken(r, authRequired); err != nil {
-		return nil, err
-	}
-	return facade.NewContextWithFirestoreClient(ctx)
-}
 
 type VerifyAuthenticatedRequestAndDecodeBodyFunc = func(
 	w http.ResponseWriter, r *http.Request,
@@ -72,7 +64,7 @@ var VerifyRequestAndCreateUserContext = func(
 	}
 	const from = "VerifyRequestAndCreateUserContext"
 	var authContext facade.AuthContext
-	if authContext, err = NewAuthContext(r); err != nil {
+	if authContext, err = sneatfirestore.NewAuthContext(r); err != nil {
 		httpserver.HandleError(err, from, w, r)
 		return
 	}
@@ -130,7 +122,7 @@ var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options endpoin
 		return
 	}
 
-	if ctx, err = ContextWithFirebaseToken(r, options.AuthenticationRequired()); err != nil {
+	if ctx, err = sneatfirestore.ContextWithFirebaseToken(r, options.AuthenticationRequired()); err != nil {
 		err = fmt.Errorf("failed to create context wuth firestore client: %w", err)
 		return
 	}

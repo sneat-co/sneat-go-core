@@ -5,10 +5,10 @@ import (
 	"fmt"
 )
 
-// ErrUnauthenticated when user is not authenticated
+// ErrUnauthenticated when AuthUser is not authenticated
 var ErrUnauthenticated = errors.New("not authenticated")
 
-// ErrUnauthorized when user have no access to requested resource/operation
+// ErrUnauthorized when AuthUser have no access to requested resource/operation
 var ErrUnauthorized = errors.New("unauthorized")
 
 // ErrNoAuthHeader when auth header has not been provided

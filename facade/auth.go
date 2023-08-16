@@ -10,24 +10,24 @@ type AuthContext interface {
 	User(ctx context.Context, authRequired bool) (User, error)
 }
 
-type user struct {
-	id string
+type AuthUser struct {
+	ID string
 }
 
-// ID returns user's ID
-func (v user) ID() string {
-	return v.id
+// GetID returns AuthUser's ID
+func (v AuthUser) GetID() string {
+	return v.ID
 }
 
-// User defines an interface for a user context that provides user ID.
+// User defines an interface for a AuthUser context that provides AuthUser ID.
 type User interface {
-	ID() string
+	GetID() string
 }
 
-// NewUser creates new user context
+// NewUser creates new AuthUser context
 func NewUser(id string) User {
 	if strings.TrimSpace(id) == "" {
-		panic("user id is empty string")
+		panic("AuthUser id is empty string")
 	}
-	return user{id: id}
+	return AuthUser{ID: id}
 }
