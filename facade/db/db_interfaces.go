@@ -1,13 +1,5 @@
 package db
 
-// Record is a db record interface
-type Record interface {
-	Kind() string
-	Key() RecordKey
-	Data() interface{}
-	Validate() error
-}
-
 // RecordRef hold a reference to a single record within a root or nested recordset.
 type RecordRef struct {
 	Kind string `json:"kind"`
