@@ -7,9 +7,6 @@ import (
 
 // CaptureError captures & logs an error
 func CaptureError(ctx context.Context, err error) error {
-	if len(loggers) == 0 {
-		return err
-	}
 	for _, logger := range loggers {
 		logger.LogError(ctx, err)
 	}

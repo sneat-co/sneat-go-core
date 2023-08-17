@@ -1,6 +1,9 @@
 package monitoring
 
-import "log"
+import (
+	"github.com/sneat-co/sneat-go-core/capturer"
+	"log"
+)
 
 var captureException func(err error) Event
 
@@ -27,6 +30,9 @@ func CaptureException(err error) Event {
 			return Event{}
 		}
 	}
-
+	isCapturedErr, capturedErr := capturer.IsCapturedError(err)
+	if isCapturedErr {
+		err = capturedErr
+	}
 	return captureException(err)
 }
