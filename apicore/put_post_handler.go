@@ -2,6 +2,7 @@ package apicore
 
 import (
 	"context"
+	"github.com/sneat-co/sneat-go-core/apicore/verify"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"net/http"
 )
@@ -17,7 +18,7 @@ func HandleAuthenticatedRequestWithBody(w http.ResponseWriter, r *http.Request,
 	request interface{ Validate() error },
 	facadeHandler FacadeHandler,
 	successStatusCode int,
-	options VerifyRequestOptions,
+	options verify.RequestOptions,
 ) {
 	ctx, userContext, err := VerifyAuthenticatedRequestAndDecodeBody(w, r, options, request)
 	if err != nil { // The error has been handled inside the function

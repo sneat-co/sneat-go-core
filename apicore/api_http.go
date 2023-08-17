@@ -2,6 +2,7 @@ package apicore
 
 import (
 	"context"
+	"github.com/sneat-co/sneat-go-core/apicore/verify"
 	"github.com/sneat-co/sneat-go-core/httpserver"
 	"github.com/sneat-co/sneat-go-core/monitoring"
 	"log"
@@ -19,13 +20,6 @@ type ResponseDTO interface {
 	Validate() error
 }
 
-// VerifyRequestOptions - options for request verification
-type VerifyRequestOptions interface { // TODO: move to shared Sneat package
-	MinimumContentLength() int64
-	MaximumContentLength() int64
-	AuthenticationRequired() bool
-}
-
 type ContextProvider = func(r *http.Request) (context.Context, error)
 
 type Worker = func(ctx context.Context) (responseDTO ResponseDTO, err error)
@@ -35,7 +29,7 @@ var Execute = func(
 	w http.ResponseWriter,
 	r *http.Request,
 	request RequestDTO,
-	verifyOptions VerifyRequestOptions,
+	verifyOptions verify.RequestOptions,
 	successStatusCode int,
 	getContext ContextProvider,
 	handler Worker,

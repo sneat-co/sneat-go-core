@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/sneat-co/sneat-go-core/apicore/verify"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/httpserver"
 	"io"
@@ -27,14 +28,14 @@ const DefaultMaxJSONRequestSize = 7 * KB
 
 type VerifyAuthenticatedRequestAndDecodeBodyFunc = func(
 	w http.ResponseWriter, r *http.Request,
-	options VerifyRequestOptions,
+	options verify.RequestOptions,
 	request facade.Request,
 ) (ctx context.Context, userContext facade.User, err error)
 
 // VerifyAuthenticatedRequestAndDecodeBody decodes & verifies an HTTP request
 var VerifyAuthenticatedRequestAndDecodeBody = func(
 	w http.ResponseWriter, r *http.Request,
-	options VerifyRequestOptions,
+	options verify.RequestOptions,
 	request facade.Request,
 ) (ctx context.Context, userContext facade.User, err error) {
 	ctx, userContext, err = VerifyRequestAndCreateUserContext(w, r, options)
@@ -51,7 +52,7 @@ var NewAuthContext func(r *http.Request) (facade.AuthContext, error)
 
 // VerifyRequestAndCreateUserContext runs common checks
 var VerifyRequestAndCreateUserContext = func(
-	w http.ResponseWriter, r *http.Request, options VerifyRequestOptions,
+	w http.ResponseWriter, r *http.Request, options verify.RequestOptions,
 ) (ctx context.Context, userContext facade.User, err error) {
 	if r == nil {
 		panic("request is nil")
@@ -93,7 +94,7 @@ var UserContextProvider func() facade.User
 //	processUserID          func(uid string) error
 //}
 //
-//var _ VerifyRequestOptions = (*verifyRequestOptions)(nil)
+//var _ RequestOptions = (*verifyRequestOptions)(nil)
 //
 //func (v verifyRequestOptions) MinimumContentLength() int64 {
 //	return v.minimumContentLength
@@ -107,14 +108,14 @@ var UserContextProvider func() facade.User
 //	return v.authenticationRequired
 //}
 //
-//func VerifyRequestOptions(opts) VerifyRequestOptions {
+//func RequestOptions(opts) RequestOptions {
 //
 //}
 
 var NewContextWithToken func(r *http.Request, authRequired bool) (ctx context.Context, err error)
 
 // VerifyRequest runs common checks
-var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options VerifyRequestOptions) (ctx context.Context, err error) {
+var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options verify.RequestOptions) (ctx context.Context, err error) {
 	ctx = r.Context()
 	if !httpserver.AccessControlAllowOrigin(w, r) {
 		err = errBadOrigin
@@ -124,6 +125,10 @@ var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options VerifyR
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte(err.Error()))
 		return
+	}
+
+	if NewContextWithToken == nil {
+		panic("NewContextWithToken is nil")
 	}
 
 	if ctx, err = NewContextWithToken(r, options.AuthenticationRequired()); err != nil {
