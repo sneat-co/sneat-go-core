@@ -21,10 +21,11 @@ on:
 jobs:
 
   strongo_workflow:
+    uses: strongo/go-ci-action/.github/workflows/workflow.yml@main
     permissions:
       contents: write
-    uses: strongo/go-ci-action/.github/workflows/workflow.yml@main
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
-#    with:
-#      disable-version-bumping: true
+      COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+    with:
+      code_coverage: true
