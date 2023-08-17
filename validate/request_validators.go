@@ -10,7 +10,7 @@ import (
 // RequestID validates request ContactID
 func RequestID(id, fieldName string) error { // TODO: move into github.com/strongo/validation/validate
 	if v := strings.TrimSpace(id); v == "" {
-		return validation.NewErrRequestIsMissingRequiredField("title")
+		return validation.NewErrRequestIsMissingRequiredField(fieldName)
 	} else if v != id {
 		return validation.NewErrBadRequestFieldValue(fieldName, "id should not start or end with whitespace characters")
 	}
@@ -19,6 +19,9 @@ func RequestID(id, fieldName string) error { // TODO: move into github.com/stron
 
 // RecordID validates record ContactID
 func RecordID(id string) error { // TODO: move into github.com/strongo/validation/validate
+	if v := strings.TrimSpace(id); v == "" {
+		return errors.New("id is required")
+	}
 	if strings.TrimSpace(id) != id {
 		return errors.New("id should not start or end with whitespace characters")
 	}

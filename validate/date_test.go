@@ -13,6 +13,7 @@ func TestDateString(t *testing.T) {
 	}
 	var data = map[string]expected{
 		"":           {error: true},
+		"1234567890": {error: true},
 		"2020-12-31": {error: false, date: time.Date(2020, 12, 31, 0, 0, 0, 0, time.UTC)},
 	}
 	for s, expects := range data {

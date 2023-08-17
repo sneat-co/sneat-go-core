@@ -17,7 +17,10 @@ func TestIsValidateTime(t *testing.T) {
 		{Name: "24:00", Input: "24:00", ExpectedOutput: ""},
 		{Name: "34:56", Input: "34:56", ExpectedOutput: invalidTimeNumbers.Error()},
 		{Name: "12345", Input: "12345", ExpectedOutput: shouldBeHHMMFormat.Error()},
-		{Name: "HH:34", Input: "HH:34", ExpectedOutput: shouldBeHHMMFormat.Error()},
+		{Name: "H1:34", Input: "H1:34", ExpectedOutput: shouldBeHHMMFormat.Error()},
+		{Name: "1H:34", Input: "1H:34", ExpectedOutput: shouldBeHHMMFormat.Error()},
+		{Name: "12:M4", Input: "12:M4", ExpectedOutput: shouldBeHHMMFormat.Error()},
+		{Name: "12:3M", Input: "12:3M", ExpectedOutput: shouldBeHHMMFormat.Error()},
 	}
 
 	for _, test := range testCases {
