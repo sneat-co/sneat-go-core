@@ -6,4 +6,4 @@ import (
 )
 
 // GetDatabase creates a new DB for a given context
-var GetDatabase func(ctx context.Context) dal.Database
+var GetDatabase func(ctx context.Context) dal.DB
