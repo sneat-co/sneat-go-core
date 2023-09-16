@@ -8,10 +8,7 @@ require (
 	github.com/alexsergivan/transliterator v1.0.0
 	github.com/crediterra/money v0.2.0
 	github.com/dal-go/dalgo v0.10.2
-	github.com/dal-go/dalgo2buntdb v0.7.15
-	github.com/dal-go/mocks4dalgo v0.1.15
 	github.com/golang/mock v1.6.0
-	github.com/gosimple/slug v1.13.1
 	github.com/stretchr/testify v1.8.4
 	github.com/strongo/random v0.0.1
 	github.com/strongo/slice v0.1.4
@@ -34,18 +31,9 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
-	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7 // indirect
 	github.com/strongo/decimal v0.0.1 // indirect
-	github.com/tidwall/btree v1.6.0 // indirect
-	github.com/tidwall/buntdb v1.3.0 // indirect
-	github.com/tidwall/gjson v1.14.4 // indirect
-	github.com/tidwall/grect v0.1.4 // indirect
-	github.com/tidwall/match v1.1.1 // indirect
-	github.com/tidwall/pretty v1.2.1 // indirect
-	github.com/tidwall/rtred v0.1.2 // indirect
-	github.com/tidwall/tinyqueue v0.1.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/oauth2 v0.6.0 // indirect
