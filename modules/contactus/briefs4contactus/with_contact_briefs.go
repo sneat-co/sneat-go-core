@@ -3,14 +3,14 @@ package briefs4contactus
 import (
 	"fmt"
 	"github.com/sneat-co/sneat-go-core"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/strongo/validation"
 )
 
 // WithContactBriefs is a base struct for DTOs that have contacts
 // TODO: Document how it is different from WithContactsBase or merge them
 type WithContactBriefs[
-	K string | dbmodels2.TeamItemID,
+	K string | dbmodels.TeamItemID,
 	T interface {
 		core.Validatable
 		Equal(v T) bool
@@ -22,15 +22,15 @@ type WithContactBriefs[
 // WithContactsBase is a base struct for DTOs that represent a short version of a contact
 // TODO: Document how it is different from WithContactBriefs or merge them
 type WithContactsBase[
-	K string | dbmodels2.TeamItemID,
+	K string | dbmodels.TeamItemID,
 	T interface {
-		dbmodels2.UserIDGetter
-		dbmodels2.RelatedAs
+		dbmodels.UserIDGetter
+		dbmodels.RelatedAs
 		HasRole(role string) bool
 		Equal(v T) bool
 	}] struct {
 	WithContactBriefs[K, T]
-	dbmodels2.WithUserIDs
+	dbmodels.WithUserIDs
 }
 
 func (v WithContactsBase[K, T]) Validate() error {

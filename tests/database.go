@@ -6,15 +6,13 @@ import (
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/dalgo2buntdb"
 	"github.com/sneat-co/sneat-go-core/facade"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/briefs4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/dal4teamus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/models4teamus"
-	models4userus2 "github.com/sneat-co/sneat-go-core/modules/userus/models4userus"
-	//"github.com/sneat-co/sneat-go/src/modules/meetingus/models4meetingus"
-	//"github.com/sneat-co/sneat-go/src/modules/retrospectus/models4retrospectus"
+	"github.com/sneat-co/sneat-go-core/modules/userus/models4userus"
 	"testing"
 )
 
@@ -63,11 +61,11 @@ func WithProfile1() SetupOption {
 }
 
 func createUsers(ctx context.Context, tx dal.ReadwriteTransaction) (err error) {
-	_, err = createUser(ctx, tx, "user1", &models4userus2.UserDto{
+	_, err = createUser(ctx, tx, "user1", &models4userus.UserDto{
 		Email: "first.user@example.com",
 		ContactBase: briefs4contactus.ContactBase{
 			ContactBrief: briefs4contactus.ContactBrief{
-				Name: &dbmodels2.Name{
+				Name: &dbmodels.Name{
 					Full: "First user",
 				},
 			},
@@ -76,10 +74,10 @@ func createUsers(ctx context.Context, tx dal.ReadwriteTransaction) (err error) {
 	if err != nil {
 		return err
 	}
-	_, err = createUser(ctx, tx, "user2", &models4userus2.UserDto{
+	_, err = createUser(ctx, tx, "user2", &models4userus.UserDto{
 		ContactBase: briefs4contactus.ContactBase{
 			ContactBrief: briefs4contactus.ContactBrief{
-				Name: &dbmodels2.Name{
+				Name: &dbmodels.Name{
 					First: "Second",
 					Last:  "UserDto",
 				},
@@ -93,8 +91,8 @@ func createUsers(ctx context.Context, tx dal.ReadwriteTransaction) (err error) {
 	return err
 }
 
-func createUser(ctx context.Context, tx dal.ReadwriteTransaction, id string, data *models4userus2.UserDto) (record dal.Record, err error) {
-	key := models4userus2.NewUserKey(id)
+func createUser(ctx context.Context, tx dal.ReadwriteTransaction, id string, data *models4userus.UserDto) (record dal.Record, err error) {
+	key := models4userus.NewUserKey(id)
 	record = dal.NewRecordWithData(key, data)
 	if err = tx.Set(ctx, record); err != nil {
 		return nil, err
@@ -107,7 +105,7 @@ func createTeams(ctx context.Context, tx dal.ReadwriteTransaction) (err error) {
 		TeamBrief: models4teamus.TeamBrief{
 			Type:  "team",
 			Title: "First team",
-			WithRequiredCountryID: dbmodels2.WithRequiredCountryID{
+			WithRequiredCountryID: dbmodels.WithRequiredCountryID{
 				CountryID: "IE",
 			},
 		},
@@ -117,16 +115,16 @@ func createTeams(ctx context.Context, tx dal.ReadwriteTransaction) (err error) {
 	})
 	team1Contactus := dal4contactus.NewContactusTeamContext(team1.ID)
 	team1Contactus.Data.AddContact("m1", &briefs4contactus.ContactBrief{
-		WithUserID: dbmodels2.WithUserID{
+		WithUserID: dbmodels.WithUserID{
 			UserID: "user1",
 		},
 		Type:   briefs4contactus.ContactTypePerson,
 		Gender: "unknown",
-		Name: &dbmodels2.Name{
+		Name: &dbmodels.Name{
 			Full: "First user",
 		},
 		Title: "First user",
-		WithRoles: dbmodels2.WithRoles{
+		WithRoles: dbmodels.WithRoles{
 			Roles: []string{briefs4memberus.TeamMemberRoleTeamMember, briefs4memberus.TeamMemberRoleContributor},
 		},
 	})
@@ -165,7 +163,7 @@ func createTeam(ctx context.Context, tx dal.ReadwriteTransaction, team dal4teamu
 	//		MaxVotesPerUser: 3,
 	//	},
 	//	Meeting: models4meetingus.Meeting{
-	//		WithUserIDs: dbmodels2.WithUserIDs{
+	//		WithUserIDs: dbmodels.WithUserIDs{
 	//			UserIDs: team.Data.UserIDs,
 	//		},
 	//	},

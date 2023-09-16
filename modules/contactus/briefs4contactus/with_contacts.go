@@ -3,15 +3,15 @@ package briefs4contactus
 import (
 	"fmt"
 	"github.com/dal-go/dalgo/dal"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/validate"
 	"github.com/strongo/slice"
 	"github.com/strongo/validation"
 )
 
 type contactBrief interface {
-	dbmodels2.UserIDGetter
-	dbmodels2.RelatedAs
+	dbmodels.UserIDGetter
+	dbmodels.RelatedAs
 }
 
 type WithSingleTeamContactsWithoutContactIDs[
@@ -78,7 +78,7 @@ type WithMultiTeamContacts[
 	},
 ] struct {
 	WithMultiTeamContactIDs
-	WithContactsBase[dbmodels2.TeamItemID, T]
+	WithContactsBase[dbmodels.TeamItemID, T]
 }
 
 // Validate returns error if not valid
@@ -86,10 +86,10 @@ func (v *WithMultiTeamContacts[T]) Validate() error {
 	if err := v.WithMultiTeamContactIDs.Validate(); err != nil {
 		return nil
 	}
-	return dbmodels2.ValidateWithIdsAndBriefs("contactIDs", "contacts", v.ContactIDs, v.Contacts)
+	return dbmodels.ValidateWithIdsAndBriefs("contactIDs", "contacts", v.ContactIDs, v.Contacts)
 }
 
-func (v *WithMultiTeamContacts[T]) Updates(contactIDs ...dbmodels2.TeamItemID) (updates []dal.Update) {
+func (v *WithMultiTeamContacts[T]) Updates(contactIDs ...dbmodels.TeamItemID) (updates []dal.Update) {
 	updates = append(updates,
 		dal.Update{
 			Field: "contactIDs",
@@ -114,7 +114,7 @@ func (v *WithMultiTeamContacts[T]) Updates(contactIDs ...dbmodels2.TeamItemID) (
 
 // SetContactBrief sets contactBrief brief by ID
 func (v *WithMultiTeamContacts[T]) SetContactBrief(teamID, contactID string, contactBrief T) (updates []dal.Update) {
-	id := dbmodels2.NewTeamItemID(teamID, contactID)
+	id := dbmodels.NewTeamItemID(teamID, contactID)
 	if !slice.Contains(v.ContactIDs, id) {
 		v.ContactIDs = append(v.ContactIDs, id)
 		updates = append(updates, dal.Update{
@@ -133,7 +133,7 @@ func (v *WithMultiTeamContacts[T]) SetContactBrief(teamID, contactID string, con
 }
 
 // ParentContactBrief returns parent contactBrief brief
-func (v *WithMultiTeamContacts[T]) ParentContactBrief() (i int, id dbmodels2.TeamItemID, brief T) {
+func (v *WithMultiTeamContacts[T]) ParentContactBrief() (i int, id dbmodels.TeamItemID, brief T) {
 	for i, id := range v.ContactIDs {
 		brief := v.Contacts[id]
 		if brief.GetRelatedAs() == "parent" {
@@ -145,7 +145,7 @@ func (v *WithMultiTeamContacts[T]) ParentContactBrief() (i int, id dbmodels2.Tea
 
 // GetContactBriefByID returns contactBrief brief by ID
 func (v *WithMultiTeamContacts[T]) GetContactBriefByID(teamID, contactID string) (i int, brief T) {
-	id := dbmodels2.NewTeamItemID(teamID, contactID)
+	id := dbmodels.NewTeamItemID(teamID, contactID)
 	if brief, ok := v.Contacts[id]; !ok {
 		return -1, brief
 	}
@@ -153,7 +153,7 @@ func (v *WithMultiTeamContacts[T]) GetContactBriefByID(teamID, contactID string)
 }
 
 // GetContactBriefByUserID returns contactBrief brief by user ID
-func (v *WithMultiTeamContacts[T]) GetContactBriefByUserID(userID string) (id dbmodels2.TeamItemID, t T) {
+func (v *WithMultiTeamContacts[T]) GetContactBriefByUserID(userID string) (id dbmodels.TeamItemID, t T) {
 	for cID, c := range v.Contacts {
 		if c.GetUserID() == userID {
 			return cID, c
@@ -163,7 +163,7 @@ func (v *WithMultiTeamContacts[T]) GetContactBriefByUserID(userID string) (id db
 }
 
 func (v *WithMultiTeamContacts[T]) AddContact(teamID, contactID string, c T) (updates []dal.Update) {
-	id := dbmodels2.NewTeamItemID(teamID, contactID)
+	id := dbmodels.NewTeamItemID(teamID, contactID)
 	if !slice.Contains(v.ContactIDs, id) {
 		v.ContactIDs = append(v.ContactIDs, id)
 		updates = append(updates, dal.Update{
@@ -178,7 +178,7 @@ func (v *WithMultiTeamContacts[T]) AddContact(teamID, contactID string, c T) (up
 		})
 	}
 	if v.Contacts == nil {
-		v.Contacts = make(map[dbmodels2.TeamItemID]T)
+		v.Contacts = make(map[dbmodels.TeamItemID]T)
 	}
 	v.Contacts[id] = c
 	return

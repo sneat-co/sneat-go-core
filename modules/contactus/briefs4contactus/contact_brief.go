@@ -2,20 +2,20 @@ package briefs4contactus
 
 import (
 	"github.com/sneat-co/sneat-go-core"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/models/dbprofile"
 	"github.com/strongo/validation"
 	"strings"
 )
 
 type ContactBrief struct {
-	dbmodels2.WithUserID
-	Type       ContactType      `json:"type" firestore:"type"` // "person", "company", "location"
-	Gender     dbmodels2.Gender `json:"gender,omitempty" firestore:"gender,omitempty"`
-	Name       *dbmodels2.Name  `json:"name,omitempty" firestore:"name,omitempty"`
-	Title      string           `json:"title,omitempty" firestore:"title,omitempty"`
-	ShortTitle string           `json:"shortTitle,omitempty" firestore:"shortTitle,omitempty"` // Not supposed to be used in models4contactus.ContactDto
-	ParentID   string           `json:"parentID" firestore:"parentID"`                         // Intentionally not adding `omitempty` so we can search root contacts only
+	dbmodels.WithUserID
+	Type       ContactType     `json:"type" firestore:"type"` // "person", "company", "location"
+	Gender     dbmodels.Gender `json:"gender,omitempty" firestore:"gender,omitempty"`
+	Name       *dbmodels.Name  `json:"name,omitempty" firestore:"name,omitempty"`
+	Title      string          `json:"title,omitempty" firestore:"title,omitempty"`
+	ShortTitle string          `json:"shortTitle,omitempty" firestore:"shortTitle,omitempty"` // Not supposed to be used in models4contactus.ContactDto
+	ParentID   string          `json:"parentID" firestore:"parentID"`                         // Intentionally not adding `omitempty` so we can search root contacts only
 
 	// Number of active invites to join a team
 	InvitesCount int `json:"activeInvitesCount,omitempty" firestore:"activeInvitesCount,omitempty"`
@@ -23,10 +23,10 @@ type ContactBrief struct {
 	// AgeGroup is deprecated?
 	AgeGroup string `json:"ageGroup,omitempty" firestore:"ageGroup,omitempty"` // TODO: Add validation
 	// Avatar holds a photo of a member
-	Avatar                          *dbprofile.Avatar `json:"avatar,omitempty" firestore:"avatar,omitempty"`
-	dbmodels2.WithOptionalRelatedAs                   // This is used in `RelatedContacts` field of `ContactDto`
-	dbmodels2.WithOptionalCountryID
-	dbmodels2.WithRoles
+	Avatar                         *dbprofile.Avatar `json:"avatar,omitempty" firestore:"avatar,omitempty"`
+	dbmodels.WithOptionalRelatedAs                   // This is used in `RelatedContacts` field of `ContactDto`
+	dbmodels.WithOptionalCountryID
+	dbmodels.WithRoles
 }
 
 // GetUserID returns UserID field value
@@ -50,7 +50,7 @@ func (v *ContactBrief) Validate() error {
 	if err := ValidateContactType(v.Type); err != nil {
 		return err
 	}
-	if err := dbmodels2.ValidateGender(v.Gender, false); err != nil {
+	if err := dbmodels.ValidateGender(v.Gender, false); err != nil {
 		return err
 	}
 	if strings.TrimSpace(v.Title) == "" && v.Name == nil {

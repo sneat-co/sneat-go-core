@@ -7,8 +7,8 @@ import (
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/dal4contactus"
-	models4invitus2 "github.com/sneat-co/sneat-go-core/modules/invitus/models4invitus"
-	dal4memberus2 "github.com/sneat-co/sneat-go-core/modules/memberus/dal4memberus"
+	"github.com/sneat-co/sneat-go-core/modules/invitus/models4invitus"
+	"github.com/sneat-co/sneat-go-core/modules/memberus/dal4memberus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/dto4teamus"
 	"github.com/strongo/validation"
 )
@@ -18,8 +18,8 @@ type InviteMemberRequest struct {
 	dto4teamus.TeamRequest
 	RemoteClient dbmodels.RemoteClientInfo `json:"remoteClient"`
 
-	To    models4invitus2.InviteToMember `json:"to"`
-	Roles []string                       `json:"roles,omitempty"`
+	To    models4invitus.InviteToMember `json:"to"`
+	Roles []string                      `json:"roles,omitempty"`
 	//
 	Send    bool   `json:"send,omitempty"`
 	Message string `json:"message,omitempty"`
@@ -49,7 +49,7 @@ func (v InviteMemberRequest) Validate() error {
 
 // CreateInviteResponse is a response DTO
 type CreateInviteResponse struct {
-	Invite models4invitus2.InviteBrief `json:"invite"`
+	Invite models4invitus.InviteBrief `json:"invite"`
 }
 
 // CreateOrReuseInviteForMember creates or reuses an invitation for a member
@@ -68,7 +68,7 @@ func CreateOrReuseInviteForMember(ctx context.Context, user facade.User, request
 			}
 			var (
 				inviteID       string
-				personalInvite *models4invitus2.PersonalInviteDto
+				personalInvite *models4invitus.PersonalInviteDto
 			)
 
 			fromContact := dal4contactus.NewContactContext(request.TeamID, fromContactID)
@@ -89,7 +89,7 @@ func CreateOrReuseInviteForMember(ctx context.Context, user facade.User, request
 					inviteID = memberInviteBrief.ID
 				} else {
 					personalInvite = nil
-					inviteBriefs := make([]*models4invitus2.MemberInviteBrief, 0, len(fromContact.Data.Invites)-1)
+					inviteBriefs := make([]*models4invitus.MemberInviteBrief, 0, len(fromContact.Data.Invites)-1)
 					for _, mi := range fromContact.Data.Invites {
 						if mi.ID != memberInviteBrief.ID {
 							inviteBriefs = append(inviteBriefs, mi)
@@ -105,7 +105,7 @@ func CreateOrReuseInviteForMember(ctx context.Context, user facade.User, request
 					return fmt.Errorf("failed to create personal invite record: %w", err)
 				}
 			}
-			response.Invite = models4invitus2.NewInviteBriefFromDto(inviteID, personalInvite.InviteDto)
+			response.Invite = models4invitus.NewInviteBriefFromDto(inviteID, personalInvite.InviteDto)
 			if !request.Send {
 				response.Invite.Pin = personalInvite.Pin
 			}
@@ -123,9 +123,9 @@ func createPersonalInvite(
 	uid string,
 	request InviteMemberRequest,
 	param *dal4contactus.ContactusTeamWorkerParams,
-	fromMember dal4memberus2.MemberContext,
+	fromMember dal4memberus.MemberContext,
 ) (
-	inviteID string, personalInvite *models4invitus2.PersonalInviteDto, err error,
+	inviteID string, personalInvite *models4invitus.PersonalInviteDto, err error,
 ) {
 
 	toMember := param.ContactusTeam.Data.Contacts[request.To.MemberID]
@@ -134,8 +134,8 @@ func createPersonalInvite(
 		return
 	}
 	request.To.Title = toMember.GetTitle()
-	from := models4invitus2.InviteFrom{
-		InviteContact: models4invitus2.InviteContact{
+	from := models4invitus.InviteFrom{
+		InviteContact: models4invitus.InviteContact{
 			UserID:   uid,
 			MemberID: fromMember.ID,
 			Title:    fromMember.Data.GetTitle(),
@@ -143,7 +143,7 @@ func createPersonalInvite(
 	}
 	to := request.To
 	to.Title = toMember.GetTitle()
-	inviteTeam := models4invitus2.InviteTeam{
+	inviteTeam := models4invitus.InviteTeam{
 		ID:    request.TeamID,
 		Type:  param.Team.Data.Type,
 		Title: param.Team.Data.Title,
@@ -179,12 +179,12 @@ func createPersonalInvite(
 			return inviteID, personalInvite, err
 		}
 	}
-	fromMember.Data.Invites = append(fromMember.Data.Invites, &models4invitus2.MemberInviteBrief{
+	fromMember.Data.Invites = append(fromMember.Data.Invites, &models4invitus.MemberInviteBrief{
 		ID:         inviteID,
 		To:         *personalInvite.To,
 		CreateTime: personalInvite.Created.At,
 	})
-	memberKey := dal4memberus2.NewMemberKey(request.TeamID, fromMember.ID)
+	memberKey := dal4memberus.NewMemberKey(request.TeamID, fromMember.ID)
 	if err = tx.Update(ctx, memberKey, []dal.Update{
 		{Field: "invites", Value: fromMember.Data.Invites},
 	}); err != nil {

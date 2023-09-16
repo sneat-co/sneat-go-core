@@ -13,7 +13,7 @@ import (
 	"github.com/sneat-co/sneat-go-core/modules/memberus/dal4memberus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/dto4teamus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/models4teamus"
-	models4userus2 "github.com/sneat-co/sneat-go-core/modules/userus/models4userus"
+	"github.com/sneat-co/sneat-go-core/modules/userus/models4userus"
 	"github.com/strongo/validation"
 	"strings"
 	"time"
@@ -51,8 +51,8 @@ func JoinTeam(ctx context.Context, userContext facade.User, request JoinTeamRequ
 	// We intentionally do not use team worker to query both team & user records in parallel
 	err = dal4contactus.RunContactusTeamWorker(ctx, userContext, request.TeamRequest, func(ctx context.Context, tx dal.ReadwriteTransaction, params *dal4contactus.ContactusTeamWorkerParams) error {
 
-		userKey := models4userus2.NewUserKey(uid)
-		userDto := new(models4userus2.UserDto)
+		userKey := models4userus.NewUserKey(uid)
+		userDto := new(models4userus.UserDto)
 		userRecord := dal.NewRecordWithData(userKey, userDto)
 
 		inviteKey := NewInviteKey(request.InviteID)
@@ -171,7 +171,7 @@ func onJoinUpdateInvite(
 func onJoinAddTeamToUser(
 	ctx context.Context,
 	tx dal.ReadwriteTransaction,
-	userDto *models4userus2.UserDto,
+	userDto *models4userus.UserDto,
 	userRecord dal.Record,
 	teamID string,
 	team *models4teamus.TeamDto,
@@ -189,7 +189,7 @@ func onJoinAddTeamToUser(
 	}
 	teamInfo := userDto.GetUserTeamInfoByID(teamID)
 	if teamInfo == nil {
-		teamInfo = &models4userus2.UserTeamBrief{
+		teamInfo = &models4userus.UserTeamBrief{
 			TeamBrief: team.TeamBrief,
 			Roles:     member.Data.Roles,
 			//MemberType:   "", // TODO: populate?
@@ -242,7 +242,7 @@ func onJoinUpdateMemberBriefInTeamOrAddIfMissing(
 	inviterMemberID string,
 	member dal4memberus.MemberContext,
 	uid string,
-	user *models4userus2.UserDto,
+	user *models4userus.UserDto,
 ) (err error) {
 	//var updates []dal.Update
 	if strings.TrimSpace(uid) == "" {

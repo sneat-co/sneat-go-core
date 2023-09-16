@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/facade"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/briefs4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/const4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/models4contactus"
-	briefs4memberus2 "github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
+	"github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
 	"github.com/sneat-co/sneat-go-core/modules/memberus/dal4memberus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/dal4teamus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/facade4teamus"
@@ -50,10 +50,10 @@ func CreateMember(
 				return errors.New("user does not belong to the team: " + params.UserID)
 			}
 			switch userMember.AgeGroup {
-			case "", dbmodels2.AgeGroupUnknown:
+			case "", dbmodels.AgeGroupUnknown:
 				switch request.Relationship {
-				case dbmodels2.RelationshipSpouse, dbmodels2.RelationshipChild:
-					userMember.AgeGroup = dbmodels2.AgeGroupAdult
+				case dbmodels.RelationshipSpouse, dbmodels.RelationshipChild:
+					userMember.AgeGroup = dbmodels.AgeGroupAdult
 					userMemberKey := dal4memberus.NewMemberKey(request.TeamID, contactID)
 					if err = tx.Update(ctx, userMemberKey, []dal.Update{
 						{
@@ -69,11 +69,11 @@ func CreateMember(
 			memberBrief.ShortTitle = getShortTitle(request.Title, contactusTeam.Data.Contacts)
 			if team.Data.Type == "family" {
 				memberBrief.Roles = []string{
-					briefs4memberus2.TeamMemberRoleContributor,
+					briefs4memberus.TeamMemberRoleContributor,
 				}
 			}
 
-			if memberBrief.Name.First != "" && briefs4memberus2.IsUniqueShortTitle(memberBrief.Name.First, contactusTeam.Data.Contacts, briefs4memberus2.TeamMemberRoleTeamMember) {
+			if memberBrief.Name.First != "" && briefs4memberus.IsUniqueShortTitle(memberBrief.Name.First, contactusTeam.Data.Contacts, briefs4memberus.TeamMemberRoleTeamMember) {
 				memberBrief.ShortTitle = memberBrief.Name.First
 			} else if memberBrief.Name.Full != "" {
 				memberBrief.ShortTitle = getShortTitle(memberBrief.Name.Full, contactusTeam.Data.Contacts)
@@ -88,7 +88,7 @@ func CreateMember(
 			//if memberBrief.Name.First != "" && memberBrief.Name.Last != "" {
 			//
 			//}
-			contactID, err = dbmodels2.GenerateIDFromNameOrRandom(*memberBrief.Name, contactusTeam.Data.ContactIDs())
+			contactID, err = dbmodels.GenerateIDFromNameOrRandom(*memberBrief.Name, contactusTeam.Data.ContactIDs())
 			if err != nil {
 				return fmt.Errorf("failed to generate new member ContactID: %w", err)
 			}

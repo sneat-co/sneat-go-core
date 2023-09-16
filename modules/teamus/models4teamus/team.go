@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dal-go/dalgo/dal"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/core4teamus"
 	"github.com/strongo/slice"
 	"github.com/strongo/validation"
@@ -105,7 +105,7 @@ type TeamBrief struct {
 	Title   string               `json:"title" firestore:"title"`
 	Modules []string             `json:"modules" firestore:"modules"`
 
-	dbmodels2.WithRequiredCountryID
+	dbmodels.WithRequiredCountryID
 
 	// TODO: This should be populated
 	ParentTeamID string `json:"parentTeamID,omitempty" firestore:"parentTeamID,omitempty"`
@@ -134,7 +134,7 @@ func (v TeamBrief) Validate() error {
 // TeamDto record
 type TeamDto struct {
 	TeamBrief
-	dbmodels2.WithUserIDs
+	dbmodels.WithUserIDs
 
 	NumberOf  map[string]int `json:"numberOf,omitempty" firestore:"numberOf,omitempty"`
 	Version   int            `json:"v" firestore:"v"`
@@ -143,7 +143,7 @@ type TeamDto struct {
 	//Contacts   []*briefs4contactus.ContactBrief `json:"contacts,omitempty" firestore:"contacts,omitempty"`
 
 	//
-	Timezone *dbmodels2.Timezone `json:"timezone,omitempty" firestore:"timezone,omitempty"`
+	Timezone *dbmodels.Timezone `json:"timezone,omitempty" firestore:"timezone,omitempty"`
 	//
 	Metrics []*TeamMetric `json:"metrics,omitempty" firestore:"metrics,omitempty"`
 }

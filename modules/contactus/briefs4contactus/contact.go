@@ -2,7 +2,7 @@ package briefs4contactus
 
 import (
 	"fmt"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/validate"
 	"github.com/strongo/slice"
 	"github.com/strongo/validation"
@@ -15,7 +15,7 @@ type WithGroupIDs struct {
 
 // Validate returns error if not valid
 func (v WithGroupIDs) Validate() error {
-	if err := dbmodels2.ValidateSetSliceField("groupIDs", v.GroupIDs, true); err != nil {
+	if err := dbmodels.ValidateSetSliceField("groupIDs", v.GroupIDs, true); err != nil {
 		return err
 	}
 	return nil
@@ -66,6 +66,6 @@ func ValidateContactType(v ContactType) error {
 }
 
 const (
-	ContactStatusActive   = dbmodels2.StatusActive
-	ContactStatusArchived = dbmodels2.StatusArchived
+	ContactStatusActive   = dbmodels.StatusActive
+	ContactStatusArchived = dbmodels.StatusArchived
 )

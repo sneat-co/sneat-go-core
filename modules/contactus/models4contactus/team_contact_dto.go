@@ -2,7 +2,7 @@ package models4contactus
 
 import (
 	"fmt"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/briefs4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/invitus/models4invitus"
 	"github.com/strongo/validation"
@@ -19,7 +19,7 @@ type ContactDto struct {
 	//dbmodels.WithTeamID -- not needed as it's in record key
 	//dbmodels.WithUserIDs
 	briefs4contactus.ContactBase
-	dbmodels2.WithTags
+	dbmodels.WithTags
 	briefs4contactus.WithMultiTeamContacts[*briefs4contactus.ContactBrief]
 	models4invitus.WithInvites // Invites to become a team member
 }
@@ -30,7 +30,7 @@ func (v ContactDto) Validate() error {
 	//	return err
 	//}
 	switch v.Status {
-	case dbmodels2.StatusActive, dbmodels2.StatusArchived:
+	case dbmodels.StatusActive, dbmodels.StatusArchived:
 	// OK
 	case "":
 		return validation.NewErrRecordIsMissingRequiredField("status")

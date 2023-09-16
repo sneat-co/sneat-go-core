@@ -7,10 +7,10 @@ import (
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/dto4contactus"
-	briefs4memberus2 "github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
+	"github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/dal4teamus"
 	"github.com/sneat-co/sneat-go-core/modules/userus/facade4userus"
-	models4userus2 "github.com/sneat-co/sneat-go-core/modules/userus/models4userus"
+	"github.com/sneat-co/sneat-go-core/modules/userus/models4userus"
 	"github.com/strongo/slice"
 )
 
@@ -25,7 +25,7 @@ func RemoveMember(ctx context.Context, user facade.User, request dto4contactus.C
 			var memberUserID string
 
 			if memberUserID, updates, err = removeTeamMember(params.Team, params.ContactusTeam,
-				func(contactID string, _ *briefs4memberus2.MemberBrief) bool {
+				func(contactID string, _ *briefs4memberus.MemberBrief) bool {
 					return contactID == request.ContactID
 				},
 			); err != nil || len(updates) == 0 {
@@ -36,8 +36,8 @@ func RemoveMember(ctx context.Context, user facade.User, request dto4contactus.C
 				var (
 					userRef *dal.Key
 				)
-				user := new(models4userus2.UserDto)
-				userRecord := dal.NewRecordWithData(models4userus2.NewUserKey(memberUserID), user)
+				user := new(models4userus.UserDto)
+				userRecord := dal.NewRecordWithData(models4userus.NewUserKey(memberUserID), user)
 				if err = facade4userus.TxGetUserByID(ctx, tx, userRecord); err != nil {
 					return
 				}
@@ -59,7 +59,7 @@ func RemoveMember(ctx context.Context, user facade.User, request dto4contactus.C
 		})
 }
 
-func updateUserRecordOnTeamMemberRemoved(user *models4userus2.UserDto, teamID string) *dal.Update {
+func updateUserRecordOnTeamMemberRemoved(user *models4userus.UserDto, teamID string) *dal.Update {
 	delete(user.Teams, teamID)
 	user.TeamIDs = slice.RemoveInPlace(teamID, user.TeamIDs)
 	return &dal.Update{
@@ -71,7 +71,7 @@ func updateUserRecordOnTeamMemberRemoved(user *models4userus2.UserDto, teamID st
 func removeTeamMember(
 	team dal4teamus.TeamContext,
 	contactusTeam dal4contactus.ContactusTeamContext,
-	match func(contactID string, m *briefs4memberus2.MemberBrief) bool,
+	match func(contactID string, m *briefs4memberus.MemberBrief) bool,
 ) (memberUserID string, updates []dal.Update, err error) {
 	userIds := contactusTeam.Data.UserIDs
 
@@ -94,7 +94,7 @@ func removeTeamMember(
 		}
 	}
 	updates = append(updates, team.Data.SetNumberOf("contacts", len(contactusTeam.Data.Contacts)))
-	updates = append(updates, team.Data.SetNumberOf("members", len(contactusTeam.Data.GetContactBriefsByRoles(briefs4memberus2.TeamMemberRoleTeamMember))))
+	updates = append(updates, team.Data.SetNumberOf("members", len(contactusTeam.Data.GetContactBriefsByRoles(briefs4memberus.TeamMemberRoleTeamMember))))
 	return
 }
 

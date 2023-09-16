@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/sneat-co/sneat-go-core"
 	"github.com/sneat-co/sneat-go-core/facade"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/dto4teamus"
 	"github.com/sneat-co/sneat-go-core/validate"
 	"github.com/strongo/validation"
@@ -35,17 +35,17 @@ type InitUserRecordRequest struct {
 	Email           string                        `json:"email,omitempty"`
 	EmailIsVerified bool                          `json:"emailIsVerified,omitempty"`
 	IanaTimezone    string                        `json:"ianaTimezone,omitempty"`
-	Name            *dbmodels2.Name               `json:"name"`
+	Name            *dbmodels.Name                `json:"name"`
 	Team            *dto4teamus.CreateTeamRequest `json:"team,omitempty"`
 	//
-	RemoteClient dbmodels2.RemoteClientInfo `json:"remoteClient"`
+	RemoteClient dbmodels.RemoteClientInfo `json:"remoteClient"`
 }
 
 // Validate validates request
 func (v *InitUserRecordRequest) Validate() error {
 	if v.AuthProvider == "" {
 		return validation.NewErrRequestIsMissingRequiredField("authProvider")
-	} else if !dbmodels2.IsKnownAuthProviderID(v.AuthProvider) {
+	} else if !dbmodels.IsKnownAuthProviderID(v.AuthProvider) {
 		return validation.NewErrBadRequestFieldValue("authProvider", "unknown value: "+v.AuthProvider)
 	}
 	if v.Name != nil {
@@ -90,5 +90,5 @@ func (v *CreateUserRequest) Validate() error {
 // CreateUserRequestWithRemoteClientInfo a request DTO
 type CreateUserRequestWithRemoteClientInfo struct {
 	CreateUserRequest
-	RemoteClient dbmodels2.RemoteClientInfo
+	RemoteClient dbmodels.RemoteClientInfo
 }

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/facade"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/briefs4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/facade4teamus"
 	"github.com/sneat-co/sneat-go-core/modules/userus/dto4userus"
@@ -82,7 +82,7 @@ func createUserRecord(ctx context.Context, tx dal.ReadwriteTransaction, request 
 	user.Dto.Created.Client = request.RemoteClient
 	user.Dto.Email = request.Email
 	user.Dto.EmailVerified = request.EmailIsVerified
-	user.Dto.Emails = []dbmodels2.PersonEmail{
+	user.Dto.Emails = []dbmodels.PersonEmail{
 		{
 			Type:         "primary",
 			Address:      request.Email,
@@ -91,7 +91,7 @@ func createUserRecord(ctx context.Context, tx dal.ReadwriteTransaction, request 
 		},
 	}
 	if request.IanaTimezone != "" {
-		user.Dto.Timezone = &dbmodels2.Timezone{
+		user.Dto.Timezone = &dbmodels.Timezone{
 			Iana: request.IanaTimezone,
 		}
 	}
@@ -121,7 +121,7 @@ func updateUserRecordWithInitData(ctx context.Context, tx dal.ReadwriteTransacti
 
 	if request.IanaTimezone != "" && (user.Dto.Timezone == nil || user.Dto.Timezone.Iana == "") {
 		if user.Dto.Timezone == nil {
-			user.Dto.Timezone = &dbmodels2.Timezone{}
+			user.Dto.Timezone = &dbmodels.Timezone{}
 		}
 		user.Dto.Timezone.Iana = request.IanaTimezone
 		updates = append(updates, dal.Update{Field: "timezone.iana", Value: request.IanaTimezone})

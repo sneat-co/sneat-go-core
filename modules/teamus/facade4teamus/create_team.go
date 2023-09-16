@@ -7,13 +7,13 @@ import (
 	"github.com/dal-go/dalgo/dal"
 	"github.com/gosimple/slug"
 	"github.com/sneat-co/sneat-go-core/facade"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/dal4teamus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/dto4teamus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/models4teamus"
-	models4userus2 "github.com/sneat-co/sneat-go-core/modules/userus/models4userus"
+	"github.com/sneat-co/sneat-go-core/modules/userus/models4userus"
 	"github.com/strongo/random"
 	"strings"
 )
@@ -37,12 +37,12 @@ func createTeamTxWorker(ctx context.Context, userID string, tx dal.ReadwriteTran
 		return response, facade.ErrUnauthenticated
 	}
 	var memberID string
-	user := models4userus2.NewUserContext(userID)
+	user := models4userus.NewUserContext(userID)
 	if err = tx.Get(ctx, user.Record); err != nil {
 		return
 	}
 
-	memberID, err = dbmodels2.GenerateIDFromNameOrRandom(*user.Dto.Name, nil)
+	memberID, err = dbmodels.GenerateIDFromNameOrRandom(*user.Dto.Name, nil)
 	if err != nil {
 		return response, fmt.Errorf("failed to generate  member ContactID: %w", err)
 	}
@@ -65,7 +65,7 @@ func createTeamTxWorker(ctx context.Context, userID string, tx dal.ReadwriteTran
 			Type:  request.Type,
 			Title: request.Title,
 		},
-		WithUserIDs: dbmodels2.WithUserIDs{
+		WithUserIDs: dbmodels.WithUserIDs{
 			UserIDs: []string{userID},
 		},
 		//WithMembers: models4memberus.WithMembers{
@@ -135,7 +135,7 @@ func createTeamTxWorker(ctx context.Context, userID string, tx dal.ReadwriteTran
 		return response, fmt.Errorf("failed to insert a new teamDto contactus record: %w", err)
 	}
 
-	teamInfo := models4userus2.UserTeamBrief{
+	teamInfo := models4userus.UserTeamBrief{
 		TeamBrief: models4teamus.TeamBrief{
 			Type:  request.Type,
 			Title: request.Title,
@@ -145,7 +145,7 @@ func createTeamTxWorker(ctx context.Context, userID string, tx dal.ReadwriteTran
 	}
 
 	if user.Dto.Teams == nil {
-		user.Dto.Teams = make(map[string]*models4userus2.UserTeamBrief, 1)
+		user.Dto.Teams = make(map[string]*models4userus.UserTeamBrief, 1)
 	}
 	updates := user.Dto.SetTeamBrief(teamID, &teamInfo)
 	if err = user.Dto.Validate(); err != nil {

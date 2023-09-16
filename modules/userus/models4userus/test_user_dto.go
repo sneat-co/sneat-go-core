@@ -1,7 +1,7 @@
 package models4userus
 
 import (
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/briefs4contactus"
 	"testing"
 	"time"
@@ -13,7 +13,7 @@ func TestUserDto_Validate(t *testing.T) {
 			ContactBrief: briefs4contactus.ContactBrief{
 				Type:   briefs4contactus.ContactTypePerson,
 				Gender: "unknown",
-				Name: &dbmodels2.Name{
+				Name: &dbmodels.Name{
 					First: "Firstname",
 					Last:  "Lastname",
 				},
@@ -21,9 +21,9 @@ func TestUserDto_Validate(t *testing.T) {
 			},
 			Status: "active",
 		},
-		Created: dbmodels2.CreatedInfo{
+		Created: dbmodels.CreatedInfo{
 			At: time.Now(),
-			Client: dbmodels2.RemoteClientInfo{
+			Client: dbmodels.RemoteClientInfo{
 				HostOrApp:  "unit-test",
 				RemoteAddr: "127.0.0.1",
 			},

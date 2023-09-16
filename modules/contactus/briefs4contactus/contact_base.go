@@ -3,7 +3,7 @@ package briefs4contactus
 import (
 	"errors"
 	"fmt"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/strongo/validation"
 	"strings"
 )
@@ -12,20 +12,20 @@ import (
 type ContactBase struct {
 	ContactBrief
 
-	Status dbmodels2.Status `json:"status" firestore:"status"` // active, archived
+	Status dbmodels.Status `json:"status" firestore:"status"` // active, archived
 
 	WithGroupIDs
 
-	Address   *dbmodels2.Address `json:"address,omitempty" firestore:"address,omitempty"`
-	VATNumber string             `json:"vatNumber,omitempty" firestore:"vatNumber,omitempty"`
+	Address   *dbmodels.Address `json:"address,omitempty" firestore:"address,omitempty"`
+	VATNumber string            `json:"vatNumber,omitempty" firestore:"vatNumber,omitempty"`
 
 	// Dob is Date of birth
 	DoB string `json:"dob,omitempty" firestore:"dob,omitempty"`
 
-	Emails []dbmodels2.PersonEmail `json:"emails,omitempty" firestore:"emails,omitempty"`
-	Phones []dbmodels2.PersonPhone `json:"phones,omitempty" firestore:"phones,omitempty"`
+	Emails []dbmodels.PersonEmail `json:"emails,omitempty" firestore:"emails,omitempty"`
+	Phones []dbmodels.PersonPhone `json:"phones,omitempty" firestore:"phones,omitempty"`
 
-	Timezone *dbmodels2.Timezone `json:"timezone,omitempty" firestore:"timezone,omitempty"`
+	Timezone *dbmodels.Timezone `json:"timezone,omitempty" firestore:"timezone,omitempty"`
 }
 
 func (v *ContactBase) Equal(v2 *ContactBase) bool {
@@ -63,23 +63,23 @@ func (v *ContactBase) Validate() error {
 		if v.VATNumber != "" {
 			return validation.NewErrBadRecordFieldValue("vatNumber", "should be empty for a contactBrief of type=person")
 		}
-		if err := dbmodels2.ValidateGender(v.Gender, true); err != nil {
+		if err := dbmodels.ValidateGender(v.Gender, true); err != nil {
 			errs = append(errs, err)
 		}
-		if err := dbmodels2.ValidateAgeGroup(v.AgeGroup, true); err != nil {
+		if err := dbmodels.ValidateAgeGroup(v.AgeGroup, true); err != nil {
 			errs = append(errs, err)
 		}
 	case ContactTypeCompany:
 		if v.Gender != "" {
 			errs = append(errs, validation.NewErrBadRecordFieldValue("gender", "expected to be empty for contactBrief type=company, got: "+v.Gender))
 		}
-		if err := dbmodels2.ValidateGender(v.Gender, false); err != nil {
+		if err := dbmodels.ValidateGender(v.Gender, false); err != nil {
 			return err
 		}
 		if v.AgeGroup != "" {
 			errs = append(errs, validation.NewErrBadRecordFieldValue("ageGroup", "expected to be empty for contactBrief type=company, got: "+v.Gender))
 		}
-		if err := dbmodels2.ValidateAgeGroup(v.AgeGroup, false); err != nil {
+		if err := dbmodels.ValidateAgeGroup(v.AgeGroup, false); err != nil {
 			errs = append(errs, err)
 		}
 	}

@@ -6,7 +6,7 @@ import (
 	"github.com/dal-go/mocks4dalgo/mocks4dal"
 	"github.com/golang/mock/gomock"
 	"github.com/sneat-co/sneat-go-core/facade"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/briefs4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/models4contactus"
@@ -52,7 +52,7 @@ func TestAcceptPersonalInvite(t *testing.T) {
 func TestAcceptPersonalInviteRequest_Validate(t *testing.T) {
 	type fields struct {
 		InviteRequest InviteRequest
-		Member        dbmodels2.DtoWithID[*briefs4contactus.ContactBase]
+		Member        dbmodels.DtoWithID[*briefs4contactus.ContactBase]
 	}
 	tests := []struct {
 		name    string
@@ -86,7 +86,7 @@ func Test_createOrUpdateUserRecord(t *testing.T) {
 		inviteRecordError error
 		request           AcceptPersonalInviteRequest
 		team              dal4teamus.TeamContext
-		teamMember        dbmodels2.DtoWithID[*briefs4contactus.ContactBase]
+		teamMember        dbmodels.DtoWithID[*briefs4contactus.ContactBase]
 		invite            PersonalInviteContext
 	}
 
@@ -102,20 +102,20 @@ func Test_createOrUpdateUserRecord(t *testing.T) {
 				userRecordError: dal.ErrRecordNotFound,
 				team: dal4teamus.NewTeamContextWithDto("testteamid", &models4teamus.TeamDto{
 					TeamBrief: models4teamus.TeamBrief{
-						WithRequiredCountryID: dbmodels2.WithRequiredCountryID{
+						WithRequiredCountryID: dbmodels.WithRequiredCountryID{
 							CountryID: "--",
 						},
 						Type:  "family",
 						Title: "Family",
 					},
 				}),
-				teamMember: dbmodels2.DtoWithID[*briefs4contactus.ContactBase]{
+				teamMember: dbmodels.DtoWithID[*briefs4contactus.ContactBase]{
 					ID: "test_member_id2",
 					Data: &briefs4contactus.ContactBase{
 						ContactBrief: briefs4contactus.ContactBrief{
 							Type:   briefs4contactus.ContactTypePerson,
 							Gender: "unknown",
-							Name: &dbmodels2.Name{
+							Name: &dbmodels.Name{
 								First: "First",
 							},
 							//Status:   "active",
@@ -130,7 +130,7 @@ func Test_createOrUpdateUserRecord(t *testing.T) {
 					},
 				}),
 				request: AcceptPersonalInviteRequest{
-					RemoteClient: dbmodels2.RemoteClientInfo{
+					RemoteClient: dbmodels.RemoteClientInfo{
 						HostOrApp:  "unit-test",
 						RemoteAddr: "localhost",
 					},
@@ -141,7 +141,7 @@ func Test_createOrUpdateUserRecord(t *testing.T) {
 						InviteID: "test_personal_invite_id",
 						Pin:      "1234",
 					},
-					Member: dbmodels2.DtoWithID[*briefs4contactus.ContactBase]{
+					Member: dbmodels.DtoWithID[*briefs4contactus.ContactBase]{
 						ID: "test_member_id",
 						Data: &briefs4contactus.ContactBase{
 							ContactBrief: briefs4contactus.ContactBrief{
@@ -220,9 +220,9 @@ func Test_updateInviteRecord(t *testing.T) {
 							Type:  "family",
 							Title: "Family",
 						},
-						Created: dbmodels2.CreatedInfo{
+						Created: dbmodels.CreatedInfo{
 							At: time.Now(),
-							Client: dbmodels2.RemoteClientInfo{
+							Client: dbmodels.RemoteClientInfo{
 								HostOrApp:  "unit-test",
 								RemoteAddr: "127.0.0.1",
 							},
@@ -273,9 +273,9 @@ func Test_updateTeamRecord(t *testing.T) {
 		memberID      string
 		team          dal4teamus.TeamContext
 		contactusTeam dal4contactus.ContactusTeamContext
-		requestMember dbmodels2.DtoWithID[*briefs4contactus.ContactBase]
+		requestMember dbmodels.DtoWithID[*briefs4contactus.ContactBase]
 	}
-	testMember := dbmodels2.DtoWithID[*briefs4contactus.ContactBase]{
+	testMember := dbmodels.DtoWithID[*briefs4contactus.ContactBase]{
 		ID:   "test_member_id1",
 		Data: &briefs4contactus.ContactBase{},
 	}
@@ -283,7 +283,7 @@ func Test_updateTeamRecord(t *testing.T) {
 		name           string
 		teamRecordErr  error
 		args           args
-		wantTeamMember dbmodels2.DtoWithID[*briefs4contactus.ContactBase]
+		wantTeamMember dbmodels.DtoWithID[*briefs4contactus.ContactBase]
 		wantErr        bool
 	}{
 		{
@@ -309,11 +309,11 @@ func Test_updateTeamRecord(t *testing.T) {
 						},
 					},
 				}),
-				requestMember: dbmodels2.DtoWithID[*briefs4contactus.ContactBase]{
+				requestMember: dbmodels.DtoWithID[*briefs4contactus.ContactBase]{
 					ID: testMember.ID,
 					Data: &briefs4contactus.ContactBase{
 						ContactBrief: briefs4contactus.ContactBrief{
-							Name: &dbmodels2.Name{
+							Name: &dbmodels.Name{
 								First: "First name",
 							},
 						},

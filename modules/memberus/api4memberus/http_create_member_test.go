@@ -6,13 +6,13 @@ import (
 	"github.com/sneat-co/sneat-go-core/apicore"
 	"github.com/sneat-co/sneat-go-core/apicore/httpmock"
 	"github.com/sneat-co/sneat-go-core/facade"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/briefs4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/models4contactus"
-	briefs4memberus2 "github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
+	"github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/dto4teamus"
-	sneatfb2 "github.com/sneat-co/sneat-go-core/sneatfb"
+	"github.com/sneat-co/sneat-go-core/sneatfb"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -26,22 +26,22 @@ func TestHttpAddMember(t *testing.T) {
 			TeamID: teamID,
 		},
 		Relationship: "spouse",
-		MemberBase: briefs4memberus2.MemberBase{
+		MemberBase: briefs4memberus.MemberBase{
 			ContactBase: briefs4contactus.ContactBase{
 				ContactBrief: briefs4contactus.ContactBrief{
 					Type:     briefs4contactus.ContactTypePerson,
 					Gender:   "unknown",
 					Title:    "Some new members",
 					AgeGroup: "unknown",
-					WithRoles: dbmodels2.WithRoles{
-						Roles: []string{briefs4memberus2.TeamMemberRoleContributor},
+					WithRoles: dbmodels.WithRoles{
+						Roles: []string{briefs4memberus.TeamMemberRoleContributor},
 					},
 				},
 				Status: "active",
 				//WithRequiredCountryID: dbmodels.WithRequiredCountryID{
 				//	CountryID: "--",
 				//},
-				Emails: []dbmodels2.PersonEmail{
+				Emails: []dbmodels.PersonEmail{
 					{Type: "personal", Address: "someone@example.com"},
 				},
 			},
@@ -68,11 +68,11 @@ func TestHttpAddMember(t *testing.T) {
 				ContactBrief: briefs4contactus.ContactBrief{
 					Type:  briefs4contactus.ContactTypeCompany,
 					Title: "Some company",
-					WithOptionalCountryID: dbmodels2.WithOptionalCountryID{
+					WithOptionalCountryID: dbmodels.WithOptionalCountryID{
 						CountryID: "IE",
 					},
-					WithRoles: dbmodels2.WithRoles{
-						Roles: []string{briefs4memberus2.TeamMemberRoleContributor},
+					WithRoles: dbmodels.WithRoles{
+						Roles: []string{briefs4memberus.TeamMemberRoleContributor},
 					},
 				},
 				Status: "active",
@@ -89,9 +89,9 @@ func TestHttpAddMember(t *testing.T) {
 
 	const uid = "unit-test-user"
 	apicore.NewContextWithToken = func(r *http.Request, authRequired bool) (ctx context.Context, err error) {
-		return sneatfb2.NewContextWithFirebaseToken(r.Context(), &auth.Token{UID: uid}), nil
+		return sneatfb.NewContextWithFirebaseToken(r.Context(), &auth.Token{UID: uid}), nil
 	}
-	sneatfb2.NewFirebaseAuthToken = func(ctx context.Context, fbIDToken func() (string, error), authRequired bool) (*auth.Token, error) {
+	sneatfb.NewFirebaseAuthToken = func(ctx context.Context, fbIDToken func() (string, error), authRequired bool) (*auth.Token, error) {
 		return &auth.Token{UID: uid}, nil
 	}
 

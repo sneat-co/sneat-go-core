@@ -8,7 +8,7 @@ import (
 	"github.com/sneat-co/sneat-go-core/modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/dto4teamus"
-	models4userus2 "github.com/sneat-co/sneat-go-core/modules/userus/models4userus"
+	"github.com/sneat-co/sneat-go-core/modules/userus/models4userus"
 )
 
 // LeaveTeam leaves team
@@ -24,8 +24,8 @@ func LeaveTeam(ctx context.Context, userContext facade.User, request dto4teamus.
 			}
 
 			uid := userContext.GetID()
-			user := new(models4userus2.UserDto)
-			userKey := dal.NewKeyWithID(models4userus2.UsersCollection, uid)
+			user := new(models4userus.UserDto)
+			userKey := dal.NewKeyWithID(models4userus.UsersCollection, uid)
 			userRecord := dal.NewRecordWithData(userKey, nil)
 			if err = tx.Get(ctx, userRecord); err != nil {
 				return

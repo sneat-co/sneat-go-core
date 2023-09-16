@@ -1,7 +1,7 @@
 package briefs4memberus
 
 import (
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/briefs4contactus"
 	"testing"
 )
@@ -22,14 +22,14 @@ func TestMemberBase_Validate(t *testing.T) {
 			name: "should_pass", fields: fields{
 				ContactBase: briefs4contactus.ContactBase{
 					ContactBrief: briefs4contactus.ContactBrief{
-						Gender:   dbmodels2.GenderUnknown,
+						Gender:   dbmodels.GenderUnknown,
 						Type:     briefs4contactus.ContactTypePerson,
 						Title:    "test_title",
 						AgeGroup: "unknown",
-						WithUserID: dbmodels2.WithUserID{
+						WithUserID: dbmodels.WithUserID{
 							UserID: "test_user_id",
 						},
-						WithRoles: dbmodels2.WithRoles{
+						WithRoles: dbmodels.WithRoles{
 							Roles: []string{"contributor"},
 						},
 					},

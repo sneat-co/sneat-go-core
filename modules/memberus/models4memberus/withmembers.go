@@ -3,14 +3,14 @@ package models4memberus
 import (
 	"errors"
 	"fmt"
-	briefs4memberus2 "github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
+	"github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
 	"github.com/strongo/slice"
 	"github.com/strongo/validation"
 )
 
 // WithMembers holds Members property
 type WithMembers struct {
-	Members []*briefs4memberus2.MemberBrief `json:"members,omitempty" firestore:"members,omitempty"`
+	Members []*briefs4memberus.MemberBrief `json:"members,omitempty" firestore:"members,omitempty"`
 }
 
 // Validate returns error if not valid
@@ -19,7 +19,7 @@ func (v WithMembers) Validate() error {
 		if err := m1.Validate(); err != nil {
 			return fmt.Errorf("invalid members at index %d: %w", i, err)
 		}
-		m1.Roles = slice.RemoveInPlace(briefs4memberus2.TeamMemberRoleTeamMember, m1.Roles)
+		m1.Roles = slice.RemoveInPlace(briefs4memberus.TeamMemberRoleTeamMember, m1.Roles)
 		for j, m2 := range v.Members {
 			if i != j {
 				//if m1.ID == m2.ID {
@@ -40,7 +40,7 @@ func (v WithMembers) Validate() error {
 }
 
 // GetMemberBriefByUserID returns member's brief by user's ContactID
-func (v WithMembers) GetMemberBriefByUserID(userID string) *briefs4memberus2.MemberBrief {
+func (v WithMembers) GetMemberBriefByUserID(userID string) *briefs4memberus.MemberBrief {
 	for _, m := range v.Members {
 		if m.UserID == userID {
 			return m

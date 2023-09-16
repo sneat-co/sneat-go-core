@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/dal4contactus"
-	briefs4memberus2 "github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
+	"github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
 	"github.com/sneat-co/sneat-go-core/modules/memberus/dal4memberus"
 )
 
@@ -15,7 +15,7 @@ func CreateMemberRecordFromBrief(
 	tx dal.ReadwriteTransaction,
 	teamID string,
 	contactID string,
-	memberBrief briefs4memberus2.MemberBrief,
+	memberBrief briefs4memberus.MemberBrief,
 ) (
 	member dal4memberus.MemberContext,
 	err error,
@@ -27,7 +27,7 @@ func CreateMemberRecordFromBrief(
 	//member.Brief = &memberBrief
 	//member.Data.TeamID = teamID
 	member.Data.ContactBrief = memberBrief
-	_ = member.Data.AddRole(briefs4memberus2.TeamMemberRoleTeamMember)
+	_ = member.Data.AddRole(briefs4memberus.TeamMemberRoleTeamMember)
 	if err := tx.Insert(ctx, member.Record); err != nil {
 		return member, fmt.Errorf("failed to inser member record into DB: %w", err)
 	}

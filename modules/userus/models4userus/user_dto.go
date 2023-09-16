@@ -3,7 +3,7 @@ package models4userus
 import (
 	"fmt"
 	"github.com/dal-go/dalgo/dal"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/briefs4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/teamus/core4teamus"
 	"github.com/strongo/slice"
@@ -18,7 +18,7 @@ type UserDto struct {
 	IsAnonymous bool `json:"isAnonymous" firestore:"isAnonymous"`
 	//Title       string `json:"title,omitempty" firestore:"title,omitempty"`
 
-	Timezone *dbmodels2.Timezone `json:"timezone,omitempty" firestore:"timezone,omitempty"`
+	Timezone *dbmodels.Timezone `json:"timezone,omitempty" firestore:"timezone,omitempty"`
 
 	Defaults *UserDefaults `json:"defaults,omitempty" firestore:"defaults,omitempty"`
 
@@ -29,7 +29,7 @@ type UserDto struct {
 	Teams   map[string]*UserTeamBrief `json:"teams,omitempty"   firestore:"teams,omitempty"`
 	TeamIDs []string                  `json:"teamIDs,omitempty" firestore:"teamIDs,omitempty"`
 
-	Created dbmodels2.CreatedInfo `json:"created" firestore:"created"`
+	Created dbmodels.CreatedInfo `json:"created" firestore:"created"`
 	// TODO: Should this be moved to company members?
 	//models.DatatugUser
 }
@@ -80,7 +80,7 @@ func (v *UserDto) Validate() error {
 	if err := v.validateTeams(); err != nil {
 		return err
 	}
-	if err := dbmodels2.ValidateGender(v.Gender, true); err != nil {
+	if err := dbmodels.ValidateGender(v.Gender, true); err != nil {
 		return err
 	}
 	//if v.Datatug != nil {

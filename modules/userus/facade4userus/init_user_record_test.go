@@ -6,7 +6,7 @@ import (
 	"github.com/dal-go/mocks4dalgo/mocks4dal"
 	"github.com/golang/mock/gomock"
 	"github.com/sneat-co/sneat-go-core/facade"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/modules/userus/dto4userus"
 	"github.com/sneat-co/sneat-go-core/modules/userus/models4userus"
 	"github.com/stretchr/testify/assert"
@@ -31,13 +31,13 @@ func Test_InitUserRecord(t *testing.T) {
 				user: models4userus.NewUserContext("test_user_1"),
 				request: dto4userus.InitUserRecordRequest{
 					AuthProvider: "password",
-					Name: &dbmodels2.Name{
+					Name: &dbmodels.Name{
 						First: "First",
 						Last:  "User",
 					},
 					IanaTimezone: "Europe/Paris",
 					Email:        "u1@example.com",
-					RemoteClient: dbmodels2.RemoteClientInfo{
+					RemoteClient: dbmodels.RemoteClientInfo{
 						HostOrApp:  "unit-test",
 						RemoteAddr: "127.0.0.1",
 					},

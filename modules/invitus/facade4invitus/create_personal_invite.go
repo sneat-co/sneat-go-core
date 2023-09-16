@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/dal-go/dalgo/dal"
-	dbmodels2 "github.com/sneat-co/sneat-go-core/models/dbmodels"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/sneat-co/sneat-go-core/models/dbprofile"
 	"github.com/sneat-co/sneat-go-core/modules/invitus/models4invitus"
 	"github.com/sneat-co/sneat-go-core/modules/memberus/briefs4memberus"
@@ -34,7 +34,7 @@ func createInviteForMember(
 	ctx context.Context,
 	tx dal.ReadwriteTransaction,
 	uid string,
-	remoteClient dbmodels2.RemoteClientInfo,
+	remoteClient dbmodels.RemoteClientInfo,
 	team models4invitus.InviteTeam,
 	from models4invitus.InviteFrom,
 	to models4invitus.InviteToMember,
@@ -91,7 +91,7 @@ func createInviteForMember(
 				},
 				ComposeOnly: composeOnly,
 			},
-			Created: dbmodels2.CreatedInfo{
+			Created: dbmodels.CreatedInfo{
 				At:     time.Now(),
 				Client: remoteClient,
 			},
