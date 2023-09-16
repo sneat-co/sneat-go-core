@@ -7,8 +7,8 @@ import (
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/models/dbmodels"
-	"github.com/sneat-co/sneat-go-core/modules/contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/briefs4contactus"
+	"github.com/sneat-co/sneat-go-core/modules/contactus/const4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/dal4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/dto4contactus"
 	"github.com/sneat-co/sneat-go-core/modules/contactus/models4contactus"
@@ -28,7 +28,7 @@ func CreateContact(
 		return
 	}
 
-	err = dal4teamus.CreateTeamItem(ctx, userContext, "contacts", request.TeamRequest, contactus.ModuleID,
+	err = dal4teamus.CreateTeamItem(ctx, userContext, "contacts", request.TeamRequest, const4contactus.ModuleID,
 		func(ctx context.Context, tx dal.ReadwriteTransaction, params *dal4teamus.ModuleTeamWorkerParams[*models4contactus.ContactusTeamDto]) (err error) {
 			var contact dal4contactus.ContactContext
 			if contact, err = CreateContactTx(ctx, tx, params.UserID, request, params); err != nil {

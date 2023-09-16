@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-// RegisterTeamRoutes registers team routes
-func RegisterTeamRoutes(handle modules.HTTPHandleFunc) {
+// RegisterHttpRoutes registers team routes
+func RegisterHttpRoutes(handle modules.HTTPHandleFunc) {
 	handle(http.MethodPost, "/v0/teams/create_team", httpPostCreateTeam)
 	//
 	handle(http.MethodPost, "/v0/team/join_info", httpPostGetTeamJoinInfo)
