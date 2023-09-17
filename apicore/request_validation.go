@@ -70,23 +70,19 @@ var VerifyRequestAndCreateUserContext = func(
 		httpserver.HandleError(err, from, w, r)
 		return
 	}
-	if userContext, err = authContext.User(r.Context(), options.AuthenticationRequired()); err != nil {
-		httpserver.HandleError(err, from, w, r)
-		return
-	}
 	if ctx, err = VerifyRequest(w, r, options); err != nil {
 		httpserver.HandleError(err, from, w, r)
 		return
 	}
-	if UserContextProvider != nil {
-		userContext = UserContextProvider()
+	if token := sneatauth.AuthTokenFromContext(ctx); token != nil {
+		userContext = facade.AuthUser{ID: token.UID}
+	}
+	if userContext, err = authContext.User(r.Context(), options.AuthenticationRequired()); err != nil {
+		httpserver.HandleError(err, from, w, r)
 		return
 	}
 	return
 }
-
-// UserContextProvider defines signature foe a function that provides user context
-var UserContextProvider func() facade.User
 
 //type verifyRequestOptions struct {
 //	minimumContentLength   int64
