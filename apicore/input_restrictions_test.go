@@ -2,8 +2,8 @@ package apicore
 
 import (
 	"bytes"
-	"context"
 	"github.com/sneat-co/sneat-go-core/apicore/verify"
+	"github.com/sneat-co/sneat-go-core/sneatauth"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -27,9 +27,13 @@ func TestVerifyRequest(t *testing.T) {
 	if o == nil {
 		t.Fatal("expected options, got nil")
 	}
-	NewContextWithToken = func(r *http.Request, authRequired bool) (ctx context.Context, err error) {
-		return context.Background(), nil
+	defer func() {
+		GetAuthTokenFromHttpRequest = nil
+	}()
+	GetAuthTokenFromHttpRequest = func(r *http.Request) (token *sneatauth.Token, err error) {
+		return nil, nil
 	}
+
 	ctx, err := VerifyRequest(w, r, o)
 	if ctx == nil {
 		t.Errorf("expected context, got nil")

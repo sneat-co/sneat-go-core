@@ -9,6 +9,7 @@ import (
 	"github.com/sneat-co/sneat-go-core/apicore/verify"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/httpserver"
+	"github.com/sneat-co/sneat-go-core/sneatauth"
 	"io"
 	"log"
 	"net/http"
@@ -112,7 +113,7 @@ var UserContextProvider func() facade.User
 //
 //}
 
-var NewContextWithToken func(r *http.Request, authRequired bool) (ctx context.Context, err error)
+var GetAuthTokenFromHttpRequest func(r *http.Request) (token *sneatauth.Token, err error)
 
 // VerifyRequest runs common checks
 var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options verify.RequestOptions) (ctx context.Context, err error) {
@@ -127,12 +128,19 @@ var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options verify.
 		return
 	}
 
-	if NewContextWithToken == nil {
-		panic("NewContextWithToken is nil")
+	if GetAuthTokenFromHttpRequest == nil {
+		panic("GetAuthTokenFromHttpRequest is nil")
 	}
 
-	if ctx, err = NewContextWithToken(r, options.AuthenticationRequired()); err != nil {
-		err = fmt.Errorf("failed to create context wuth firestore client: %w", err)
+	var token *sneatauth.Token
+	if token, err = GetAuthTokenFromHttpRequest(r); err != nil {
+		err = fmt.Errorf("failed to get auth token from HTTP request: %w", err)
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = w.Write([]byte(err.Error()))
+		return
+	}
+	if token == nil && options.AuthenticationRequired() {
+		err = fmt.Errorf("authentication required")
 		w.WriteHeader(http.StatusUnauthorized)
 		_, _ = w.Write([]byte(err.Error()))
 		return
