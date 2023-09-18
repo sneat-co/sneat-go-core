@@ -125,8 +125,9 @@ var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options verify.
 		w.WriteHeader(http.StatusUnauthorized)
 		_, _ = w.Write([]byte(err.Error()))
 		return
-	}
-	if token == nil && options.AuthenticationRequired() {
+	} else if token != nil {
+		ctx = sneatauth.NewContextWithAuthToken(ctx, token)
+	} else if /* token == nil && */ options.AuthenticationRequired() {
 		err = fmt.Errorf("authentication required")
 		w.WriteHeader(http.StatusUnauthorized)
 		_, _ = w.Write([]byte(err.Error()))
