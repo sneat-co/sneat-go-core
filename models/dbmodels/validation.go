@@ -56,3 +56,15 @@ func ValidateRequiredName(v *Name) error {
 	}
 	return nil
 }
+
+// ValidateTitle validates title
+func ValidateTitle(title string) error {
+	if strings.TrimSpace(title) == "" {
+		return validation.NewErrRecordIsMissingRequiredField("title")
+	}
+	if strings.TrimSpace(title) != title {
+		return validation.NewErrBadRecordFieldValue("name", "title should not start or end with whitespace characters")
+	}
+	return nil
+
+}
