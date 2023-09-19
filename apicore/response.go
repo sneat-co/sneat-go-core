@@ -50,7 +50,7 @@ func ReturnError(_ context.Context, w http.ResponseWriter, r *http.Request, err 
 // ReturnJSON returns provided response as a JSON and sets "Content-Role" as "application/json"
 func ReturnJSON(_ context.Context, w http.ResponseWriter, r *http.Request, successStatusCode int, err error, response interface{}) {
 	if err != nil {
-		if errors.Is(err, facade.ErrUnauthorized) {
+		if errors.Is(err, facade.ErrUnauthorized) || errors.Is(err, facade.ErrUnauthenticated) {
 			w.WriteHeader(http.StatusUnauthorized)
 			_, _ = fmt.Fprint(w, err.Error())
 			return

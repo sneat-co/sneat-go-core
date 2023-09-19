@@ -6,7 +6,7 @@ import (
 )
 
 // ErrUnauthenticated when AuthUser is not authenticated
-//var ErrUnauthenticated = errors.New("not authenticated")
+var ErrUnauthenticated = errors.New("not authenticated")
 
 // ErrUnauthorized when AuthUser have no access to requested resource/operation
 var ErrUnauthorized = errors.New("unauthorized")
