@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/alexsergivan/transliterator v1.0.0
 	github.com/crediterra/money v0.2.1
-	github.com/dal-go/dalgo v0.10.2
+	github.com/dal-go/dalgo v0.12.0
 	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.8.4
 	github.com/strongo/random v0.0.1
