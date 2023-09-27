@@ -7,6 +7,8 @@ import (
 
 // Versioned defines an interface for versioned record
 type Versioned interface {
-	IncreaseVersion(timestamp time.Time) int
 	core.Validatable
+
+	// IncreaseVersion returns new record version increased by 1. It also should update UpdatedAt and UpdatedBy fields.
+	IncreaseVersion(updatedAt time.Time, updatedBy string) int
 }
