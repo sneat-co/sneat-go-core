@@ -24,7 +24,7 @@ func CleanForID(s string) string {
 	return result.String()
 }
 
-func GenerateIDFromNameOrRandom(name Name, existingIDs []string) (id string, err error) {
+func GenerateIDFromNameOrRandom(name *Name, existingIDs []string) (id string, err error) {
 	trans := transliterator.NewTransliterator(nil)
 	//
 	first := CleanForID(trans.Transliterate(name.First, ""))

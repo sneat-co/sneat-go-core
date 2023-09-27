@@ -40,7 +40,7 @@ func TestGenerateIDFromNameOrRandom(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotId, err := GenerateIDFromNameOrRandom(tt.args.name, tt.args.existingIDs)
+			gotId, err := GenerateIDFromNameOrRandom(&tt.args.name, tt.args.existingIDs)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GenerateIDFromNameOrRandom() error = %v, wantErr %v", err, tt.wantErr)
 				return
