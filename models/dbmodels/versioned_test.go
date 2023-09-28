@@ -12,7 +12,9 @@ func TestWithUpdatedAndVersion_IncreaseVersion(t *testing.T) {
 			UpdatedAt: time.Now(),
 			UpdatedBy: "test1",
 		},
-		Version: 1,
+		WithVersion: WithVersion{
+			Version: 1,
+		},
 	}
 	now := time.Now()
 	version := v.IncreaseVersion(now, "test2")

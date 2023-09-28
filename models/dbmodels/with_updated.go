@@ -14,8 +14,8 @@ type WithUpdated struct {
 	UpdatedBy string    `json:"updatedBy,omitempty"  firestore:"updatedBy,omitempty"`
 }
 
-// UpdatesWhenUpdated populates update instructions for DAL when a record has been updated
-func (v *WithUpdated) UpdatesWhenUpdated() []dal.Update {
+// GetUpdates populates update instructions for DAL when a record has been updated
+func (v *WithUpdated) GetUpdates() []dal.Update {
 	return []dal.Update{
 		{Field: "updatedAt", Value: v.UpdatedAt},
 		{Field: "updatedBy", Value: v.UpdatedBy},
