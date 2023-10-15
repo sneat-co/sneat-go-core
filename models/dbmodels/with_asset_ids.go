@@ -16,7 +16,7 @@ type WithMultiTeamAssetIDs struct {
 // Validate  returns error if not valid
 func (v WithMultiTeamAssetIDs) Validate() error {
 	if len(v.AssetIDs) == 0 {
-		return validation.NewErrRecordIsMissingRequiredField("assetIDs")
+		return validation.NewErrRecordIsMissingRequiredField("assetIDs") // First element should
 	}
 	if v.AssetIDs[0] != "*" {
 		return validation.NewErrBadRecordFieldValue("assetIDs[0]", "should be '*'")

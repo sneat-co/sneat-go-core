@@ -32,7 +32,7 @@ func ValidateSetSliceField(field string, v []string, isRecordID bool) error {
 	return nil
 }
 
-func ValidateWithIdsAndBriefs[K string | TeamItemID, R core.Validatable](idsField, briefsField string, ids []K, briefs map[K]R) error {
+func ValidateWithIdsAndBriefs[R core.Validatable](idsField, briefsField string, ids []string, briefs map[string]R) error {
 	for id, r := range briefs {
 		if !slice.Contains(ids[1:], id) {
 			return validation.NewErrBadRecordFieldValue(fmt.Sprintf("%s[%s]", briefsField, id), "id is not in "+idsField)
@@ -51,8 +51,8 @@ func ValidateWithIdsAndBriefs[K string | TeamItemID, R core.Validatable](idsFiel
 
 // ValidateRequiredName validates required names
 func ValidateRequiredName(v *Name) error {
-	if strings.TrimSpace(v.First) == "" && strings.TrimSpace(v.Last) == "" && strings.TrimSpace(v.Full) == "" {
-		return validation.NewErrBadRecordFieldValue("first|last|full", "at least one of names should be specified")
+	if strings.TrimSpace(v.First) == "" && strings.TrimSpace(v.Last) == "" && strings.TrimSpace(v.Full) == "" && strings.TrimSpace(v.Nick) == "" {
+		return validation.NewErrBadRecordFieldValue("first|last|full|nick", "at least one of names should be specified")
 	}
 	return nil
 }
