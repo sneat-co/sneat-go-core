@@ -33,17 +33,29 @@ func ValidateSetSliceField(field string, v []string, isRecordID bool) error {
 }
 
 func ValidateWithIdsAndBriefs[R core.Validatable](idsField, briefsField string, ids []string, briefs map[string]R) error {
-	for id, r := range briefs {
-		if !slice.Contains(ids[1:], id) {
-			return validation.NewErrBadRecordFieldValue(fmt.Sprintf("%s[%s]", briefsField, id), "id is not in "+idsField)
-		}
-		if err := r.Validate(); err != nil {
-			return validation.NewErrBadRecordFieldValue(fmt.Sprintf("%s[%s]", briefsField, id), err.Error())
-		}
+	if len(ids) == 0 {
+		return validation.NewErrRecordIsMissingRequiredField(idsField)
+	}
+	if ids[0] != "*" {
+		return validation.NewErrBadRecordFieldValue(idsField, "first element should be '*'")
 	}
 	for _, id := range ids[1:] {
 		if _, ok := briefs[id]; !ok {
 			return validation.NewErrRecordIsMissingRequiredField(fmt.Sprintf("%s[%s]", briefsField, id))
+		}
+	}
+	for id, r := range briefs {
+		field := func() string {
+			return fmt.Sprintf("%s[%s]", briefsField, id)
+		}
+		if !slice.Contains(ids[1:], id) {
+			return validation.NewErrBadRecordFieldValue(field(), "id is not in "+idsField)
+		}
+		//if r == nil {
+		//	return validation.NewErrRecordIsMissingRequiredField(field())
+		//}
+		if err := r.Validate(); err != nil {
+			return validation.NewErrBadRecordFieldValue(field(), err.Error())
 		}
 	}
 	return nil
