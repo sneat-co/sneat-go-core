@@ -69,7 +69,7 @@ func TestWithCreatedBy_Validate(t *testing.T) {
 			v := &WithCreatedBy{
 				CreatedBy: tt.fields.CreatedBy,
 			}
-			tt.wantErr(t, v.Validate(), fmt.Sprintf("Validate()"))
+			tt.wantErr(t, v.Validate(), fmt.Sprintf("{CreatedBy=%s}Validate()", v.CreatedBy))
 		})
 	}
 }

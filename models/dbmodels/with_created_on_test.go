@@ -75,7 +75,7 @@ func TestWithCreatedOn_Validate(t *testing.T) {
 			v := &WithCreatedOn{
 				CreatedOn: tt.fields.CreatedOn,
 			}
-			tt.wantErr(t, v.Validate(), fmt.Sprintf("Validate()"))
+			tt.wantErr(t, v.Validate(), fmt.Sprintf("{CreatedOn=%s}.Validate()", v.CreatedOn))
 		})
 	}
 }
