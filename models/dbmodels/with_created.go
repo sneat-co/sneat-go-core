@@ -10,8 +10,8 @@ import (
 
 // WithCreated DTO
 type WithCreated struct {
-	CreatedAt time.Time `json:"createdAt,omitempty"  firestore:"createdAt,omitempty"`
-	CreatedBy string    `json:"createdBy,omitempty"  firestore:"createdBy,omitempty"`
+	CreatedAt time.Time `json:"createdAt"  firestore:"createdAt"`
+	CreatedBy string    `json:"createdBy"  firestore:"createdBy"`
 }
 
 // UpdatesWhenCreated populates update instructions for DAL when a record has been created
