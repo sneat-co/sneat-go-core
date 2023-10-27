@@ -10,8 +10,8 @@ import (
 
 // Created is intended to be used only in WithCreatedField. For root level use WithCreated instead.
 type Created struct {
-	On string `json:"on"`
-	By string `json:"by"`
+	On string `json:"on" firestore:"on"`
+	By string `json:"by" firestore:"by"`
 }
 
 func (v *Created) Validate() error {
@@ -32,7 +32,7 @@ func (v *Created) Validate() error {
 }
 
 type WithCreatedField struct {
-	Created Created `json:"created"`
+	Created Created `json:"created" firestore:"created"`
 }
 
 func (v *WithCreatedField) Validate() error {
