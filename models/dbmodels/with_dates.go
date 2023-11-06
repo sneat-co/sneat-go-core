@@ -54,7 +54,7 @@ func (v *WithDates) Validate() error {
 				return validation.NewErrBadRecordFieldValue("dates", "duplicate value: "+date)
 			}
 		}
-		if date < v.DateMin {
+		if date < v.DateMin || v.DateMin == "" {
 			v.DateMin = date
 		}
 		if date > v.DateMax {
