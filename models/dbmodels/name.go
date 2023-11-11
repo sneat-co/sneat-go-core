@@ -15,6 +15,37 @@ type Name struct {
 	Nick   string `json:"nick,omitempty" firestore:"nick,omitempty"`
 }
 
+func (v *Name) GetFullName() string {
+	if v.Full != "" {
+		return v.Full
+	}
+	if v.First != "" && v.Last != "" {
+		if v.Middle == "" {
+			return fmt.Sprintf("%v %v", v.First, v.Last)
+		}
+		return fmt.Sprintf("%v %v %v", v.First, v.Middle, v.Last)
+	}
+	if v.First != "" {
+		if v.Nick != "" {
+			return fmt.Sprintf("%v (%v)", v.First, v.Nick)
+		}
+		return v.First
+	}
+	if v.Last != "" {
+		if v.Nick != "" {
+			return fmt.Sprintf("%v (%v)", v.Last, v.Nick)
+		}
+		return v.Last
+	}
+	if v.Nick != "" {
+		return v.Nick
+	}
+	if v.Middle != "" {
+		return v.Middle
+	}
+	return "NAME_IS_UNKNOWN"
+}
+
 // Equal returns true if two Name structs are equal
 func (v *Name) Equal(v2 *Name) bool {
 	return v == nil && v2 == nil || v != nil && v2 != nil && *v == *v2

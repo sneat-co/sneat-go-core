@@ -10,9 +10,10 @@ func (v *WithPreferredLocale) GetPreferredLocale() string {
 	return v.PreferredLocale
 }
 
-func (v *WithPreferredLocale) SetPreferredLocale(code5 string) {
+func (v *WithPreferredLocale) SetPreferredLocale(code5 string) error {
 	if l := len(code5); l != 0 && l != 5 {
-		panic(fmt.Sprintf("invalid code5: '%s'", code5))
+		return fmt.Errorf("invalid code5: '%s'", code5)
 	}
 	v.PreferredLocale = code5
+	return nil
 }

@@ -1,6 +1,8 @@
 module github.com/sneat-co/sneat-go-core
 
-go 1.20
+go 1.21
+
+toolchain go1.21.3
 
 require (
 	github.com/alexsergivan/transliterator v1.0.0
@@ -10,7 +12,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/strongo/random v0.0.1
 	github.com/strongo/slice v0.1.4
-	github.com/strongo/validation v0.0.5
+	github.com/strongo/validation v0.0.6
 )
 
 require (
