@@ -48,6 +48,11 @@ type WithCreated struct {
 	CreatedBy string    `json:"createdBy"  firestore:"createdBy"`
 }
 
+// GetCreatedTime returns CreatedAt
+func (v *WithCreated) GetCreatedTime() time.Time {
+	return v.CreatedAt
+}
+
 // UpdatesWhenCreated populates update instructions for DAL when a record has been created
 func (v *WithCreated) UpdatesWhenCreated() []dal.Update {
 	return []dal.Update{
