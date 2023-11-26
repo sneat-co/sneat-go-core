@@ -12,6 +12,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/strongo/random v0.0.1
 	github.com/strongo/slice v0.1.4
+	github.com/strongo/strongoapp v0.9.1
 	github.com/strongo/validation v0.0.6
 )
 

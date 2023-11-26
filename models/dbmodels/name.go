@@ -2,6 +2,7 @@ package dbmodels
 
 import (
 	"fmt"
+	"github.com/strongo/strongoapp/appuser"
 	"github.com/strongo/validation"
 	"strings"
 )
@@ -13,6 +14,21 @@ type Name struct {
 	Middle string `json:"middle,omitempty" firestore:"middle,omitempty"`
 	Last   string `json:"last,omitempty" firestore:"last,omitempty"`
 	Nick   string `json:"nick,omitempty" firestore:"nick,omitempty"`
+}
+
+func (v *Name) SetNames(names ...appuser.Name) {
+	for _, name := range names {
+		switch name.Field {
+		case appuser.FirstName:
+			v.First = name.Value
+		case appuser.LastName:
+			v.Last = name.Value
+		case appuser.MiddleName:
+			v.Middle = name.Value
+		case appuser.NickName:
+			v.Nick = name.Value
+		}
+	}
 }
 
 func (v *Name) GetFullName() string {
