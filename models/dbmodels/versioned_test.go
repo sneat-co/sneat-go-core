@@ -1,8 +1,8 @@
 package dbmodels
 
 import (
-	"github.com/sneat-co/sneat-go-core/models/dbmodels/with"
 	"github.com/stretchr/testify/assert"
+	"github.com/strongo/strongoapp/with"
 	"testing"
 	"time"
 )

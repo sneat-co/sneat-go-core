@@ -2,7 +2,7 @@ package dbmodels
 
 import (
 	"errors"
-	"github.com/sneat-co/sneat-go-core/models/dbmodels/with"
+	"github.com/strongo/strongoapp/with"
 	"github.com/strongo/validation"
 	"strings"
 	"time"

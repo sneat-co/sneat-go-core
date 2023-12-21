@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core"
-	"github.com/sneat-co/sneat-go-core/models/dbmodels/with"
+	"github.com/strongo/strongoapp/with"
 	"github.com/strongo/validation"
 	"time"
 )
