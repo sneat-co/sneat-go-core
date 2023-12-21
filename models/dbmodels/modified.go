@@ -32,13 +32,13 @@ type WithModified struct {
 }
 
 func NewWithModified(at time.Time, by string) WithModified {
+	var withCreated WithCreated
+	withCreated.SetCreatedAt(at)
+	withCreated.SetCreatedBy(by)
 	return WithModified{
-		WithCreated: WithCreated{
-			CreatedAt: at,
-			CreatedBy: by,
-		},
+		WithCreated: withCreated,
 		WithUpdated: WithUpdated{
-			UpdatedAt: time.Now(),
+			UpdatedAt: at,
 			UpdatedBy: by,
 		},
 	}

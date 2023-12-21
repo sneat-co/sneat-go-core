@@ -8,7 +8,7 @@ import (
 
 func TestWithCreatedOn_Validate(t *testing.T) {
 	type fields struct {
-		CreatedOn string
+		CreatedAt string
 	}
 	tests := []struct {
 		name    string
@@ -18,7 +18,7 @@ func TestWithCreatedOn_Validate(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				CreatedOn: "2020-12-31",
+				CreatedAt: "2020-12-31",
 			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.NoError(t, err, i...)
@@ -27,7 +27,7 @@ func TestWithCreatedOn_Validate(t *testing.T) {
 		{
 			name: "missing",
 			fields: fields{
-				CreatedOn: "",
+				CreatedAt: "",
 			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.Error(t, err, i...)
@@ -36,7 +36,7 @@ func TestWithCreatedOn_Validate(t *testing.T) {
 		{
 			name: "invalid_letters",
 			fields: fields{
-				CreatedOn: "abc",
+				CreatedAt: "abc",
 			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.Error(t, err, i...)
@@ -45,7 +45,7 @@ func TestWithCreatedOn_Validate(t *testing.T) {
 		{
 			name: "invalid_no_dashes",
 			fields: fields{
-				CreatedOn: "20201231",
+				CreatedAt: "20201231",
 			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.Error(t, err, i...)
@@ -54,7 +54,7 @@ func TestWithCreatedOn_Validate(t *testing.T) {
 		{
 			name: "invalid_slashes",
 			fields: fields{
-				CreatedOn: "2020/12/31",
+				CreatedAt: "2020/12/31",
 			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.Error(t, err, i...)
@@ -63,7 +63,7 @@ func TestWithCreatedOn_Validate(t *testing.T) {
 		{
 			name: "invalid_us",
 			fields: fields{
-				CreatedOn: "31/12/2020",
+				CreatedAt: "31/12/2020",
 			},
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				return assert.Error(t, err, i...)
@@ -72,10 +72,10 @@ func TestWithCreatedOn_Validate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			v := &WithCreatedOn{
-				CreatedOn: tt.fields.CreatedOn,
+			v := &WithCreatedAt{
+				CreatedAt: tt.fields.CreatedAt,
 			}
-			tt.wantErr(t, v.Validate(), fmt.Sprintf("{CreatedOn=%s}.Validate()", v.CreatedOn))
+			tt.wantErr(t, v.Validate(), fmt.Sprintf("{CreatedAt=%s}.Validate()", v.CreatedAt))
 		})
 	}
 }

@@ -10,19 +10,20 @@ import (
 
 // Created is intended to be used only in WithCreatedField. For root level use WithCreated instead.
 type Created struct {
-	On string `json:"on" firestore:"on"`
-	By string `json:"by" firestore:"by"`
+	At string `json:"at" dalgo:"at" firestore:"at"`
+	By string `json:"by" dalgo:"at" firestore:"by"`
 }
 
+// Validate returns error if not valid
 func (v *Created) Validate() error {
 	var errs []error
+	if strings.TrimSpace(v.At) == "" {
+		errs = append(errs, validation.NewErrRecordIsMissingRequiredField("at"))
+	}
 	if strings.TrimSpace(v.By) == "" {
 		errs = append(errs, validation.NewErrRecordIsMissingRequiredField("by"))
 	}
-	if strings.TrimSpace(v.On) == "" {
-		errs = append(errs, validation.NewErrRecordIsMissingRequiredField("on"))
-	}
-	if _, err := time.Parse(time.DateOnly, v.On); err != nil {
+	if _, err := time.Parse(time.DateOnly, v.At); err != nil {
 		return validation.NewErrBadRecordFieldValue("on", err.Error())
 	}
 	if len(errs) > 0 {
@@ -31,6 +32,7 @@ func (v *Created) Validate() error {
 	return nil
 }
 
+// WithCreatedField adds a Created field to a data model
 type WithCreatedField struct {
 	Created Created `json:"created" firestore:"created"`
 }
@@ -42,33 +44,25 @@ func (v *WithCreatedField) Validate() error {
 	return nil
 }
 
-// WithCreated DTO
+// WithCreated adds CreatedAt and CreatedBy fields to a data model
 type WithCreated struct {
-	CreatedAt time.Time `json:"createdAt"  firestore:"createdAt"`
-	CreatedBy string    `json:"createdBy"  firestore:"createdBy"`
+	WithCreatedAt
+	WithCreatedBy
 }
 
-// GetCreatedTime returns CreatedAt
-func (v *WithCreated) GetCreatedTime() time.Time {
-	return v.CreatedAt
-}
-
-// UpdatesWhenCreated populates update instructions for DAL when a record has been created
-func (v *WithCreated) UpdatesWhenCreated() []dal.Update {
-	return []dal.Update{
-		{Field: "createdAt", Value: v.CreatedAt},
-		{Field: "createdBy", Value: v.CreatedBy},
-	}
+// UpdatesWithCreated populates update instructions for DAL when a record has been created
+func (v *WithCreated) UpdatesWithCreated() []dal.Update {
+	return append(v.WithCreatedAt.UpdatesCreatedOn(), v.WithCreatedBy.UpdatesCreatedBy()...)
 }
 
 // Validate returns error if not valid
 func (v *WithCreated) Validate() error {
 	var errs []error
-	if v.CreatedAt.IsZero() {
-		errs = append(errs, validation.NewErrRecordIsMissingRequiredField("createdAt"))
+	if err := v.WithCreatedAt.Validate(); err != nil {
+		errs = append(errs, err)
 	}
-	if strings.TrimSpace(v.CreatedBy) == "" {
-		errs = append(errs, validation.NewErrRecordIsMissingRequiredField("createdBy"))
+	if err := v.WithCreatedBy.Validate(); err != nil {
+		errs = append(errs, err)
 	}
 	if len(errs) > 0 {
 		return errors.Join(errs...)
