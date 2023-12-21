@@ -1,4 +1,4 @@
-package dbmodels
+package with
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestWithCreatedOn_Validate(t *testing.T) {
+func TestCreatedOn_Validate(t *testing.T) {
 	type fields struct {
 		CreatedAt string
 	}
@@ -72,10 +72,10 @@ func TestWithCreatedOn_Validate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			v := &WithCreatedAt{
+			v := &CreatedAtField{
 				CreatedAt: tt.fields.CreatedAt,
 			}
-			tt.wantErr(t, v.Validate(), fmt.Sprintf("{CreatedAt=%s}.Validate()", v.CreatedAt))
+			tt.wantErr(t, v.Validate(), fmt.Sprintf("{CreatedAtField=%s}.Validate()", v.CreatedAt))
 		})
 	}
 }

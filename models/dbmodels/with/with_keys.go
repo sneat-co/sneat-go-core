@@ -1,4 +1,4 @@
-package dbmodels
+package with
 
 import (
 	"fmt"
@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-type WithKeys struct {
-	Keys []string `json:"keys,omitempty" firestore:"keys,omitempty"`
+type KeysField struct {
+	Keys []string `json:"keys,omitempty" dalgo:"keys,omitempty"  firestore:"keys,omitempty"`
 }
 
-func (v WithKeys) Validate() error {
+func (v KeysField) Validate() error {
 	for i, k := range v.Keys {
 		if s := strings.TrimSpace(k); s == "" {
 			return validation.NewErrRecordIsMissingRequiredField(fmt.Sprintf("keys[%v]", i))
@@ -27,7 +27,7 @@ func (v WithKeys) Validate() error {
 	return nil
 }
 
-func (v WithKeys) Updates() []dal.Update {
+func (v KeysField) UpdatesWhenKeysChanged() []dal.Update {
 	if len(v.Keys) == 0 {
 		return []dal.Update{
 			{Field: "keys", Value: dal.DeleteField},

@@ -1,4 +1,4 @@
-package dbmodels
+package with
 
 import (
 	"fmt"
@@ -8,14 +8,14 @@ import (
 	"strings"
 )
 
-// WithDates is a struct that contains dates for indexing
-type WithDates struct {
-	Dates   []string `json:"dates,omitempty" firestore:"dates,omitempty"`
-	DateMin string   `json:"dateMin,omitempty" firestore:"dateMin,omitempty"`
-	DateMax string   `json:"dateMax,omitempty" firestore:"dateMax,omitempty"`
+// DatesFields is a struct that contains dates for indexing
+type DatesFields struct {
+	Dates   []string `json:"dates,omitempty" dalgo:"dates,omitempty" firestore:"dates,omitempty"`
+	DateMin string   `json:"dateMin,omitempty" dalgo:"dateMin,omitempty" firestore:"dateMin,omitempty"`
+	DateMax string   `json:"dateMax,omitempty" dalgo:"dateMax,omitempty" firestore:"dateMax,omitempty"`
 }
 
-func (v *WithDates) Updates() []dal.Update {
+func (v *DatesFields) UpdatesWhenDatesChanged() []dal.Update {
 	updates := []dal.Update{
 		{Field: "dates", Value: v.Dates},
 		{Field: "dateMin", Value: v.DateMin},
@@ -27,7 +27,7 @@ func (v *WithDates) Updates() []dal.Update {
 	return updates
 }
 
-func (v *WithDates) AddDate(date string) {
+func (v *DatesFields) AddDate(date string) {
 	v.Dates = append(v.Dates, date)
 	if v.DateMax == "" || date > v.DateMax {
 		v.DateMax = date
@@ -38,7 +38,7 @@ func (v *WithDates) AddDate(date string) {
 }
 
 // Validate returns error if not valid
-func (v *WithDates) Validate() error {
+func (v *DatesFields) Validate() error {
 	v.DateMin = ""
 	v.DateMax = ""
 	for i, date := range v.Dates {

@@ -2,6 +2,7 @@ package dbmodels
 
 import (
 	"fmt"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels/with"
 	"github.com/sneat-co/sneat-go-core/validate"
 	"github.com/strongo/slice"
 	"github.com/strongo/validation"
@@ -14,7 +15,7 @@ var reTeamDate = regexp.MustCompile(`\w+:\d{4}-[01]\d-[0-3]\d`)
 // WithTeamDates holds date properties for indexed queries
 type WithTeamDates struct {
 	WithTeamIDs
-	WithDates
+	with.DatesFields
 	TeamDates []string `json:"teamDates" firestore:"teamDates"`
 }
 
@@ -23,12 +24,12 @@ func (v *WithTeamDates) Validate() error {
 	if err := v.WithTeamIDs.Validate(); err != nil {
 		return err
 	}
-	if err := v.WithDates.Validate(); err != nil {
+	if err := v.DatesFields.Validate(); err != nil {
 		return err
 	}
 	v.populateTeamDatesField()
 	if len(v.TeamDates) != len(v.TeamIDs)*len(v.Dates) {
-		message := fmt.Sprintf("len(v.TeamDates) != len(v.TeamIDs) * len(v.Dates): %v != %v*%v: {teamIDs=%v, dates: %v, teamDates: %v}",
+		message := fmt.Sprintf("len(v.TeamDates) != len(v.TeamIDs) * len(v.DatesFields): %v != %v*%v: {teamIDs=%v, dates: %v, teamDates: %v}",
 			len(v.TeamDates),
 			len(v.TeamIDs),
 			len(v.Dates),
@@ -109,7 +110,7 @@ func (v WithTeamDates) validateTeamDates() error {
 		if slice.Index(v.Dates, date) < 0 {
 			return validation.NewErrBadRecordFieldValue(
 				field(i),
-				fmt.Sprintf("reference date %v that is not in 'dates' field: {dates: %+v}", date, v.Dates),
+				fmt.Sprintf("reference date %v that is not in 'dates' field: {dates: %+v}", date, v.DatesFields),
 			)
 		}
 	}

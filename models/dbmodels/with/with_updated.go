@@ -1,4 +1,4 @@
-package dbmodels
+package with
 
 import (
 	"errors"
@@ -8,14 +8,14 @@ import (
 	"time"
 )
 
-// WithUpdated DTO
-type WithUpdated struct {
+// UpdatedFields provides UpdatedAt & UpdatedBy fields
+type UpdatedFields struct {
 	UpdatedAt time.Time `json:"updatedAt,omitempty"  firestore:"updatedAt,omitempty"`
 	UpdatedBy string    `json:"updatedBy,omitempty"  firestore:"updatedBy,omitempty"`
 }
 
-// GetUpdates populates update instructions for DAL when a record has been updated
-func (v *WithUpdated) GetUpdates() []dal.Update {
+// UpdatesWhenUpdatedFieldsChanged populates update instructions for DALgo when UpdatedAt or UpdatedBy fields changed
+func (v *UpdatedFields) UpdatesWhenUpdatedFieldsChanged() []dal.Update {
 	return []dal.Update{
 		{Field: "updatedAt", Value: v.UpdatedAt},
 		{Field: "updatedBy", Value: v.UpdatedBy},
@@ -23,7 +23,7 @@ func (v *WithUpdated) GetUpdates() []dal.Update {
 }
 
 // Validate returns error if not valid
-func (v *WithUpdated) Validate() error {
+func (v *UpdatedFields) Validate() error {
 	var errs []error
 	if v.UpdatedAt.IsZero() {
 		errs = append(errs, validation.NewErrRecordIsMissingRequiredField("updatedAt"))

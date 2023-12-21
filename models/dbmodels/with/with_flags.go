@@ -1,4 +1,4 @@
-package dbmodels
+package with
 
 import (
 	"fmt"
@@ -6,13 +6,13 @@ import (
 	"strings"
 )
 
-// WithFlags defines a record with a list of flags
-type WithFlags struct {
-	Flags []string `json:"flags,omitempty" firestore:"flags,omitempty"`
+// FlagsField defines a record with a list of flags
+type FlagsField struct {
+	Flags []string `json:"flags,omitempty" dalgo:"flags,omitempty" firestore:"flags,omitempty"`
 }
 
 // Validate returns error as soon as 1st flag is not valid.
-func (v WithFlags) Validate() error {
+func (v FlagsField) Validate() error {
 	for i, flag := range v.Flags {
 		if strings.TrimSpace(flag) == "" {
 			return validation.NewErrRecordIsMissingRequiredField(fmt.Sprintf("flags[%v]", i))
@@ -21,7 +21,7 @@ func (v WithFlags) Validate() error {
 	return nil
 }
 
-// String returns string representation of the WithTags
-func (v WithFlags) String() string {
+// String returns string representation of the TagsField
+func (v FlagsField) String() string {
 	return "flags=" + strings.Join(v.Flags, ",")
 }

@@ -1,4 +1,4 @@
-package dbmodels
+package with
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestWithCreatedBy_UpdatesCreatedBy(t *testing.T) {
+func TestCreatedBy_UpdatesCreatedBy(t *testing.T) {
 	type fields struct {
 		CreatedBy string
 	}
@@ -28,7 +28,7 @@ func TestWithCreatedBy_UpdatesCreatedBy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			v := &WithCreatedBy{
+			v := &CreatedByField{
 				CreatedBy: tt.fields.CreatedBy,
 			}
 			assert.Equalf(t, tt.want, v.UpdatesCreatedBy(), "UpdatesCreatedBy()")
@@ -36,7 +36,7 @@ func TestWithCreatedBy_UpdatesCreatedBy(t *testing.T) {
 	}
 }
 
-func TestWithCreatedBy_Validate(t *testing.T) {
+func TestCreatedBy_Validate(t *testing.T) {
 	type fields struct {
 		CreatedBy string
 	}
@@ -66,10 +66,10 @@ func TestWithCreatedBy_Validate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			v := &WithCreatedBy{
+			v := &CreatedByField{
 				CreatedBy: tt.fields.CreatedBy,
 			}
-			tt.wantErr(t, v.Validate(), fmt.Sprintf("{CreatedBy=%s}Validate()", v.CreatedBy))
+			tt.wantErr(t, v.Validate(), fmt.Sprintf("{CreatedByField=%s}Validate()", v.CreatedBy))
 		})
 	}
 }

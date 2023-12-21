@@ -2,6 +2,7 @@ package dbmodels
 
 import (
 	"errors"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels/with"
 	"github.com/strongo/validation"
 	"strings"
 	"time"
@@ -26,18 +27,18 @@ func (v Modified) Validate() error {
 
 // WithModified DTO
 type WithModified struct {
-	WithCreated
-	WithUpdated
-	WithDeleted
+	with.CreatedFields
+	with.UpdatedFields
+	with.DeletedFields
 }
 
 func NewWithModified(at time.Time, by string) WithModified {
-	var withCreated WithCreated
+	var withCreated with.CreatedFields
 	withCreated.SetCreatedAt(at)
 	withCreated.SetCreatedBy(by)
 	return WithModified{
-		WithCreated: withCreated,
-		WithUpdated: WithUpdated{
+		CreatedFields: withCreated,
+		UpdatedFields: with.UpdatedFields{
 			UpdatedAt: at,
 			UpdatedBy: by,
 		},
@@ -47,13 +48,13 @@ func NewWithModified(at time.Time, by string) WithModified {
 // Validate returns error if not valid
 func (v *WithModified) Validate() error {
 	var errs []error
-	if err := v.WithCreated.Validate(); err != nil {
+	if err := v.CreatedFields.Validate(); err != nil {
 		errs = append(errs, err)
 	}
-	if err := v.WithUpdated.Validate(); err != nil {
+	if err := v.UpdatedFields.Validate(); err != nil {
 		errs = append(errs, validation.NewErrBadRecordFieldValue("updated", err.Error()))
 	}
-	if err := v.WithDeleted.Validate(); err != nil {
+	if err := v.DeletedFields.Validate(); err != nil {
 		errs = append(errs, validation.NewErrBadRecordFieldValue("deleted", err.Error()))
 	}
 	if len(errs) > 0 {

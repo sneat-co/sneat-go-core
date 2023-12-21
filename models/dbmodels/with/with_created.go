@@ -1,4 +1,4 @@
-package dbmodels
+package with
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Created is intended to be used only in WithCreatedField. For root level use WithCreated instead.
+// Created is intended to be used only in WithCreatedField. For root level use WithCreatedFields instead.
 type Created struct {
 	At string `json:"at" dalgo:"at" firestore:"at"`
 	By string `json:"by" dalgo:"at" firestore:"by"`
@@ -32,36 +32,36 @@ func (v *Created) Validate() error {
 	return nil
 }
 
-// WithCreatedField adds a Created field to a data model
-type WithCreatedField struct {
+// CreatedField adds a Created field to a data model
+type CreatedField struct {
 	Created Created `json:"created" firestore:"created"`
 }
 
-func (v *WithCreatedField) Validate() error {
+func (v *CreatedField) Validate() error {
 	if err := v.Created.Validate(); err != nil {
 		return validation.NewErrBadRecordFieldValue("created", err.Error())
 	}
 	return nil
 }
 
-// WithCreated adds CreatedAt and CreatedBy fields to a data model
-type WithCreated struct {
-	WithCreatedAt
-	WithCreatedBy
+// CreatedFields adds CreatedAtField and CreatedByField fields to a data model
+type CreatedFields struct {
+	CreatedAtField
+	CreatedByField
 }
 
-// UpdatesWithCreated populates update instructions for DAL when a record has been created
-func (v *WithCreated) UpdatesWithCreated() []dal.Update {
-	return append(v.WithCreatedAt.UpdatesCreatedOn(), v.WithCreatedBy.UpdatesCreatedBy()...)
+// UpdatesWhenCreated populates update instructions for DAL when a record has been created
+func (v *CreatedFields) UpdatesWhenCreated() []dal.Update {
+	return append(v.CreatedAtField.UpdatesCreatedOn(), v.CreatedByField.UpdatesCreatedBy()...)
 }
 
 // Validate returns error if not valid
-func (v *WithCreated) Validate() error {
+func (v *CreatedFields) Validate() error {
 	var errs []error
-	if err := v.WithCreatedAt.Validate(); err != nil {
+	if err := v.CreatedAtField.Validate(); err != nil {
 		errs = append(errs, err)
 	}
-	if err := v.WithCreatedBy.Validate(); err != nil {
+	if err := v.CreatedByField.Validate(); err != nil {
 		errs = append(errs, err)
 	}
 	if len(errs) > 0 {

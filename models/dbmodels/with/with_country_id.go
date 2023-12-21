@@ -1,4 +1,4 @@
-package dbmodels
+package with
 
 import (
 	"fmt"
@@ -7,24 +7,24 @@ import (
 	"strings"
 )
 
-// WithOptionalCountryID defines a record with a Country ContactID
-type WithOptionalCountryID struct {
-	CountryID string `json:"countryID,omitempty" firestore:"countryID"` // Intentionally do NOT omitempty for Firestore
+// OptionalCountryID defines a record with a Country ContactID
+type OptionalCountryID struct {
+	CountryID string `json:"countryID" dalgo:"countryID" firestore:"countryID"` // Intentionally do NOT omitempty for Firestore
 }
 
-func (v WithOptionalCountryID) Validate() error {
+func (v OptionalCountryID) Validate() error {
 	if err := ValidateOptionalCountryID("countryID", v.CountryID); err != nil {
 		return validation.NewErrBadRequestFieldValue("WithOptionalCountryID", err.Error())
 	}
 	return nil
 }
 
-// WithRequiredCountryID defines a record with a Country ContactID
-type WithRequiredCountryID struct {
-	CountryID string `json:"countryID" firestore:"countryID"`
+// RequiredCountryID defines a record with a Country ContactID
+type RequiredCountryID struct {
+	CountryID string `json:"countryID" dalgo:"countryID" firestore:"countryID"`
 }
 
-func (v WithRequiredCountryID) Validate() error {
+func (v RequiredCountryID) Validate() error {
 	if err := ValidateRequiredCountryID("countryID", v.CountryID); err != nil {
 		return err
 	}

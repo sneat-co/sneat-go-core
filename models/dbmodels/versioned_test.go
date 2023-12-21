@@ -1,6 +1,7 @@
 package dbmodels
 
 import (
+	"github.com/sneat-co/sneat-go-core/models/dbmodels/with"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -8,7 +9,7 @@ import (
 
 func TestWithUpdatedAndVersion_IncreaseVersion(t *testing.T) {
 	v := &WithUpdatedAndVersion{
-		WithUpdated: WithUpdated{
+		UpdatedFields: with.UpdatedFields{
 			UpdatedAt: time.Now(),
 			UpdatedBy: "test1",
 		},

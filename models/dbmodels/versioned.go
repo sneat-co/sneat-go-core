@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels/with"
 	"github.com/strongo/validation"
 	"time"
 )
@@ -38,7 +39,7 @@ func (v *WithVersion) GetUpdates() []dal.Update {
 }
 
 type WithUpdatedAndVersion struct {
-	WithUpdated
+	with.UpdatedFields
 	WithVersion
 }
 
@@ -54,7 +55,7 @@ func (v *WithUpdatedAndVersion) Validate() error {
 	if err := v.WithVersion.Validate(); err != nil {
 		errs = append(errs, err)
 	}
-	if err := v.WithUpdated.Validate(); err != nil {
+	if err := v.UpdatedFields.Validate(); err != nil {
 		errs = append(errs, err)
 	}
 	if len(errs) > 0 {
@@ -66,6 +67,6 @@ func (v *WithUpdatedAndVersion) Validate() error {
 func (v *WithUpdatedAndVersion) GetUpdates() []dal.Update {
 	return append(
 		v.WithVersion.GetUpdates(),
-		v.WithUpdated.GetUpdates()...,
+		v.UpdatedFields.UpdatesWhenUpdatedFieldsChanged()...,
 	)
 }

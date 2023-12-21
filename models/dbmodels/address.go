@@ -2,6 +2,7 @@ package dbmodels
 
 import (
 	"fmt"
+	"github.com/sneat-co/sneat-go-core/models/dbmodels/with"
 	"github.com/strongo/validation"
 	"strings"
 )
@@ -23,7 +24,7 @@ func (v *Address) Validate() error {
 	if v.CountryID == "" {
 		return validation.NewErrRecordIsMissingRequiredField("countryID")
 	}
-	if err := ValidateRequiredCountryID("countryID", v.CountryID); err != nil {
+	if err := with.ValidateRequiredCountryID("countryID", v.CountryID); err != nil {
 		return err
 	}
 	if strings.TrimSpace(v.ZipCode) != v.ZipCode {
