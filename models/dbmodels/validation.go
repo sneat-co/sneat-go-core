@@ -62,12 +62,12 @@ func ValidateWithIdsAndBriefs[R core.Validatable](idsField, briefsField string, 
 }
 
 // ValidateRequiredName validates required names
-func ValidateRequiredName(v *Name) error {
-	if strings.TrimSpace(v.First) == "" && strings.TrimSpace(v.Last) == "" && strings.TrimSpace(v.Full) == "" && strings.TrimSpace(v.Nick) == "" {
-		return validation.NewErrBadRecordFieldValue("first|last|full|nick", "at least one of names should be specified")
-	}
-	return nil
-}
+//func ValidateRequiredName(v *Name) error {
+//	if strings.TrimSpace(v.First) == "" && strings.TrimSpace(v.Last) == "" && strings.TrimSpace(v.Full) == "" && strings.TrimSpace(v.Nick) == "" {
+//		return validation.NewErrBadRecordFieldValue("first|last|full|nick", "at least one of names should be specified")
+//	}
+//	return nil
+//}
 
 // ValidateTitle validates title
 func ValidateTitle(title string) error {
