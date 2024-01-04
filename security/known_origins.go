@@ -1,19 +1,22 @@
 package security
 
 import (
-	"github.com/sneat-co/sneat-go-core"
-	"github.com/strongo/slice"
+	"slices"
 	"strings"
 )
 
 var knownOrigins []string
 
 func init() {
-	for _, h := range core.KnownHosts {
-		knownOrigins = append(knownOrigins, "https://"+h)
-		if h == "localhost" || strings.HasPrefix(h, "localhost:") {
-			knownOrigins = append(knownOrigins, "http://"+h)
-		}
+	for _, host := range knownHosts {
+		addKnownOrigins(host)
+	}
+}
+
+func addKnownOrigins(host string) {
+	knownOrigins = append(knownOrigins, "https://"+host)
+	if host == "localhost" || strings.HasPrefix(host, "localhost:") {
+		knownOrigins = append(knownOrigins, "http://"+host)
 	}
 }
 
@@ -22,7 +25,7 @@ func IsSupportedOrigin(origin string) bool {
 	if origin == "" {
 		return true
 	}
-	if slice.Index(knownOrigins, origin) >= 0 {
+	if slices.Contains(knownOrigins, origin) {
 		return true
 	}
 	if strings.HasPrefix(origin, "http://localhost:") {

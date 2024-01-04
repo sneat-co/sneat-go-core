@@ -1,13 +1,12 @@
 package security
 
 import (
-	core "github.com/sneat-co/sneat-go-core"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestKnownHosts(t *testing.T) {
-	assert.Equal(t, []string{"localhost:4200"}, core.KnownHosts)
+	assert.Equal(t, []string{"localhost:4200"}, knownHosts)
 }
 
 func TestIsSupportedOrigin(t *testing.T) {
