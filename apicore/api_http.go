@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/sneat-co/sneat-go-core/apicore/verify"
 	"github.com/sneat-co/sneat-go-core/httpserver"
-	"github.com/sneat-co/sneat-go-core/monitoring"
 	"log"
 	"net/http"
 )
@@ -51,13 +50,9 @@ var Execute = func(
 	ctx, err = getContext(r)
 	if err != nil {
 		log.Printf("failed to get request context: %v", err)
-		httpserver.HandleError(err, "Execute", w, r)
+		httpserver.HandleError(ctx, err, "Execute", w, r)
 		return
 	}
 	response, err := handler(ctx)
-	if err != nil {
-		monitoring.CaptureException(err)
-		err = nil
-	}
 	ReturnJSON(ctx, w, r, successStatusCode, err, response)
 }

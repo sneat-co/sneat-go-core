@@ -62,7 +62,7 @@ var VerifyRequestAndCreateUserContext = func(
 	//	return
 	//}
 	if ctx, err = VerifyRequest(w, r, options); err != nil {
-		httpserver.HandleError(err, from, w, r)
+		httpserver.HandleError(ctx, err, from, w, r)
 		return
 	}
 	if token := sneatauth.AuthTokenFromContext(ctx); token != nil {
@@ -163,7 +163,7 @@ func DecodeRequestBody(w http.ResponseWriter, r *http.Request, request facade.Re
 		}
 		if err = request.Validate(); err != nil {
 			err = fmt.Errorf("request struct decoded from HTTP request body failed initial validation %T: %w", request, err)
-			httpserver.HandleError(err, "DecodeRequestBody", w, r)
+			httpserver.HandleError(r.Context(), err, "DecodeRequestBody", w, r)
 			return err
 		}
 	}
