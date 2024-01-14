@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-var GetUserInfo func(ctx context.Context, uid string) (authUser *AuthUserInfo, err error) = func(ctx context.Context, uid string) (authUser *AuthUserInfo, err error) {
+var GetUserInfo = func(ctx context.Context, uid string) (authUser *AuthUserInfo, err error) {
 	panic("GetUserInfo is not initialized")
 }
 
