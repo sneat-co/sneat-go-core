@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+// GetUserInfo returns user info by user ID.
+// This might come from app DB, but in Sneat.app it comes from Firebase Authentication.
 var GetUserInfo = func(ctx context.Context, uid string) (authUser *AuthUserInfo, err error) {
 	panic("GetUserInfo is not initialized")
 }
