@@ -10,7 +10,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.9.0
 	github.com/strongo/slice v0.1.4
-	github.com/strongo/strongoapp v0.17.2
+	github.com/strongo/strongoapp v0.18.2
 	github.com/strongo/validation v0.0.6
 )
 
