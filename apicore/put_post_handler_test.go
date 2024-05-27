@@ -20,6 +20,7 @@ func TestHandleAuthenticatedRequestWithBody(t *testing.T) {
 		facadeHandler     FacadeHandler
 	}
 
+	getAuthTokenFromHttpRequest := GetAuthTokenFromHttpRequest
 	GetAuthTokenFromHttpRequest = func(r *http.Request) (token *sneatauth.Token, err error) {
 		return nil, nil
 	}
@@ -47,4 +48,5 @@ func TestHandleAuthenticatedRequestWithBody(t *testing.T) {
 			assert.Equal(t, tt.args.successStatusCode, w.Code)
 		})
 	}
+	GetAuthTokenFromHttpRequest = getAuthTokenFromHttpRequest
 }
