@@ -7,24 +7,23 @@ import (
 	"net/http"
 )
 
-// FacadeHandler TODO:?
-type FacadeHandler = func(
-	ctx context.Context,
-	userCtx facade.User,
-) (response interface{}, err error)
+// FacadeHandler defines a function that handles a request
+type FacadeHandler = func(ctx context.Context, userCtx facade.User) (response any, err error)
 
-// HandleAuthenticatedRequestWithBody is very similar to Execute // TODO: consider code unification & reuse
-func HandleAuthenticatedRequestWithBody(w http.ResponseWriter, r *http.Request,
+// HandleAuthenticatedRequestWithBody is very similar to Execute - consider code unification & reuse
+func HandleAuthenticatedRequestWithBody(
+	w http.ResponseWriter,
+	r *http.Request,
 	request interface{ Validate() error },
-	facadeHandler FacadeHandler,
-	successStatusCode int,
 	options verify.RequestOptions,
+	successStatusCode int,
+	facadeHandler FacadeHandler,
 ) {
 	ctx, userContext, err := VerifyAuthenticatedRequestAndDecodeBody(w, r, options, request)
-	if err != nil { // The error has been handled inside the function
-		return
+	if err != nil {
+		return // No need to write to response as the error has been handled inside the called function
 	}
-	var response interface{}
+	var response any
 	response, err = facadeHandler(ctx, userContext)
 	ReturnJSON(ctx, w, r, successStatusCode, err, response)
 }
