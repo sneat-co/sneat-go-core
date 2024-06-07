@@ -10,12 +10,12 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.9.0
 	github.com/strongo/slice v0.1.4
-	github.com/strongo/strongoapp v0.18.2
+	github.com/strongo/strongoapp v0.18.3
 	github.com/strongo/validation v0.0.6
 )
 
 require (
-	github.com/alexsergivan/transliterator v1.0.0 // indirect
+	github.com/alexsergivan/transliterator v1.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/strongo/decimal v0.0.1 // indirect
