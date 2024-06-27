@@ -10,8 +10,8 @@ import (
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/httpserver"
 	"github.com/sneat-co/sneat-go-core/sneatauth"
+	"github.com/strongo/log"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -145,15 +145,16 @@ func DecodeRequestBody(w http.ResponseWriter, r *http.Request, request facade.Re
 		return err
 	}
 	if r.ContentLength > 0 {
+		ctx := r.Context()
 		var reader io.Reader = r.Body
-		log.Println("HOST: " + r.Host)
+		log.Debugf(ctx, "HOST: %s", r.Host)
 		if strings.HasPrefix(r.Host, "localhost:") {
 			var body []byte
 			if body, err = io.ReadAll(r.Body); err != nil {
 				_, _ = fmt.Fprintf(w, "Failed to read request body: %v", err)
 				return err
 			}
-			log.Println("REQUEST BODY:\n", string(body))
+			log.Debugf(ctx, "REQUEST BODY:\n%s", string(body))
 			reader = bytes.NewReader(body)
 		}
 		if err = json.NewDecoder(reader).Decode(request); err != nil {

@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"github.com/sneat-co/sneat-go-core/capturer"
 	"github.com/sneat-co/sneat-go-core/monitoring"
+	"github.com/strongo/log"
 	"github.com/strongo/validation"
 	"io"
-	"log"
 	"net/http"
 	"reflect"
 )
@@ -30,11 +30,11 @@ type errorResponse struct {
 
 // HandleError handles error and returns appropriate HTTP status code and error details as JSON
 var HandleError = func(ctx context.Context, err error, from string, w http.ResponseWriter, r *http.Request) {
-	if flag.Lookup("test.v") == nil { // do not log errors during tests
-		log.Printf("ERROR: HandleError: from=%s; error: %v", from, err)
-	}
 	if ctx == nil {
 		ctx = r.Context()
+	}
+	if flag.Lookup("test.v") == nil { // do not log errors during tests
+		log.Errorf(ctx, "HandleError: from=%s; error: %s", from, err)
 	}
 	if isCaptured, e := capturer.IsCapturedError(err); isCaptured {
 		err = e
@@ -61,7 +61,7 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 
 	if content, err := json.Marshal(responseBody); err != nil {
 		err = fmt.Errorf("failed to encode response to JSON: %w", err)
-		log.Printf("ERROR: HandleError: %v", err)
+		log.Errorf(ctx, "HandleError: %v", err)
 		_ = monitoring.CaptureException(ctx, err)
 		//w.WriteHeader(500) // TODO: Ask at StackOverflow: Does it make sense?
 		_, _ = io.WriteString(w, "Failed to encode error as JSON: ")
@@ -70,7 +70,7 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 	} else {
 		_, err = w.Write(content)
 		if err != nil {
-			log.Printf("ERROR: HandleError: failed to write response body: %v", err)
+			log.Errorf(ctx, "HandleError: failed to write response body: %v", err)
 		}
 	}
 }

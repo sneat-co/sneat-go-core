@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/sneat-co/sneat-go-core/apicore/verify"
 	"github.com/sneat-co/sneat-go-core/httpserver"
-	"log"
+	"github.com/strongo/log"
 	"net/http"
 )
 
@@ -33,23 +33,26 @@ var Execute = func(
 	getContext ContextProvider,
 	handler Worker,
 ) {
-	log.Printf("apicore.Execute(successStatusCode=%v)", successStatusCode)
+	ctx := r.Context()
+	log.Debugf(ctx, "apicore.Execute(successStatusCode=%v)", successStatusCode)
 
 	_, err := VerifyRequest(w, r, verifyOptions)
 	if err != nil {
-		log.Printf("failed to verify request: %v", err)
+		log.Errorf(ctx, "failed to verify request: %v", err)
 		return
 	}
 	if r.Method != http.MethodGet && r.Method != http.MethodDelete {
 		if err = DecodeRequestBody(w, r, request); err != nil {
-			log.Printf("failed to decode request body: %v", err)
+			log.Errorf(ctx, "failed to decode request body: %v", err)
 			return
 		}
 	}
-	var ctx context.Context
 	ctx, err = getContext(r)
 	if err != nil {
-		log.Printf("failed to get request context: %v", err)
+		if ctx == nil {
+			ctx = r.Context()
+		}
+		log.Debugf(ctx, "failed to get request context: %v", err)
 		httpserver.HandleError(ctx, err, "Execute", w, r)
 		return
 	}
