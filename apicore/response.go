@@ -8,7 +8,7 @@ import (
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/httpserver"
 	"github.com/sneat-co/sneat-go-core/monitoring"
-	"github.com/strongo/log"
+	"github.com/strongo/logus"
 	"io"
 	"net/http"
 )
@@ -75,7 +75,7 @@ func ReturnJSON(ctx context.Context, w http.ResponseWriter, r *http.Request, suc
 			return
 		}
 	}
-	log.Debugf(ctx, "ReturnJSON(successStatusCode=%v, err=%v)", successStatusCode, err)
+	logus.Debugf(ctx, "ReturnJSON(successStatusCode=%v, err=%v)", successStatusCode, err)
 	w.WriteHeader(successStatusCode)
 	if successStatusCode == http.StatusNoContent {
 		if response != nil {

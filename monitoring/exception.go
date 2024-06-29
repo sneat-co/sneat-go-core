@@ -3,7 +3,7 @@ package monitoring
 import (
 	"context"
 	"github.com/sneat-co/sneat-go-core/capturer"
-	"github.com/strongo/log"
+	"github.com/strongo/logus"
 )
 
 var captureException func(ctx context.Context, err error) Event
@@ -24,10 +24,10 @@ type Event struct {
 // CaptureException captures exception and returns event ID.
 func CaptureException(ctx context.Context, err error) Event {
 	if captureException == nil {
-		log.Warningf(ctx, "Exception capturer is not set. Call monitoring.SetExceptionCapturer(capture func(err error)) in you app initialization code")
+		logus.Warningf(ctx, "Exception capturer is not set. Call monitoring.SetExceptionCapturer(capture func(err error)) in you app initialization code")
 
 		captureException = func(ctx context.Context, err error) Event {
-			log.Errorf(ctx, err.Error())
+			logus.Errorf(ctx, err.Error())
 			return Event{}
 		}
 	}

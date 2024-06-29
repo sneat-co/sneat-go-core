@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/sneat-co/sneat-go-core/capturer"
 	"github.com/sneat-co/sneat-go-core/monitoring"
-	"github.com/strongo/log"
+	"github.com/strongo/logus"
 	"github.com/strongo/validation"
 	"io"
 	"net/http"
@@ -34,7 +34,7 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 		ctx = r.Context()
 	}
 	if flag.Lookup("test.v") == nil { // do not log errors during tests
-		log.Errorf(ctx, "HandleError: from=%s; error: %s", from, err)
+		logus.Errorf(ctx, "HandleError: from=%s; error: %s", from, err)
 	}
 	if isCaptured, e := capturer.IsCapturedError(err); isCaptured {
 		err = e
@@ -61,7 +61,7 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 
 	if content, err := json.Marshal(responseBody); err != nil {
 		err = fmt.Errorf("failed to encode response to JSON: %w", err)
-		log.Errorf(ctx, "HandleError: %v", err)
+		logus.Errorf(ctx, "HandleError: %v", err)
 		_ = monitoring.CaptureException(ctx, err)
 		//w.WriteHeader(500) // TODO: Ask at StackOverflow: Does it make sense?
 		_, _ = io.WriteString(w, "Failed to encode error as JSON: ")
@@ -70,7 +70,7 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 	} else {
 		_, err = w.Write(content)
 		if err != nil {
-			log.Errorf(ctx, "HandleError: failed to write response body: %v", err)
+			logus.Errorf(ctx, "HandleError: failed to write response body: %v", err)
 		}
 	}
 }
