@@ -7,14 +7,14 @@ import (
 	"strings"
 )
 
-// WithMultiTeamAssetIDs mixin that adds indexed AssetIDs field // TODO: should be moved to assetus module?
-type WithMultiTeamAssetIDs struct {
+// WithMultiSpaceAssetIDs mixin that adds indexed AssetIDs field // TODO: should be moved to assetus module?
+type WithMultiSpaceAssetIDs struct {
 	// AssetIDs is used to indicate links to other assets for indexed search
 	AssetIDs []string `json:"assetIDs,omitempty" firestore:"assetIDs,omitempty"`
 }
 
 // Validate  returns error if not valid
-func (v WithMultiTeamAssetIDs) Validate() error {
+func (v WithMultiSpaceAssetIDs) Validate() error {
 	if len(v.AssetIDs) == 0 {
 		return validation.NewErrRecordIsMissingRequiredField("assetIDs") // First element should
 	}
@@ -27,10 +27,10 @@ func (v WithMultiTeamAssetIDs) Validate() error {
 		}
 		ids := strings.Split(id, ":")
 		if len(ids) != 2 {
-			return validation.NewErrBadRecordFieldValue(fmt.Sprintf("contactIDs[%v]", i), "should be in format 'teamID:assetID', got: "+id)
+			return validation.NewErrBadRecordFieldValue(fmt.Sprintf("contactIDs[%v]", i), "should be in format 'spaceID:assetID', got: "+id)
 		}
 		if ids[0] == "" {
-			return validation.NewErrBadRecordFieldValue(fmt.Sprintf("contactIDs[%v]", i), "teamID can not be empty string")
+			return validation.NewErrBadRecordFieldValue(fmt.Sprintf("contactIDs[%v]", i), "spaceID can not be empty string")
 		}
 		if ids[1] == "" {
 			return validation.NewErrBadRecordFieldValue(fmt.Sprintf("contactIDs[%v]", i), "assetID can not be empty string")
@@ -40,7 +40,7 @@ func (v WithMultiTeamAssetIDs) Validate() error {
 }
 
 // HasAssetID check if a record has a specific contact ContactID
-func (v WithMultiTeamAssetIDs) HasAssetID(id string) bool {
+func (v WithMultiSpaceAssetIDs) HasAssetID(id string) bool {
 	if id == "*" {
 		panic("id == '*'")
 	}
