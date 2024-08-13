@@ -6,6 +6,7 @@ import (
 
 var knownHosts = []string{
 	"localhost:4200",
+	"local.sneat.ws",
 }
 
 // IsKnownHost checks if it is a known app

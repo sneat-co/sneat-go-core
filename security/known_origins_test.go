@@ -6,11 +6,11 @@ import (
 )
 
 func TestKnownHosts(t *testing.T) {
-	assert.Equal(t, []string{"localhost:4200"}, knownHosts)
+	assert.Equal(t, []string{"localhost:4200", "local.sneat.ws"}, knownHosts)
 }
 
 func TestIsSupportedOrigin(t *testing.T) {
-	for i, s := range []string{"", "http://localhost:8100"} {
+	for i, s := range []string{"", "http://localhost:8100", "https://local.sneat.ws"} {
 		if !IsSupportedOrigin(s) {
 			t.Errorf("string #%d [%v] should be a supported origin", i, s)
 		}
