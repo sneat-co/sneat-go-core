@@ -1,4 +1,4 @@
-package modules
+package module
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -6,7 +6,6 @@ import (
 )
 
 func TestNewModule(t *testing.T) {
-	m := NewModule("test", func(handle HTTPHandleFunc) {
-	})
+	m := NewModule("test")
 	assert.NotNil(t, m)
 }
