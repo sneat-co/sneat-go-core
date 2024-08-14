@@ -2,8 +2,8 @@ package dbmodels
 
 import (
 	"fmt"
-	"github.com/strongo/slice"
 	"github.com/strongo/validation"
+	"slices"
 	"strings"
 )
 
@@ -47,5 +47,5 @@ func (v WithMultiSpaceAssetIDs) HasAssetID(id string) bool {
 	if id == "" {
 		panic("id is empty string")
 	}
-	return slice.Contains(v.AssetIDs, id)
+	return slices.Contains(v.AssetIDs, id)
 }

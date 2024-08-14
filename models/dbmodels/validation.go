@@ -3,8 +3,8 @@ package dbmodels
 import (
 	"fmt"
 	"github.com/sneat-co/sneat-go-core"
-	"github.com/strongo/slice"
 	"github.com/strongo/validation"
+	"slices"
 	"strings"
 )
 
@@ -24,7 +24,7 @@ func ValidateWithIdsAndBriefs[R core.Validatable](idsField, briefsField string, 
 		field := func() string {
 			return fmt.Sprintf("%s[%s]", briefsField, id)
 		}
-		if !slice.Contains(ids[1:], id) {
+		if !slices.Contains(ids[1:], id) {
 			return validation.NewErrBadRecordFieldValue(field(), "id is not in "+idsField)
 		}
 		//if r == nil {
