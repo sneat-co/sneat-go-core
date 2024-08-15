@@ -8,12 +8,8 @@ import (
 	"testing"
 )
 
-func VerifyModule(t *testing.T, m module.Module) {
-	VerifyModuleWithDelays(t, m, false)
-}
-
-// VerifyModuleWithDelays is used in module's package tests to verify that module is correctly implements registration
-func VerifyModuleWithDelays(t *testing.T, m module.Module, expectsDelays bool) {
+// VerifyModule is used in module's package tests to verify that module is correctly implements registration
+func VerifyModule(t *testing.T, m module.Module, expectsDelays bool) {
 	assert.NotNil(t, m)
 	assert.NotEmpty(t, m.ID())
 	assert.NotNil(t, m.Register)
