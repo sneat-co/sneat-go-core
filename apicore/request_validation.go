@@ -22,14 +22,14 @@ type VerifyAuthenticatedRequestAndDecodeBodyFunc = func(
 	w http.ResponseWriter, r *http.Request,
 	options verify.RequestOptions,
 	request facade.Request,
-) (ctx context.Context, userContext facade.User, err error)
+) (ctx context.Context, userContext facade.UserContext, err error)
 
 // VerifyAuthenticatedRequestAndDecodeBody decodes & verifies an HTTP request
 var VerifyAuthenticatedRequestAndDecodeBody = func(
 	w http.ResponseWriter, r *http.Request,
 	options verify.RequestOptions,
 	request facade.Request,
-) (ctx context.Context, userContext facade.User, err error) {
+) (ctx context.Context, userContext facade.UserContext, err error) {
 	ctx, userContext, err = VerifyRequestAndCreateUserContext(w, r, options)
 	if err != nil {
 		return
@@ -45,7 +45,7 @@ var VerifyAuthenticatedRequestAndDecodeBody = func(
 // VerifyRequestAndCreateUserContext runs common checks
 var VerifyRequestAndCreateUserContext = func(
 	w http.ResponseWriter, r *http.Request, options verify.RequestOptions,
-) (ctx context.Context, userContext facade.User, err error) {
+) (ctx context.Context, userContext facade.UserContext, err error) {
 	if r == nil {
 		panic("request is nil")
 	}
@@ -66,9 +66,9 @@ var VerifyRequestAndCreateUserContext = func(
 		return
 	}
 	if token := sneatauth.AuthTokenFromContext(ctx); token != nil {
-		userContext = facade.AuthUser{ID: token.UID}
+		userContext = facade.AuthUserContext{ID: token.UID}
 	}
-	//if userContext, err = authContext.User(r.Context(), options.AuthenticationRequired()); err != nil {
+	//if userContext, err = authContext.UserContext(r.Context(), options.AuthenticationRequired()); err != nil {
 	//	httpserver.HandleError(err, from, w, r)
 	//	return
 	//}

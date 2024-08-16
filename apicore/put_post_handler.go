@@ -8,7 +8,7 @@ import (
 )
 
 // FacadeHandler defines a function that handles a request
-type FacadeHandler = func(ctx context.Context, userCtx facade.User) (response any, err error)
+type FacadeHandler = func(ctx context.Context, userCtx facade.UserContext) (response any, err error)
 
 // HandleAuthenticatedRequestWithBody is very similar to Execute - consider code unification & reuse
 func HandleAuthenticatedRequestWithBody(

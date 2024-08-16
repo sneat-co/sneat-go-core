@@ -35,7 +35,7 @@ func TestHandleAuthenticatedRequestWithBody(t *testing.T) {
 				r:                 httptest.NewRequest(http.MethodGet, "/", nil),
 				options:           verify.Request(),
 				successStatusCode: http.StatusMethodNotAllowed, // TODO: make it working using http.StatusNoContent
-				facadeHandler: func(ctx context.Context, userCtx facade.User) (response any, err error) {
+				facadeHandler: func(ctx context.Context, userCtx facade.UserContext) (response any, err error) {
 					return nil, nil
 				},
 			},

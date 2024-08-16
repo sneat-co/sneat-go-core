@@ -9,7 +9,7 @@ import (
 type HTTPHandleFunc = func(method, path string, handler http.HandlerFunc)
 
 // HandlerFuncWithUserContext handles HTTP requests with user context
-type HandlerFuncWithUserContext func(http.ResponseWriter, *http.Request, facade.User)
+type HandlerFuncWithUserContext func(http.ResponseWriter, *http.Request, facade.UserContext)
 
 // Registerer registers HTTP handlers
 type Registerer struct {
