@@ -7,7 +7,7 @@ import (
 )
 
 type WithLastCurrencies struct {
-	LastCurrencies []money.CurrencyCode `dalgo:"lastCurrencies,noindex" firestore:"lastCurrencies,noindex"`
+	LastCurrencies []money.CurrencyCode `json:"lastCurrencies,omitempty" dalgo:"lastCurrencies,omitempty" firestore:"lastCurrencies,omitempty"`
 }
 
 func (v *WithLastCurrencies) SetLastCurrency(currencyCode money.CurrencyCode) (updates []dal.Update, err error) {
