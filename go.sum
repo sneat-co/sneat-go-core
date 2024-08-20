@@ -1,5 +1,7 @@
 github.com/crediterra/money v0.2.2 h1:DWFkW42bt6MpJkiH+M8ZlO4GaWW6IIEtrgRSRj8Fkzg=
 github.com/crediterra/money v0.2.2/go.mod h1:0BT7dzPk4Wv+Wi8J6sxlFbCknYioLWVVQM4ciMJh6TI=
+github.com/crediterra/money v0.3.0 h1:dHWEZhkMGGxkHTAbGQOaeg8eYbL8qJSCgcqdOTbNg20=
+github.com/crediterra/money v0.3.0/go.mod h1:0BT7dzPk4Wv+Wi8J6sxlFbCknYioLWVVQM4ciMJh6TI=
 github.com/dal-go/dalgo v0.12.1 h1:3W95xOSC7CLgH3OQppNOWoIaMkon8GlQmgYxxO5qnvs=
 github.com/dal-go/dalgo v0.12.1/go.mod h1:gzBMQn5sfUcHcx+7FNpO+FQz7guT/AAYgzXM4300rAY=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

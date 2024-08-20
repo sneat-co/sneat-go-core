@@ -3,7 +3,7 @@ module github.com/sneat-co/sneat-go-core
 go 1.22.3
 
 require (
-	github.com/crediterra/money v0.2.2
+	github.com/crediterra/money v0.3.0
 	github.com/dal-go/dalgo v0.12.1
 	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.9.0
