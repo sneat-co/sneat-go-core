@@ -1,5 +1,3 @@
-github.com/crediterra/money v0.2.2 h1:DWFkW42bt6MpJkiH+M8ZlO4GaWW6IIEtrgRSRj8Fkzg=
-github.com/crediterra/money v0.2.2/go.mod h1:0BT7dzPk4Wv+Wi8J6sxlFbCknYioLWVVQM4ciMJh6TI=
 github.com/crediterra/money v0.3.0 h1:dHWEZhkMGGxkHTAbGQOaeg8eYbL8qJSCgcqdOTbNg20=
 github.com/crediterra/money v0.3.0/go.mod h1:0BT7dzPk4Wv+Wi8J6sxlFbCknYioLWVVQM4ciMJh6TI=
 github.com/dal-go/dalgo v0.12.1 h1:3W95xOSC7CLgH3OQppNOWoIaMkon8GlQmgYxxO5qnvs=
@@ -22,8 +20,6 @@ github.com/strongo/random v0.0.1 h1:OZHJBb/3uEa7OX8L2Dv2pLnSeewRmXMyTACoeto6O8I=
 github.com/strongo/random v0.0.1/go.mod h1:/pSI+SjBNLBkjljNtVdYr6ERddA+LqSa87o0/s+9iuU=
 github.com/strongo/slice v0.2.0 h1:HpoBqFuE/kqQLgQf6S4r8rvO8hmeplk1WD9u7Z30V68=
 github.com/strongo/slice v0.2.0/go.mod h1:5OL1zbsT5e93IihjLNag5epqjti5d24bGyOqWMgtX/o=
-github.com/strongo/strongoapp v0.19.1 h1:YfCSXl9phTg8t8t6g1nmfuAbMophpYyKh+9ZumZO+II=
-github.com/strongo/strongoapp v0.19.1/go.mod h1:MsSKFcoGftA9NC/Gv0Y/+RqcVVo1cL0txBpTtBgml1I=
 github.com/strongo/strongoapp v0.20.0 h1:ZsFhNIiILtqRq+8yyBmIrHIKIXEzqhfXLoRfDHwzIUI=
 github.com/strongo/strongoapp v0.20.0/go.mod h1:MsSKFcoGftA9NC/Gv0Y/+RqcVVo1cL0txBpTtBgml1I=
 github.com/strongo/validation v0.0.6 h1:RskXD45ILagVW3jmuKUiq7WshE4kmoQEiUbgfigqHzw=
