@@ -1,6 +1,6 @@
 module github.com/sneat-co/sneat-go-core
 
-go 1.22.3
+go 1.22.6
 
 require (
 	github.com/crediterra/money v0.3.0
