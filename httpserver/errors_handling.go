@@ -3,6 +3,7 @@ package httpserver
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/sneat-co/sneat-go-core/capturer"
@@ -12,12 +13,14 @@ import (
 	"io"
 	"net/http"
 	"reflect"
+	"slices"
 )
 
 type errorDetails struct {
-	Message string `json:"message"`
-	From    string `json:"from,omitempty"`
-	Type    string `json:"type"`
+	Message     string `json:"message"`
+	From        string `json:"from,omitempty"`
+	Type        string `json:"type"`
+	RootErrType string `json:"rootErrType,omitempty"`
 }
 
 func (e errorDetails) String() string {
@@ -51,13 +54,14 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 	}
 
 	w.Header().Add("Content-Type", "application/json")
+
 	responseBody := errorResponse{
 		Error: errorDetails{
 			From:    from,
 			Message: err.Error(),
-			Type:    reflect.TypeOf(err).String(),
 		},
 	}
+	responseBody.Error.Type, responseBody.Error.RootErrType = getErrorTypes(err)
 
 	if content, err := json.Marshal(responseBody); err != nil {
 		err = fmt.Errorf("failed to encode response to JSON: %w", err)
@@ -73,4 +77,25 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 			logus.Errorf(ctx, "HandleError: failed to write response body: %v", err)
 		}
 	}
+}
+
+func getErrorTypes(err error) (errorType, rootErrorType string) {
+	errorType = reflect.TypeOf(err).String()
+
+	wrapErrorTypes := []string{"*fmt.wrapError"}
+
+	if slices.Contains(wrapErrorTypes, errorType) {
+		for err = errors.Unwrap(err); err != nil; {
+			errorType = reflect.TypeOf(err).String()
+			if !slices.Contains(wrapErrorTypes, errorType) {
+				break
+			}
+		}
+	}
+	for err != nil {
+		if err = errors.Unwrap(err); err != nil {
+			rootErrorType = reflect.TypeOf(err).String()
+		}
+	}
+	return
 }
