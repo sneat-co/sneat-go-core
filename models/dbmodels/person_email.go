@@ -18,7 +18,7 @@ type PersonEmail struct {
 
 func IsKnownAuthProviderID(v string) bool {
 	switch v {
-	case "password", "google.com":
+	case "password", "google.com", "firebase":
 		return true
 	}
 	return false
