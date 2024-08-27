@@ -100,7 +100,8 @@ var VerifyRequestAndCreateUserContext = func(
 //
 //}
 
-var GetAuthTokenFromHttpRequest func(r *http.Request) (token *sneatauth.Token, err error)
+// GetAuthTokenFromHttpRequest gets an auth token from HTTP request
+var GetAuthTokenFromHttpRequest func(r *http.Request, authRequired bool) (token *sneatauth.Token, err error)
 
 // VerifyRequest runs common checks
 var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options verify.RequestOptions) (ctx context.Context, err error) {
@@ -119,19 +120,24 @@ var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options verify.
 		panic("GetAuthTokenFromHttpRequest is nil")
 	}
 
+	authRequired := options.AuthenticationRequired()
+
 	var token *sneatauth.Token
-	if token, err = GetAuthTokenFromHttpRequest(r); err != nil {
+	if token, err = GetAuthTokenFromHttpRequest(r, authRequired); err != nil {
 		err = fmt.Errorf("failed to get auth token from HTTP request: %w", err)
 		w.WriteHeader(http.StatusUnauthorized)
 		_, _ = w.Write([]byte(err.Error()))
 		return
-	} else if token != nil {
+	} else if token == nil {
+		if authRequired {
+			err = errors.New("authentication required")
+			w.WriteHeader(http.StatusUnauthorized)
+			_, _ = w.Write([]byte(err.Error()))
+			return
+		}
+		// Keep the original request context
+	} else {
 		ctx = sneatauth.NewContextWithAuthToken(ctx, token)
-	} else if /* token == nil && */ options.AuthenticationRequired() {
-		err = fmt.Errorf("authentication required")
-		w.WriteHeader(http.StatusUnauthorized)
-		_, _ = w.Write([]byte(err.Error()))
-		return
 	}
 	return
 }

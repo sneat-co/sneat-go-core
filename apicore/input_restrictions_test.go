@@ -30,7 +30,7 @@ func TestVerifyRequest(t *testing.T) {
 	defer func() {
 		GetAuthTokenFromHttpRequest = nil
 	}()
-	GetAuthTokenFromHttpRequest = func(r *http.Request) (token *sneatauth.Token, err error) {
+	GetAuthTokenFromHttpRequest = func(r *http.Request, authRequired bool) (token *sneatauth.Token, err error) {
 		return nil, nil
 	}
 
