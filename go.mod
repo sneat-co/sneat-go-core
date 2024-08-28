@@ -10,7 +10,7 @@ require (
 	github.com/strongo/delaying v0.0.1
 	github.com/strongo/logus v0.2.0
 	github.com/strongo/slice v0.2.0
-	github.com/strongo/strongoapp v0.20.1
+	github.com/strongo/strongoapp v0.21.1
 	github.com/strongo/validation v0.0.6
 )
 
