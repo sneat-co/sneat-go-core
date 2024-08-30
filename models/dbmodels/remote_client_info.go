@@ -8,7 +8,7 @@ import (
 // RemoteClientInfo a struct to store data about remote client (e.g. IP address)
 type RemoteClientInfo struct {
 	HostOrApp    string    `json:"hostOrApp" firestore:"hostOrApp"`
-	RemoteAddr   string    `json:"remoteAddr" firestore:"remoteAddr"`
+	RemoteAddr   string    `json:"remoteAddr,omitempty" firestore:"remoteAddr,omitempty"` // Can be enpty in case of messenger
 	ForwardedFor string    `json:"forwardedFor,omitempty" firestore:"forwardedFor,omitempty"`
 	GeoCountry   string    `json:"geoCountry,omitempty" firestore:"geoCountry,omitempty"`
 	GeoRegion    string    `json:"geoRegion,omitempty" firestore:"geoRegion,omitempty"`
@@ -20,7 +20,8 @@ func (v RemoteClientInfo) Validate() error {
 	if strings.TrimSpace(v.HostOrApp) == "" {
 		return validation.NewErrRecordIsMissingRequiredField("hostOrApp")
 	}
-	if strings.TrimSpace(v.RemoteAddr) == "" {
+	if strings.TrimSpace(v.RemoteAddr) == "" &&
+		!strings.Contains(v.HostOrApp, "@") { // @ is used to separate platform and bot ID
 		return validation.NewErrRecordIsMissingRequiredField("remoteAddr")
 	}
 	if v.GeoCityPoint != nil && !v.GeoCityPoint.Valid() {
