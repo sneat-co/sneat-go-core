@@ -8,7 +8,8 @@ import (
 
 // GetDatabase creates a new DB for a given context
 var GetDatabase = func(ctx context.Context) (dal.DB, error) {
-	return nil, fmt.Errorf("%w: facade.GetDatabase(context.Context) (dal.DB, error)", ErrNotInitialized)
+	panic(fmt.Errorf("%w: facade.GetDatabase(context.Context) (dal.DB, error)", ErrNotInitialized))
+	//return nil, fmt.Errorf("%w: facade.GetDatabase(context.Context) (dal.DB, error)", ErrNotInitialized)
 }
 
 // RunReadwriteTransaction is a helper wrapper that created a facade DB instance and runs a transaction
