@@ -153,7 +153,6 @@ func DecodeRequestBody(w http.ResponseWriter, r *http.Request, request facade.Re
 	if r.ContentLength > 0 {
 		ctx := r.Context()
 		var reader io.Reader = r.Body
-		logus.Debugf(ctx, "HOST: %s", r.Host)
 		if strings.HasPrefix(r.Host, "localhost:") {
 			var body []byte
 			if body, err = io.ReadAll(r.Body); err != nil {
