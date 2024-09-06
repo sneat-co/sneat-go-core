@@ -10,9 +10,9 @@ import (
 func TestGetDatabase(t *testing.T) {
 	ctx := context.Background()
 	defer mustPanicWithErrNotInitialized(t)
-	_, _ = GetDatabase(ctx)
+	_, _ = GetSneatDB(ctx)
 	//if db != nil {
-	//	t.Error("GetDatabase() = ", db)
+	//	t.Error("GetSneatDB() = ", db)
 	//}
 	//if !errors.Is(err, ErrNotInitialized) {
 	//	t.Error("Expected to return ErrNotInitialized")
