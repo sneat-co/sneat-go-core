@@ -8,6 +8,12 @@ import (
 
 // AccessControlAllowOrigin verifies HTTP header "Origin"
 func AccessControlAllowOrigin(w http.ResponseWriter, r *http.Request) bool {
+	if r == nil {
+		panic("request is nil")
+	}
+	if w == nil {
+		panic("response writer is nil")
+	}
 	origin := r.Header.Get("Origin")
 	if !security.IsSupportedOrigin(origin) {
 		w.WriteHeader(http.StatusForbidden)
