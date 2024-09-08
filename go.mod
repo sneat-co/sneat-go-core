@@ -9,8 +9,8 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/strongo/delaying v0.0.1
 	github.com/strongo/logus v0.2.0
-	github.com/strongo/slice v0.2.0
-	github.com/strongo/strongoapp v0.24.3
+	github.com/strongo/slice v0.3.0
+	github.com/strongo/strongoapp v0.25.0
 	github.com/strongo/validation v0.0.7
 )
 
