@@ -36,13 +36,13 @@ func (v *WithUserIDs) HasUserID(uid string) bool {
 }
 
 // AddUserID adds user ID and return dal.Update
-func (v *WithUserIDs) AddUserID(uid string) (u dal.Update, ok bool) {
+func (v *WithUserIDs) AddUserID(uid string) (updates []dal.Update) {
 	if v.HasUserID(uid) {
-		return u, false
+		return nil
 	}
 	v.UserIDs = append(v.UserIDs, uid)
-	return dal.Update{
+	return []dal.Update{{
 		Field: "userIDs",
 		Value: v.UserIDs,
-	}, true
+	}}
 }
