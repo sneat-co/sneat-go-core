@@ -13,25 +13,25 @@ type Module interface {
 
 type RegistrationArgs interface {
 	Handle() HTTPHandleFunc
-	MustRegisterDelayFunc() func(key string, i any) delaying.Function
+	MustRegisterDelayFunc() func(key string, i any) delaying.Delayer
 }
 
 var _ RegistrationArgs = (*registrationArgs)(nil)
 
 type registrationArgs struct {
 	handle                HTTPHandleFunc
-	mustRegisterDelayFunc func(key string, i any) delaying.Function
+	mustRegisterDelayFunc func(key string, i any) delaying.Delayer
 }
 
 func (a registrationArgs) Handle() HTTPHandleFunc {
 	return a.handle
 }
 
-func (a registrationArgs) MustRegisterDelayFunc() func(key string, i any) delaying.Function {
+func (a registrationArgs) MustRegisterDelayFunc() func(key string, i any) delaying.Delayer {
 	return a.mustRegisterDelayFunc
 }
 
-func NewModuleRegistrationArgs(handle HTTPHandleFunc, mustRegisterDelayFunc func(key string, i any) delaying.Function) RegistrationArgs {
+func NewModuleRegistrationArgs(handle HTTPHandleFunc, mustRegisterDelayFunc func(key string, i any) delaying.Delayer) RegistrationArgs {
 	return &registrationArgs{handle: handle, mustRegisterDelayFunc: mustRegisterDelayFunc}
 }
 
@@ -40,7 +40,7 @@ var _ Module = (*config)(nil)
 type config struct {
 	id             string
 	registerRoutes func(handle HTTPHandleFunc)
-	registerDelays func(mustRegisterFunc func(key string, i any) delaying.Function)
+	registerDelays func(mustRegisterFunc func(key string, i any) delaying.Delayer)
 }
 
 func (m *config) Register(args RegistrationArgs) {
@@ -81,7 +81,7 @@ func RegisterRoutes(registerRoutes func(handle HTTPHandleFunc)) Option {
 	}
 }
 
-func RegisterDelays(registerDelays func(mustRegisterFunc func(key string, i any) delaying.Function)) Option {
+func RegisterDelays(registerDelays func(mustRegisterFunc func(key string, i any) delaying.Delayer)) Option {
 	return func(m *config) {
 		m.registerDelays = registerDelays
 	}

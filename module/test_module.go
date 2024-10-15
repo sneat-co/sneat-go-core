@@ -26,7 +26,7 @@ func AssertModule(t *testing.T, m Module, expected Expected) {
 		handlersCount++
 	}
 	delayersCount := 0
-	mustRegisterDelayFunc := func(key string, i any) delaying.Function {
+	mustRegisterDelayFunc := func(key string, i any) delaying.Delayer {
 		delayersCount++
 		enqueueWork := func(c context.Context, params delaying.Params, args ...interface{}) error {
 			return nil
@@ -34,7 +34,7 @@ func AssertModule(t *testing.T, m Module, expected Expected) {
 		enqueueWorkMulti := func(c context.Context, params delaying.Params, args ...[]interface{}) error {
 			return nil
 		}
-		return delaying.NewFunction(key, func() {}, enqueueWork, enqueueWorkMulti)
+		return delaying.NewDelayer(key, func() {}, enqueueWork, enqueueWorkMulti)
 	}
 	delaying.Init(mustRegisterDelayFunc)
 	args := NewModuleRegistrationArgs(handle, mustRegisterDelayFunc)
