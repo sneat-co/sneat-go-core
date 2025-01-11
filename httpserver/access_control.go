@@ -15,9 +15,9 @@ func AccessControlAllowOrigin(w http.ResponseWriter, r *http.Request) bool {
 		panic("response writer is nil")
 	}
 	origin := r.Header.Get("Origin")
-	if !security.IsSupportedOrigin(origin) {
+	if err := security.VerifyOrigin(origin); err != nil {
 		w.WriteHeader(http.StatusForbidden)
-		_, _ = fmt.Fprintf(w, "Unsupported origin: %v", origin)
+		_, _ = fmt.Fprintf(w, "Unsupported origin: %v", err)
 		return false
 	}
 	if header := w.Header(); header.Get("Access-Control-Allow-Origin") == "" {

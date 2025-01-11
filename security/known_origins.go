@@ -1,6 +1,8 @@
 package security
 
 import (
+	"errors"
+	"fmt"
 	"slices"
 	"strings"
 )
@@ -20,16 +22,18 @@ func addKnownOrigins(host string) {
 	}
 }
 
-// IsSupportedOrigin verifies if provided origin is allowed
-func IsSupportedOrigin(origin string) bool {
+var ErrBadOrigin = errors.New("bad origin")
+
+// VerifyOrigin verifies if provided origin is allowed
+func VerifyOrigin(origin string) error {
 	if origin == "" {
-		return true
-	}
-	if slices.Contains(knownOrigins, origin) {
-		return true
+		return nil
 	}
 	if strings.HasPrefix(origin, "http://localhost:") {
-		return true
+		return nil
 	}
-	return false
+	if slices.Contains(knownOrigins, origin) {
+		return nil
+	}
+	return fmt.Errorf("%w: %s: known origins: %s", ErrBadOrigin, origin, strings.Join(knownOrigins, ", "))
 }
