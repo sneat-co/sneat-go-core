@@ -1,6 +1,7 @@
 package email2writer
 
 import (
+	"context"
 	"fmt"
 	"github.com/sneat-co/sneat-go-core/emails"
 	"io"
@@ -28,7 +29,7 @@ func (v sent) MessageID() string {
 	return strconv.FormatInt(v.t.UnixNano(), 16)
 }
 
-func (v email2writer) Send(email emails.Email) (emails.Sent, error) {
+func (v email2writer) Send(_ context.Context, email emails.Email) (emails.Sent, error) {
 	w, err := v.w()
 	if err != nil {
 		return nil, err

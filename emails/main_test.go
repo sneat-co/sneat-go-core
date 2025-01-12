@@ -1,6 +1,9 @@
 package emails
 
-import "testing"
+import (
+	"context"
+	"testing"
+)
 
 func TestInit(t *testing.T) {
 	defer func() {
@@ -18,6 +21,6 @@ func TestSend(t *testing.T) {
 				t.Error("panic expected")
 			}
 		}()
-		_, _ = Send(Email{})
+		_, _ = Send(context.Background(), Email{})
 	})
 }

@@ -1,8 +1,10 @@
 package emails
 
+import "context"
+
 // Client interface
 type Client interface {
-	Send(email Email) (Sent, error)
+	Send(ctx context.Context, email Email) (Sent, error)
 }
 
 // Sent interface
