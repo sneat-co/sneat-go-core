@@ -42,7 +42,7 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 	if isCaptured, e := capturer.IsCapturedError(err); isCaptured {
 		err = e
 	} else {
-		_ = monitoring.CaptureException(ctx, err)
+		_ = monitoring.CaptureError(ctx, err)
 	}
 	AccessControlAllowOrigin(w, r)
 	if IsUnauthorizedError(err) {
@@ -66,7 +66,7 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 	if content, err := json.Marshal(responseBody); err != nil {
 		err = fmt.Errorf("failed to encode response to JSON: %w", err)
 		logus.Errorf(ctx, "HandleError: %v", err)
-		_ = monitoring.CaptureException(ctx, err)
+		_ = monitoring.CaptureError(ctx, err)
 		//w.WriteHeader(500) // TODO: Ask at StackOverflow: Does it make sense?
 		_, _ = io.WriteString(w, "Failed to encode error as JSON: ")
 		_, _ = io.WriteString(w, err.Error())

@@ -6,9 +6,9 @@ func TestSetExceptionCapturer(t *testing.T) {
 	t.Run("nil", func(t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
-				t.Errorf("SetExceptionCapturer() should panic")
+				t.Errorf("SetErrorCapturer() should panic")
 			}
 		}()
-		SetExceptionCapturer(nil)
+		SetErrorCapturer(nil)
 	})
 }

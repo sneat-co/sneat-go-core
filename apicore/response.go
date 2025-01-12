@@ -89,7 +89,7 @@ func ReturnJSON(ctx context.Context, w http.ResponseWriter, r *http.Request, suc
 	w.Header().Add("Content-Type", "application/json")
 	if err = json.NewEncoder(w).Encode(response); err != nil {
 		err = fmt.Errorf("failed to encode response to JSON: %w", err)
-		monitoring.CaptureException(ctx, err)
+		monitoring.CaptureError(ctx, err)
 		w.WriteHeader(500) // Ask StackOverflow: Does it make sense?
 		_, _ = io.WriteString(w, "Failed to encode response: ")
 		_, _ = io.WriteString(w, err.Error())
