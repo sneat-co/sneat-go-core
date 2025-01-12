@@ -6,14 +6,16 @@ import (
 	"github.com/strongo/logus"
 )
 
-var captureException func(ctx context.Context, err error) Event
+type ExceptionCapturer func(ctx context.Context, err error) Event
+
+var captureException ExceptionCapturer
 
 // SetExceptionCapturer sets a function that will be called to capture exception.
-func SetExceptionCapturer(capture func(ctx context.Context, err error) Event) {
-	if capture == nil {
-		panic("func SetExceptionCapturer() should not be called with nil `capture` argument")
+func SetExceptionCapturer(capturer ExceptionCapturer) {
+	if capturer == nil {
+		panic("func SetExceptionCapturer() should not be called with nil `capturer` argument")
 	}
-	captureException = capture
+	captureException = capturer
 }
 
 // Event represents an event captured my monitoring subsystem.
