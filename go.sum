@@ -6,6 +6,8 @@ github.com/dal-go/dalgo v0.14.0 h1:XhEmNfbCtV5ISxzFBE/Bk7W8OpWePYRmlvlJ/8Jk+dQ=
 github.com/dal-go/dalgo v0.14.0/go.mod h1:tErF10bqQiNrwJQ5qwL3kwoaUa6dDq4z3X3pdChr3Ms=
 github.com/dal-go/dalgo v0.14.1 h1:AMSPsFjFH4iZ1JegHdBeouzpZ4frsLnsHxBSaV+8Wgs=
 github.com/dal-go/dalgo v0.14.1/go.mod h1:BoMNGwDE9FdjynV7xCn5f/GdVJxvfePwjsMldn+BhqA=
+github.com/dal-go/dalgo v0.14.2 h1:e7T9D2Hiv9ryMWTdJd9OmnM2ilfsX3dxQOU6wbskDqc=
+github.com/dal-go/dalgo v0.14.2/go.mod h1:BoMNGwDE9FdjynV7xCn5f/GdVJxvfePwjsMldn+BhqA=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -27,6 +29,8 @@ github.com/strongo/delaying v0.1.0 h1:w4dpqwrwOxP5YlTJeZmzzIrIUM9rVXiPNv53opL0Aa
 github.com/strongo/delaying v0.1.0/go.mod h1:6PnWp2IL3UDo7tQyFVIOxBiIiHSj0eVZ6VfrleGNjzA=
 github.com/strongo/logus v0.2.0 h1:IbLupLW9WMIwjefJF+u9/Ajlaw6ysFuEeKQxOFX5tOE=
 github.com/strongo/logus v0.2.0/go.mod h1:sd8gjJklqGQAg+Q0mlP5MWgzguAuxR25YYFSkfVOPdc=
+github.com/strongo/logus v0.2.1 h1:ZzAtdSg6PPF1Y43WbNWl7MH1XYl7kvKMxyxv/lpbadI=
+github.com/strongo/logus v0.2.1/go.mod h1:sd8gjJklqGQAg+Q0mlP5MWgzguAuxR25YYFSkfVOPdc=
 github.com/strongo/random v0.0.1 h1:OZHJBb/3uEa7OX8L2Dv2pLnSeewRmXMyTACoeto6O8I=
 github.com/strongo/random v0.0.1/go.mod h1:/pSI+SjBNLBkjljNtVdYr6ERddA+LqSa87o0/s+9iuU=
 github.com/strongo/slice v0.3.0 h1:ucuI4z0nrZst6kXSTs3GhC7nbXiwyn09EiXQ+9AldrU=
@@ -41,6 +45,8 @@ github.com/strongo/strongoapp v0.25.3 h1:d43WZy0jPvDZtjT5NX5FIFYnAdppVsbbNqbOkJd
 github.com/strongo/strongoapp v0.25.3/go.mod h1:70xzRnEbJX8jm5wqqzFTtVxTbLvB0D4jNEYjQnGweOI=
 github.com/strongo/strongoapp v0.25.4 h1:AD9GrtuHXS4A6Hvv3yjPdSnOwxMt7gopMvukt/egFPk=
 github.com/strongo/strongoapp v0.25.4/go.mod h1:0ZHjfOhfg1za8ouzLoMoID7Qn3fg5IMDdjDt69xUAYI=
+github.com/strongo/strongoapp v0.25.5 h1:MOb3JYiyZX0g+AswccUGYW7J/tO1b9oPWa+UZj+5+x4=
+github.com/strongo/strongoapp v0.25.5/go.mod h1:jCdLBw1iXnG0mMu9RxET2lIfriBO4Q1qdNEbX8sAAkE=
 github.com/strongo/validation v0.0.7 h1:gs6YkwPsYtVsepQaQOB+ZF+T0Gu5+nk4ZMND8F85e+U=
 github.com/strongo/validation v0.0.7/go.mod h1:YUwoPEItLJd/Bc9X1OCUm03ofhvm3kwZvuihU7/jz58=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
