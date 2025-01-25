@@ -1,14 +1,47 @@
 package dbprofile
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestAvatar_Validate(t *testing.T) {
-	avatar := Avatar{}
-	t.Run("test_empty", func(t *testing.T) {
-		if err := avatar.Validate(); err != nil {
-			t.Fatal("error expected")
-		}
-	})
+	tests := []struct {
+		name    string
+		avatar  *Avatar
+		wantErr string
+	}{
+		{
+			name:    "empty",
+			avatar:  &Avatar{},
+			wantErr: "url|fileID|uniqueFileID",
+		},
+		{
+			name: "with_url_and_provider",
+			avatar: &Avatar{
+				Provider: "provider1",
+				URL:      "https://example.com/avatar.jpg",
+			},
+			wantErr: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.avatar.Validate()
+			if err == nil && tt.wantErr == "" {
+				return
+			}
+			if err == nil && tt.wantErr != "" {
+				t.Errorf("Validate() returned no error, expected %v", tt.wantErr)
+			}
+			if err != nil && tt.wantErr == "" {
+				t.Errorf("Validate() returned error when no error has been expected %v", err)
+			}
+			if err != nil && !strings.Contains(err.Error(), tt.wantErr) {
+				t.Errorf("Validate() returned unexpected error %v, expected: %s", err, tt.wantErr)
+			}
+		})
+	}
 }
 
 func TestAvatar_Equal(t *testing.T) {
