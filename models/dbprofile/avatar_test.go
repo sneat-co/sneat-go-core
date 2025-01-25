@@ -14,7 +14,7 @@ func TestAvatar_Validate(t *testing.T) {
 		{
 			name:    "empty",
 			avatar:  &Avatar{},
-			wantErr: "url|fileID|uniqueFileID",
+			wantErr: "url|fileID|fileUniqueID",
 		},
 		{
 			name: "with_url_and_provider",
