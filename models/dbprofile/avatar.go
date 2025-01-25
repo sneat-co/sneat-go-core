@@ -2,15 +2,13 @@ package dbprofile
 
 import "github.com/strongo/validation"
 
-type ExternalAvatar struct {
-	Provider string `json:"provider" firestore:"provider"`
-	URL      string `json:"url" firestore:"url"`
-}
-
 // Avatar record
 type Avatar struct {
-	External ExternalAvatar `json:"external" firestore:"external"`
-	Gravatar string         `json:"gravatar" firestore:"gravatar"`
+	Provider string `json:"provider" firestore:"provider"`
+	URL      string `json:"url" firestore:"url"`
+	Width    int    `json:"width,omitempty" firestore:"width,omitempty"`
+	Height   int    `json:"height,omitempty" firestore:"height,omitempty"`
+	Size     int    `json:"size,omitempty" firestore:"size,omitempty"`
 }
 
 func (v *Avatar) Equal(v2 *Avatar) bool {
@@ -19,11 +17,20 @@ func (v *Avatar) Equal(v2 *Avatar) bool {
 
 // Validate validates Avatar record
 func (v *Avatar) Validate() error {
-	if v.Gravatar != "" && v.External.URL != "" {
-		return validation.NewErrBadRecordFieldValue("ToAvatar", "either `external.url` or `gravatar` should be set, not both")
+	if v.URL != "" {
+		return validation.NewErrRecordIsMissingRequiredField("url")
 	}
-	if v.External.URL != "" && v.External.Provider == "" {
-		return validation.NewErrBadRecordFieldValue("ToAvatar", "If `external.url` is set the `external.provider` also should be set")
+	if v.Provider != "" {
+		return validation.NewErrRecordIsMissingRequiredField("provider")
+	}
+	if v.Width < 0 {
+		return validation.NewErrBadRecordFieldValue("width", "must be positive")
+	}
+	if v.Height < 0 {
+		return validation.NewErrBadRecordFieldValue("height", "must be positive")
+	}
+	if v.Size < 0 {
+		return validation.NewErrBadRecordFieldValue("size", "must be positive")
 	}
 	return nil
 }
