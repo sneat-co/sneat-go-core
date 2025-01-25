@@ -2,13 +2,15 @@ package dbprofile
 
 import "github.com/strongo/validation"
 
+type ExternalAvatar struct {
+	Provider string `json:"provider" firestore:"provider"`
+	URL      string `json:"url" firestore:"url"`
+}
+
 // Avatar record
 type Avatar struct {
-	External struct {
-		Provider string `json:"provider" firestore:"provider"`
-		URL      string `json:"url" firestore:"url"`
-	} `json:"external" firestore:"external"`
-	Gravatar string `json:"gravatar" firestore:"gravatar"`
+	External ExternalAvatar `json:"external" firestore:"external"`
+	Gravatar string         `json:"gravatar" firestore:"gravatar"`
 }
 
 func (v *Avatar) Equal(v2 *Avatar) bool {
