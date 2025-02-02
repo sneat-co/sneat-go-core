@@ -51,6 +51,8 @@ github.com/strongo/strongoapp v0.25.5 h1:MOb3JYiyZX0g+AswccUGYW7J/tO1b9oPWa+UZj+
 github.com/strongo/strongoapp v0.25.5/go.mod h1:jCdLBw1iXnG0mMu9RxET2lIfriBO4Q1qdNEbX8sAAkE=
 github.com/strongo/strongoapp v0.25.8 h1:H1LszWEGJjeD6tYkXwDYOaLIrc8TLOepsdKxiNPb4hs=
 github.com/strongo/strongoapp v0.25.8/go.mod h1:jCdLBw1iXnG0mMu9RxET2lIfriBO4Q1qdNEbX8sAAkE=
+github.com/strongo/strongoapp v0.26.1 h1:epeqRbW2ynTY0F+3eATO/1XYlhKLyXaHCElvi+5PJIs=
+github.com/strongo/strongoapp v0.26.1/go.mod h1:N7kE2B74xwn0F7FWMwpy6piD+E9iVG6cSV/o1L/8Cfk=
 github.com/strongo/validation v0.0.7 h1:gs6YkwPsYtVsepQaQOB+ZF+T0Gu5+nk4ZMND8F85e+U=
 github.com/strongo/validation v0.0.7/go.mod h1:YUwoPEItLJd/Bc9X1OCUm03ofhvm3kwZvuihU7/jz58=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
