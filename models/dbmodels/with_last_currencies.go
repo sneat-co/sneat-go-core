@@ -10,6 +10,10 @@ type WithLastCurrencies struct {
 	LastCurrencies []money.CurrencyCode `json:"lastCurrencies,omitempty" dalgo:"lastCurrencies,omitempty" firestore:"lastCurrencies,omitempty"`
 }
 
+func (v *WithLastCurrencies) GetLastCurrencies() []money.CurrencyCode {
+	return v.LastCurrencies[:]
+}
+
 func (v *WithLastCurrencies) SetLastCurrency(currencyCode money.CurrencyCode) (updates []dal.Update, err error) {
 	if !money.IsKnownCurrency(currencyCode) {
 		return nil, validation.NewErrBadRecordFieldValue("currencyCode", "unknown currency")
