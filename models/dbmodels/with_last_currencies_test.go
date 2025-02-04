@@ -1,6 +1,9 @@
 package dbmodels
 
-import "testing"
+import (
+	"github.com/crediterra/money"
+	"testing"
+)
 
 func TestWithLastCurrencies_SetLastCurrency(t *testing.T) {
 	dbo := WithLastCurrencies{}
@@ -46,5 +49,25 @@ func TestWithLastCurrencies_SetLastCurrency(t *testing.T) {
 	}
 	if dbo.LastCurrencies[1] != "USD" {
 		t.Errorf("First currency should be USD, got: %v", dbo.LastCurrencies[1])
+	}
+}
+
+func TestWithLastCurrencies_GetLastCurrencies(t *testing.T) {
+	v := &WithLastCurrencies{
+		LastCurrencies: []money.CurrencyCode{"USD", "EUR"},
+	}
+	lastCurrencies := v.GetLastCurrencies()
+	if len(lastCurrencies) != 2 {
+		t.Errorf("Expected 2 currencies, got: %d", len(lastCurrencies))
+	}
+	if lastCurrencies[0] != "USD" {
+		t.Errorf("Expected USD, got: %v", lastCurrencies[0])
+	}
+	if lastCurrencies[1] != "EUR" {
+		t.Errorf("Expected EUR, got: %v", lastCurrencies[1])
+	}
+	lastCurrencies[0] = "RUB"
+	if v.LastCurrencies[0] != "USD" {
+		t.Errorf("Expected USD, got: %v", v.LastCurrencies[0])
 	}
 }

@@ -10,8 +10,10 @@ type WithLastCurrencies struct {
 	LastCurrencies []money.CurrencyCode `json:"lastCurrencies,omitempty" dalgo:"lastCurrencies,omitempty" firestore:"lastCurrencies,omitempty"`
 }
 
-func (v *WithLastCurrencies) GetLastCurrencies() []money.CurrencyCode {
-	return v.LastCurrencies[:]
+func (v *WithLastCurrencies) GetLastCurrencies() (lastCurrencies []money.CurrencyCode) {
+	lastCurrencies = make([]money.CurrencyCode, len(v.LastCurrencies))
+	copy(lastCurrencies, v.LastCurrencies)
+	return
 }
 
 func (v *WithLastCurrencies) SetLastCurrency(currencyCode money.CurrencyCode) (updates []dal.Update, err error) {
