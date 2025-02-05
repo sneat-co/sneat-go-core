@@ -6,7 +6,6 @@ require (
 	github.com/crediterra/money v0.3.0
 	github.com/dal-go/dalgo v0.16.1
 	github.com/dal-go/mocks4dalgo v0.2.0
-	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.10.0
 	github.com/strongo/delaying v0.1.0
 	github.com/strongo/logus v0.2.1

@@ -36,7 +36,7 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 	if ctx == nil {
 		ctx = r.Context()
 	}
-	if flag.Lookup("test.v") == nil { // do not log errors during tests
+	if flag.Lookup("test.v") == nil { // do not log errors during mock_module
 		logus.Errorf(ctx, "HandleError: from=%s; error: %s", from, err)
 	}
 	if isCaptured, e := capturer.IsCapturedError(err); isCaptured {
