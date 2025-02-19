@@ -19,10 +19,10 @@ func TestWithPreferredLocale_SetPreferredLocale(t *testing.T) {
 	if len(updates) != 1 {
 		t.Error("Expected 1 update, got", len(updates))
 	}
-	if updates[0].Field != "preferredLocale" {
-		t.Error("Expected 'preferredLocale', got", updates[0].Field)
+	if updates[0].FieldName() != "preferredLocale" {
+		t.Error("Expected 'preferredLocale', got", updates[0].FieldName())
 	}
-	if updates[0].Value != code5 {
-		t.Errorf("Expected '%s', got '%s'", code5, updates[0].Value)
+	if v := updates[0].Value(); v != code5 {
+		t.Errorf("Expected '%s', got '%s'", code5, v)
 	}
 }

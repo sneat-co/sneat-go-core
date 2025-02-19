@@ -15,10 +15,10 @@ func TestWithPrimaryCurrency_SetPrimaryCurrency(t *testing.T) {
 	if len(updates) != 1 {
 		t.Error("Expected 1 update, got", len(updates))
 	}
-	if updates[0].Field != "primaryCurrency" {
-		t.Error("Expected 'primaryCurrency', got", updates[0].Field)
+	if fieldName := updates[0].FieldName(); fieldName != "primaryCurrency" {
+		t.Error("Expected 'primaryCurrency', got", fieldName)
 	}
-	if updates[0].Value != code3 {
-		t.Errorf("Expected '%s', got '%s'", code3, updates[0].Value)
+	if v := updates[0].Value(); v != code3 {
+		t.Errorf("Expected '%s', got '%s'", code3, v)
 	}
 }

@@ -2,7 +2,7 @@ package dbmodels
 
 import (
 	"errors"
-	"github.com/dal-go/dalgo/dal"
+	"github.com/dal-go/dalgo/update"
 	"github.com/sneat-co/sneat-go-core"
 	"github.com/strongo/strongoapp/with"
 	"github.com/strongo/validation"
@@ -32,10 +32,8 @@ func (v *WithVersion) IncreaseVersion() {
 	v.Version++
 }
 
-func (v *WithVersion) GetUpdates() []dal.Update {
-	return []dal.Update{
-		{Field: "v", Value: v.Version},
-	}
+func (v *WithVersion) GetUpdates() []update.Update {
+	return []update.Update{update.ByFieldName("v", v.Version)}
 }
 
 type WithUpdatedAndVersion struct {
@@ -64,7 +62,7 @@ func (v *WithUpdatedAndVersion) Validate() error {
 	return nil
 }
 
-func (v *WithUpdatedAndVersion) GetUpdates() []dal.Update {
+func (v *WithUpdatedAndVersion) GetUpdates() []update.Update {
 	return append(
 		v.WithVersion.GetUpdates(),
 		v.UpdatedFields.UpdatesWhenUpdatedFieldsChanged()...,

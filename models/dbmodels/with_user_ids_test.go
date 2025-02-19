@@ -1,7 +1,7 @@
 package dbmodels
 
 import (
-	"github.com/dal-go/dalgo/dal"
+	"github.com/dal-go/dalgo/update"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -17,13 +17,13 @@ func TestWithUserIDs_AddUserID(t *testing.T) {
 		name        string
 		fields      fields
 		args        args
-		wantUpdates []dal.Update
+		wantUpdates []update.Update
 	}{
 		{
 			name:        "nil",
 			fields:      fields{UserIDs: nil},
 			args:        args{uid: "user1"},
-			wantUpdates: []dal.Update{{Field: "userIDs", Value: []string{"user1"}}},
+			wantUpdates: []update.Update{update.ByFieldName("userIDs", []string{"user1"})},
 		},
 		{
 			name:        "existing",

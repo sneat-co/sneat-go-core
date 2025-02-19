@@ -2,7 +2,7 @@ package dbmodels
 
 import (
 	"github.com/crediterra/money"
-	"github.com/dal-go/dalgo/dal"
+	"github.com/dal-go/dalgo/update"
 	"github.com/strongo/validation"
 )
 
@@ -20,8 +20,8 @@ func (v *WithPrimaryCurrency) Validate() error {
 	return nil
 }
 
-func (v *WithPrimaryCurrency) SetPrimaryCurrency(currencyCode money.CurrencyCode) (updates []dal.Update, err error) {
+func (v *WithPrimaryCurrency) SetPrimaryCurrency(currencyCode money.CurrencyCode) (updates []update.Update, err error) {
 	v.PrimaryCurrency = currencyCode
-	updates = append(updates, dal.Update{Field: "primaryCurrency", Value: currencyCode})
+	updates = append(updates, update.ByFieldName("primaryCurrency", v.PrimaryCurrency))
 	return
 }

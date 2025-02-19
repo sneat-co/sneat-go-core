@@ -2,7 +2,7 @@ package dbmodels
 
 import (
 	"fmt"
-	"github.com/dal-go/dalgo/dal"
+	"github.com/dal-go/dalgo/update"
 	"github.com/strongo/validation"
 	"strings"
 )
@@ -36,13 +36,10 @@ func (v *WithUserIDs) HasUserID(uid string) bool {
 }
 
 // AddUserID adds user ID and return dal.Update
-func (v *WithUserIDs) AddUserID(uid string) (updates []dal.Update) {
+func (v *WithUserIDs) AddUserID(uid string) (updates []update.Update) {
 	if v.HasUserID(uid) {
 		return nil
 	}
 	v.UserIDs = append(v.UserIDs, uid)
-	return []dal.Update{{
-		Field: "userIDs",
-		Value: v.UserIDs,
-	}}
+	return []update.Update{update.ByFieldName("userIDs", v.UserIDs)}
 }

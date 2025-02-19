@@ -2,7 +2,7 @@ package dbmodels
 
 import (
 	"github.com/crediterra/money"
-	"github.com/dal-go/dalgo/dal"
+	"github.com/dal-go/dalgo/update"
 	"github.com/strongo/validation"
 )
 
@@ -16,7 +16,7 @@ func (v *WithLastCurrencies) GetLastCurrencies() (lastCurrencies []money.Currenc
 	return
 }
 
-func (v *WithLastCurrencies) SetLastCurrency(currencyCode money.CurrencyCode) (updates []dal.Update, err error) {
+func (v *WithLastCurrencies) SetLastCurrency(currencyCode money.CurrencyCode) (updates []update.Update, err error) {
 	if !money.IsKnownCurrency(currencyCode) {
 		return nil, validation.NewErrBadRecordFieldValue("currencyCode", "unknown currency")
 	}
@@ -38,6 +38,6 @@ func (v *WithLastCurrencies) SetLastCurrency(currencyCode money.CurrencyCode) (u
 	if len(v.LastCurrencies) > 10 {
 		v.LastCurrencies = v.LastCurrencies[:10]
 	}
-	updates = []dal.Update{{Field: "lastCurrencies", Value: v.LastCurrencies}}
+	updates = []update.Update{update.ByFieldName("lastCurrencies", v.LastCurrencies)}
 	return
 }
