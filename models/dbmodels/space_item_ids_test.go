@@ -1,13 +1,14 @@
 package dbmodels
 
 import (
+	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestNewSpaceItemID(t *testing.T) {
 	type args struct {
-		spaceID string
+		spaceID coretypes.SpaceID
 		id      string
 	}
 	tests := []struct {

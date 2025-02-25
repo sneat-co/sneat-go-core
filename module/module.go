@@ -2,12 +2,13 @@ package module
 
 import (
 	"fmt"
+	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/strongo/delaying"
 )
 
 // Module is the interface for config definition that all module must implement.
 type Module interface {
-	ID() string
+	ID() coretypes.ModuleID
 	Register(args RegistrationArgs)
 }
 
@@ -38,7 +39,7 @@ func NewModuleRegistrationArgs(handle HTTPHandleFunc, mustRegisterDelayFunc func
 var _ Module = (*config)(nil)
 
 type config struct {
-	id             string
+	id             coretypes.ModuleID
 	registerRoutes func(handle HTTPHandleFunc)
 	registerDelays func(mustRegisterFunc func(key string, i any) delaying.Delayer)
 }
@@ -62,13 +63,13 @@ func (m *config) Register(args RegistrationArgs) {
 	}
 }
 
-func (m *config) ID() string {
+func (m *config) ID() coretypes.ModuleID {
 	return m.id
 }
 
 type Option func(m *config)
 
-func NewModule(id string, options ...Option) Module {
+func NewModule(id coretypes.ModuleID, options ...Option) Module {
 	m := &config{id: id}
 	for _, option := range options {
 		option(m)

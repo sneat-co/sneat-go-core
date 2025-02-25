@@ -1,6 +1,9 @@
 package dbmodels
 
-import "errors"
+import (
+	"errors"
+	"github.com/sneat-co/sneat-go-core/coretypes"
+)
 import "strings"
 
 // SpaceItemIDSeparatorChar is a separator character between space ID and item ID
@@ -8,14 +11,14 @@ const SpaceItemIDSeparatorChar = '_'
 const SpaceItemIDSeparator = "_"
 
 // NewSpaceItemID returns space item ID as a concatenation of space ID and item ID
-func NewSpaceItemID(spaceID, id string) SpaceItemID {
-	return SpaceItemID(spaceID + SpaceItemIDSeparator + id)
+func NewSpaceItemID(spaceID coretypes.SpaceID, id string) SpaceItemID {
+	return SpaceItemID(string(spaceID) + SpaceItemIDSeparator + id)
 }
 
 type SpaceItemID string
 
-func (v SpaceItemID) SpaceID() string {
-	return string(v[:strings.IndexByte(string(v), SpaceItemIDSeparatorChar)])
+func (v SpaceItemID) SpaceID() coretypes.SpaceID {
+	return coretypes.SpaceID(v[:strings.IndexByte(string(v), SpaceItemIDSeparatorChar)])
 }
 
 func (v SpaceItemID) ItemID() string {

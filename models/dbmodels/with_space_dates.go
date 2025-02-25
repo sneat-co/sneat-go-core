@@ -2,6 +2,7 @@ package dbmodels
 
 import (
 	"fmt"
+	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/sneat-co/sneat-go-core/validate"
 	"github.com/strongo/slice"
 	"github.com/strongo/strongoapp/with"
@@ -33,7 +34,7 @@ func (v *WithSpaceDates) Validate() error {
 			len(v.SpaceDates),
 			len(v.SpaceIDs),
 			len(v.Dates),
-			strings.Join(v.SpaceIDs, ","),
+			v.JoinSpaceIDs(","),
 			strings.Join(v.Dates, ","),
 			strings.Join(v.SpaceDates, ","),
 		)
@@ -52,7 +53,7 @@ func (v *WithSpaceDates) populateSpaceDatesField() {
 	v.SpaceDates = make([]string, 0, len(v.SpaceIDs)*len(v.Dates))
 	for _, spaceID := range v.SpaceIDs {
 		for _, date := range v.Dates {
-			v.SpaceDates = append(v.SpaceDates, spaceID+":"+date)
+			v.SpaceDates = append(v.SpaceDates, string(spaceID)+":"+date)
 		}
 	}
 }
@@ -99,7 +100,7 @@ func (v *WithSpaceDates) validateSpaceDates() error {
 			return validation.NewErrBadRecordFieldValue(field(i), "invalid format: "+td)
 		}
 		s := strings.Split(td, ":")
-		spaceID := s[0]
+		spaceID := coretypes.SpaceID(s[0])
 		date := s[1]
 		if slice.Index(v.SpaceIDs, spaceID) < 0 {
 			return validation.NewErrBadRecordFieldValue(

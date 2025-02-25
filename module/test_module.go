@@ -2,13 +2,14 @@ package module
 
 import (
 	"context"
+	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/strongo/delaying"
 	"net/http"
 	"testing"
 )
 
 type Expected struct {
-	ModuleID      string
+	ModuleID      coretypes.ModuleID
 	HandlersCount int
 	DelayersCount int
 }

@@ -1,13 +1,14 @@
 package dbmodels
 
 import (
+	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestWithSingleSpaceID(t *testing.T) {
 	type args struct {
-		spaceID string
+		spaceID coretypes.SpaceID
 	}
 	tests := []struct {
 		name string
@@ -19,7 +20,7 @@ func TestWithSingleSpaceID(t *testing.T) {
 			args: args{
 				spaceID: "space1",
 			},
-			want: WithSpaceIDs{SpaceIDs: []string{"space1"}},
+			want: WithSpaceIDs{SpaceIDs: []coretypes.SpaceID{"space1"}},
 		},
 	}
 	for _, tt := range tests {
