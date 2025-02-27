@@ -32,7 +32,8 @@ func (v ShareDetail) Validate() error {
 	return nil
 }
 
-type SharedMap map[SpaceID]map[EntityRefWithoutSpaceID]ShareDetail
+// SharedMap is map[SpaceID]map[EntityRefWithoutSpaceID]ShareDetail
+type SharedMap map[string]map[string]ShareDetail
 
 type WithSharedMap struct {
 	SharedTo   SharedMap `json:"sharedTo,omitempty" firestore:"sharedTo,omitempty"`
@@ -46,7 +47,7 @@ func (v WithSharedMap) Validate() error {
 				return validation.NewErrBadRecordFieldValue("fieldName", "spaceID key has leading or trailing spaces")
 			}
 			for entityRef, shareDetail := range refs {
-				if err := entityRef.Validate(); err != nil {
+				if err := EntityRefWithoutSpaceID(entityRef).Validate(); err != nil {
 					return validation.NewErrBadRecordFieldValue(fmt.Sprintf("%s.%s", fieldName, spaceID), err.Error())
 				}
 				if err := shareDetail.Validate(); err != nil {

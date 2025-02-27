@@ -55,7 +55,7 @@ type UserMetadata struct {
 
 type AuthUserInfo struct {
 	*AuthProviderUserInfo
-	CustomClaims           map[string]interface{}
+	CustomClaims           map[string]any
 	Disabled               bool
 	EmailVerified          bool
 	ProviderUserInfo       []*AuthProviderUserInfo
