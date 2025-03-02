@@ -16,14 +16,6 @@ type PersonEmail struct {
 	AuthProvider string `json:"authProvider,omitempty" firestore:"authProvider,omitempty"`
 }
 
-func IsKnownAuthProviderID(v string) bool {
-	switch v {
-	case "password", "google.com", "firebase":
-		return true
-	}
-	return false
-}
-
 // Validate returns error if not valid
 func (v PersonEmail) Validate() error {
 	switch v.Type {
@@ -34,8 +26,10 @@ func (v PersonEmail) Validate() error {
 	default:
 		return validation.NewErrBadRecordFieldValue("type", "unknown value: "+v.Type)
 	}
-	if v.AuthProvider != "" && !IsKnownAuthProviderID(v.AuthProvider) {
-		return validation.NewErrBadRecordFieldValue("authProvider", "unknown value: "+v.AuthProvider)
+	if v.AuthProvider != "" {
+		if err := ValidateAuthProviderID(v.AuthProvider); err != nil {
+			return validation.NewErrBadRecordFieldValue("authProvider", err.Error())
+		}
 	}
 	if v.Address == "" {
 		return validation.NewErrRecordIsMissingRequiredField("address")
