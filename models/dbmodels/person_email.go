@@ -2,6 +2,7 @@ package dbmodels
 
 import (
 	"fmt"
+	"github.com/strongo/strongoapp/strongoauth"
 	"github.com/strongo/validation"
 	"net/mail"
 )
@@ -27,7 +28,7 @@ func (v PersonEmail) Validate() error {
 		return validation.NewErrBadRecordFieldValue("type", "unknown value: "+v.Type)
 	}
 	if v.AuthProvider != "" {
-		if err := ValidateAuthProviderID(v.AuthProvider); err != nil {
+		if err := strongoauth.ValidateAuthProviderID(v.AuthProvider); err != nil {
 			return validation.NewErrBadRecordFieldValue("authProvider", err.Error())
 		}
 	}
