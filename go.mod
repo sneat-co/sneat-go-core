@@ -1,5 +1,6 @@
 module github.com/sneat-co/sneat-go-core
 
+// https://github.com/sneat-co/sneat-go-core/actions
 go 1.22.3
 
 require (

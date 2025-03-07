@@ -25,7 +25,7 @@ jobs:
     permissions:
       contents: write
     secrets:
-      gh_token: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
     with:
       code_coverage: true
