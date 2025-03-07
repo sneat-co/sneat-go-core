@@ -39,20 +39,26 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 	if flag.Lookup("test.v") == nil { // do not log errors during mock_module
 		logus.Errorf(ctx, "HandleError: from=%s; error: %s", from, err)
 	}
+
 	if isCaptured, e := capturer.IsCapturedError(err); isCaptured {
 		err = e
 	} else {
 		_ = monitoring.CaptureError(ctx, err)
 	}
-	AccessControlAllowOrigin(w, r)
-	if IsUnauthorizedError(err) {
-		w.WriteHeader(http.StatusUnauthorized)
-	} else if validation.IsBadRequestError(err) {
-		w.WriteHeader(http.StatusBadRequest)
-	} else {
-		w.WriteHeader(http.StatusInternalServerError)
+
+	var statusCode int
+	switch {
+	case validation.IsBadRequestError(err):
+		statusCode = http.StatusBadRequest
+	case IsUnauthorizedError(err):
+		statusCode = http.StatusUnauthorized
+	default:
+		statusCode = http.StatusInternalServerError
 	}
 
+	w.WriteHeader(statusCode)
+
+	AccessControlAllowOrigin(w, r)
 	w.Header().Add("Content-Type", "application/json")
 
 	responseBody := errorResponse{

@@ -124,21 +124,13 @@ var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options verify.
 
 	var token *sneatauth.Token
 	if token, err = GetAuthTokenFromHttpRequest(r, authRequired); err != nil {
-		err = fmt.Errorf("failed to get auth token from HTTP request: %w", err)
-		w.WriteHeader(http.StatusUnauthorized)
-		_, _ = w.Write([]byte(err.Error()))
+		err = fmt.Errorf("%w: %v", facade.ErrUnauthorized, fmt.Errorf("failed to get auth token from HTTP request: %w", err))
 		return
-	} else if token == nil {
-		if authRequired {
-			err = errors.New("authentication required")
-			w.WriteHeader(http.StatusUnauthorized)
-			_, _ = w.Write([]byte(err.Error()))
-			return
-		}
-		// Keep the original request context
-	} else {
-		ctx = sneatauth.NewContextWithAuthToken(ctx, token)
+	} else if token == nil && authRequired {
+		err = fmt.Errorf("%w: %v", facade.ErrUnauthorized, fmt.Errorf("authentication required: %w", err))
+		return
 	}
+	ctx = sneatauth.NewContextWithAuthToken(ctx, token)
 	return
 }
 
