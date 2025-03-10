@@ -42,7 +42,7 @@ func (v SpaceRef) SpaceType() SpaceType {
 	return ""
 }
 
-// SpaceID returns space ID from the space reference
+// SpaceID returns space userID from the space reference
 func (v SpaceRef) SpaceID() SpaceID {
 	if i := strings.Index(string(v), SpaceRefSeparator); i >= 0 {
 		return SpaceID(v[i+1:])
@@ -71,7 +71,7 @@ func NewSpaceRef(spaceType SpaceType, spaceID SpaceID) SpaceRef {
 	return SpaceRef(string(spaceType) + SpaceRefSeparator + string(spaceID))
 }
 
-// NewWeakSpaceRef creates a new weak SpaceRef, e.g. only with space type, no space ID
+// NewWeakSpaceRef creates a new weak SpaceRef, e.g. only with space type, no space userID
 func NewWeakSpaceRef(spaceType SpaceType) SpaceRef {
 	switch spaceType {
 	case SpaceTypeFamily, SpaceTypePrivate:

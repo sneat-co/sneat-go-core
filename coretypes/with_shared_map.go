@@ -67,7 +67,7 @@ func (v WithSharedMap) Validate() error {
 	// Consider if we should prevent this happening in other cases?
 	//for spaceID := range v.SharedTo {
 	//	if _, ok := v.SharedFrom[spaceID]; ok {
-	//		return validation.NewErrBadRecordFieldValue("sharedFrom&sharedTo", "same space ID in sharedTo and sharedFrom: "+spaceID)
+	//		return validation.NewErrBadRecordFieldValue("sharedFrom&sharedTo", "same space userID in sharedTo and sharedFrom: "+spaceID)
 	//	}
 	//}
 	return nil

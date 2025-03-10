@@ -11,27 +11,32 @@ type AuthContext interface {
 	User(ctx context.Context, authRequired bool) (UserContext, error)
 }
 
-var _ UserContext = (*AuthUserContext)(nil)
+var _ UserContext = (*userContext)(nil)
 
-// AuthUserContext implements UserContext
-type AuthUserContext struct {
-	ID string `json:"id" firestore:"id" dalgo:"id"`
+// userContext implements UserContext
+type userContext struct {
+	userID string
+	context.Context
 }
 
-// String returns string representation of AuthUserContext
-func (v AuthUserContext) String() string {
-	return fmt.Sprintf("{id=%s}", v.ID)
+func (v userContext) User() UserContext {
+	return v
 }
 
-// Validate returns error if AuthUserContext is invalid
-func (v AuthUserContext) Validate() error {
-	if strings.TrimSpace(v.ID) == "" {
-		return fmt.Errorf("field AuthUserContext.ID is empty string")
+// String returns string representation of userContext
+func (v userContext) String() string {
+	return fmt.Sprintf("{id=%s}", v.userID)
+}
+
+// Validate returns error if userContext is invalid
+func (v userContext) Validate() error {
+	if strings.TrimSpace(v.userID) == "" {
+		return fmt.Errorf("field userContext.userID is empty string")
 	}
 	return nil
 }
 
-// GetUserIDFromContext returns user ID
-func (v AuthUserContext) GetUserID() string {
-	return v.ID
+// GetUserIDFromContext returns user userID
+func (v userContext) GetUserID() string {
+	return v.userID
 }

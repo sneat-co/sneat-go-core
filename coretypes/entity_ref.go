@@ -78,10 +78,10 @@ func (v EntityRef) Validate() error {
 	case -1:
 		return validation.NewErrBadRecordFieldValue("entityRef", "missing separator: "+string(v))
 	case len(v) - 1:
-		return validation.NewErrBadRecordFieldValue("entityRef", "missing ID: "+string(v))
+		return validation.NewErrBadRecordFieldValue("entityRef", "missing userID: "+string(v))
 	}
 	if v.ID() == "" {
-		return validation.NewErrBadRecordFieldValue("entityRef", "missing ID: "+string(v))
+		return validation.NewErrBadRecordFieldValue("entityRef", "missing userID: "+string(v))
 	}
 	return nil
 }

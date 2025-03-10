@@ -1,14 +1,13 @@
 package apicore
 
 import (
-	"context"
 	"github.com/sneat-co/sneat-go-core/apicore/verify"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"net/http"
 )
 
 // FacadeHandler defines a function that handles a request
-type FacadeHandler = func(ctx context.Context, userCtx facade.UserContext) (response any, err error)
+type FacadeHandler = func(ctx facade.ContextWithUser) (response any, err error)
 
 // HandleAuthenticatedRequestWithBody is very similar to Execute - consider code unification & reuse
 func HandleAuthenticatedRequestWithBody(
@@ -19,11 +18,11 @@ func HandleAuthenticatedRequestWithBody(
 	successStatusCode int,
 	facadeHandler FacadeHandler,
 ) {
-	ctx, userContext, err := VerifyAuthenticatedRequestAndDecodeBody(w, r, options, request)
+	ctxWithUser, err := VerifyAuthenticatedRequestAndDecodeBody(w, r, options, request)
 	if err != nil {
 		return // No need to write to response as the error has been handled inside the called function
 	}
 	var response any
-	response, err = facadeHandler(ctx, userContext)
-	ReturnJSON(ctx, w, r, successStatusCode, err, response)
+	response, err = facadeHandler(ctxWithUser)
+	ReturnJSON(ctxWithUser, w, r, successStatusCode, err, response)
 }

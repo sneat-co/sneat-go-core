@@ -19,7 +19,7 @@ func AssertModule(t *testing.T, m Module, expected Expected) {
 		t.Fatalf("Module() must not return nil")
 	}
 	if m.ID() != expected.ModuleID {
-		t.Fatalf("Module().ID() must return %q but got %q", expected.ModuleID, m.ID())
+		t.Fatalf("Module().userID() must return %q but got %q", expected.ModuleID, m.ID())
 	}
 	var handle HTTPHandleFunc
 	handlersCount := 0

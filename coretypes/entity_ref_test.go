@@ -29,7 +29,7 @@ func TestEntityRef_ID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.v.ID(); got != tt.want {
-				t.Errorf("ID() = %v, want %v", got, tt.want)
+				t.Errorf("userID() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -37,7 +37,7 @@ type Event struct {
 	ID string
 }
 
-// CaptureError captures error and returns event ID.
+// CaptureError captures error and returns event userID.
 func CaptureError(ctx context.Context, err error) Event {
 	if captureError == nil {
 		logus.Warningf(ctx, "Exception capturer is not set. Call monitoring.SetErrorCapturer(capturer ErrorCapturer) in you app initialization code")
@@ -54,7 +54,7 @@ func CaptureError(ctx context.Context, err error) Event {
 	return captureError(ctx, err)
 }
 
-// CapturePanic captures panic and returns event ID.
+// CapturePanic captures panic and returns event userID.
 func CapturePanic(ctx context.Context, err any) Event {
 	if capturePanic == nil {
 		logus.Warningf(ctx, "Panic capturer is not set. Call monitoring.SetPanicCapturer(capturer PanicCapturer) in you app initialization code")

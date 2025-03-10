@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// GetUserInfo returns user info by user ID.
+// GetUserInfo returns user info by user userID.
 // This might come from app DB, but in Sneat.app it comes from Firebase Authentication.
 var GetUserInfo = func(ctx context.Context, uid string) (authUser *AuthUserInfo, err error) {
 	panic("GetUserInfo is not initialized")
@@ -48,7 +48,7 @@ type MultiFactorSettings struct {
 type UserMetadata struct {
 	CreationTimestamp  int64
 	LastLogInTimestamp int64
-	// The time at which the user was last active (ID token refreshed), or 0 if
+	// The time at which the user was last active (userID token refreshed), or 0 if
 	// the user was never active.
 	LastRefreshTimestamp int64
 }

@@ -21,7 +21,7 @@ func (v RemoteClientInfo) Validate() error {
 		return validation.NewErrRecordIsMissingRequiredField("hostOrApp")
 	}
 	if strings.TrimSpace(v.RemoteAddr) == "" &&
-		!strings.Contains(v.HostOrApp, "@") { // @ is used to separate platform and bot ID
+		!strings.Contains(v.HostOrApp, "@") { // @ is used to separate platform and bot userID
 		return validation.NewErrRecordIsMissingRequiredField("remoteAddr")
 	}
 	if v.GeoCityPoint != nil && !v.GeoCityPoint.Valid() {

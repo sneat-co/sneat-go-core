@@ -43,7 +43,7 @@ func (m *MockModule) EXPECT() *MockModuleMockRecorder {
 // ID mocks base method.
 func (m *MockModule) ID() string {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ID")
+	ret := m.ctrl.Call(m, "userID")
 	ret0, _ := ret[0].(string)
 	return ret0
 }
@@ -51,7 +51,7 @@ func (m *MockModule) ID() string {
 // ID indicates an expected call of ID.
 func (mr *MockModuleMockRecorder) ID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ID", reflect.TypeOf((*MockModule)(nil).ID))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "userID", reflect.TypeOf((*MockModule)(nil).ID))
 }
 
 // Register mocks base method.

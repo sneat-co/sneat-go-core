@@ -35,7 +35,7 @@ func (v *WithUserIDs) HasUserID(uid string) bool {
 	return false
 }
 
-// AddUserID adds user ID and return dal.Update
+// AddUserID adds user userID and return dal.Update
 func (v *WithUserIDs) AddUserID(uid string) (updates []update.Update) {
 	if v.HasUserID(uid) {
 		return nil

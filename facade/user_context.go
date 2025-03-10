@@ -1,17 +1,40 @@
 package facade
 
-import "strings"
+import (
+	"context"
+	"strings"
+)
 
-// UserContext defines an interface for a AuthUserContext context that provides AuthUserContext ID.
+// UserContext defines an interface for a userContext context that provides userContext userID.
 type UserContext interface {
 	GetUserID() string
 }
 
-// NewUserContext creates new AuthUserContext context
+// NewUserContext creates new userContext context
+// deprecated: use NewContextWithUser instead
 func NewUserContext(id string) (userCtx UserContext) {
 	if strings.TrimSpace(id) == "" {
-		panic("AuthUserContext id is empty string")
+		panic("userContext id is empty string")
 	}
-	userCtx = AuthUserContext{ID: id}
+	userCtx = userContext{userID: id}
 	return
+}
+
+var _ context.Context = &userContext{}
+
+type ContextWithUser interface {
+	context.Context
+	User() UserContext
+}
+
+var userContextKey = "user"
+
+func NewContextWithUser(ctx context.Context, userID string) ContextWithUser {
+	userCtx := userContext{userID: userID}
+	userCtx.Context = context.WithValue(ctx, &userContextKey, &userCtx)
+	return userCtx
+}
+
+func GetUserContext(ctx context.Context) UserContext {
+	return ctx.Value(&userContextKey).(UserContext)
 }
