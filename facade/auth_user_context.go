@@ -7,5 +7,5 @@ import (
 // AuthContextObsolete defines auth context interface
 // deprecated: use ContextWithUser instead?
 type AuthContextObsolete interface {
-	User(ctx context.Context, authRequired bool) (UserContext, error)
+	User(ctx context.Context, authRequired bool) (userContext, error)
 }

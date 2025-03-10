@@ -16,7 +16,7 @@ func TestNewUserContext(t *testing.T) {
 
 func TestUserContext_GetUserID(t *testing.T) {
 	const userID = "123"
-	v := UserContext{userID: userID}
+	v := userContext{userID: userID}
 	if actual := v.GetUserID(); actual != userID {
 		t.Errorf("v.GetUserIDFromContext() != userID: %s != %s", actual, userID)
 	}
@@ -24,21 +24,21 @@ func TestUserContext_GetUserID(t *testing.T) {
 
 func TestUserContext_String(t *testing.T) {
 	const userID = "123"
-	v := UserContext{userID: userID}
-	if actual := v.String(); actual != "UserContext{id=123}" {
-		t.Errorf("v.String() != \"UserContext{id=123}\": %v", actual)
+	v := userContext{userID: userID}
+	if actual := v.String(); actual != "userContext{id=123}" {
+		t.Errorf("v.String() != \"userContext{id=123}\": %v", actual)
 	}
 }
 
 func TestUserContext_Validate(t *testing.T) {
 	t.Run("empty userID", func(t *testing.T) {
-		v := UserContext{}
+		v := userContext{}
 		if err := v.Validate(); err == nil {
 			t.Error("err == nil")
 		}
 	})
 	t.Run("non-empty userID", func(t *testing.T) {
-		v := UserContext{userID: "123"}
+		v := userContext{userID: "123"}
 		if err := v.Validate(); err != nil {
 			t.Errorf("err != nil: %v", err)
 		}
