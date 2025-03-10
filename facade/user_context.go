@@ -29,7 +29,7 @@ func (v *UserContext) GetUserID() string {
 
 func (v *UserContext) Validate() error {
 	if strings.TrimSpace(v.userID) == "" {
-		return fmt.Errorf("field contextWithUser.userID is empty string")
+		return fmt.Errorf("field `UserContext.userID` is empty string")
 	}
 	return nil
 }

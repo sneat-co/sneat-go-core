@@ -20,7 +20,7 @@ func (v contextWithUser) User() *UserContext {
 // Validate returns error if contextWithUser is invalid
 func (v contextWithUser) Validate() error {
 	if err := v.user.Validate(); err != nil {
-
+		return fmt.Errorf("field `contextWithUser.user` is invalid: %w", err)
 	}
 	if v.Context == nil {
 		return fmt.Errorf("field contextWithUser.Context is nil")
