@@ -28,7 +28,8 @@ func TestNewContextWithUser(t *testing.T) {
 
 func TestGetUserContext(t *testing.T) {
 	var ctx context.Context = NewContextWithUser(context.Background(), "123")
-	ctx = context.WithValue(ctx, "abc", "def")
+	var key = "abc"
+	ctx = context.WithValue(ctx, &key, "def")
 	userCtx := GetUserContext(ctx)
 	if userCtx == nil {
 		t.Fatal("userCtx == nil")
