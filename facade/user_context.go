@@ -1,40 +1,35 @@
 package facade
 
 import (
-	"context"
+	"fmt"
 	"strings"
 )
 
-// UserContext defines an interface for a userContext context that provides userContext userID.
-type UserContext interface {
-	GetUserID() string
+type UserContext struct {
+	userID string
 }
 
-// NewUserContext creates new userContext context
-// deprecated: use NewContextWithUser instead
-func NewUserContext(id string) (userCtx UserContext) {
-	if strings.TrimSpace(id) == "" {
-		panic("userContext id is empty string")
+// NewUserContext creates new contextWithUser context
+func NewUserContext(userID string) (userCtx *UserContext) {
+	if strings.TrimSpace(userID) == "" {
+		panic("userID is empty string")
 	}
-	userCtx = userContext{userID: id}
-	return
+	return &UserContext{userID: userID}
 }
 
-var _ context.Context = &userContext{}
-
-type ContextWithUser interface {
-	context.Context
-	User() UserContext
+// String returns string representation of contextWithUser
+func (v *UserContext) String() string {
+	return fmt.Sprintf("UserContext{id=%s}", v.userID)
 }
 
-var userContextKey = "user"
-
-func NewContextWithUser(ctx context.Context, userID string) ContextWithUser {
-	userCtx := userContext{userID: userID}
-	userCtx.Context = context.WithValue(ctx, &userContextKey, &userCtx)
-	return userCtx
+// GetUserID returns user userID
+func (v *UserContext) GetUserID() string {
+	return v.userID
 }
 
-func GetUserContext(ctx context.Context) UserContext {
-	return ctx.Value(&userContextKey).(UserContext)
+func (v *UserContext) Validate() error {
+	if strings.TrimSpace(v.userID) == "" {
+		return fmt.Errorf("field contextWithUser.userID is empty string")
+	}
+	return nil
 }
