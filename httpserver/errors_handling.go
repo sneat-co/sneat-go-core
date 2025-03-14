@@ -91,17 +91,23 @@ func getErrorTypes(err error) (errorType, rootErrorType string) {
 	wrapErrorTypes := []string{"*fmt.wrapError"}
 
 	if slices.Contains(wrapErrorTypes, errorType) {
-		for err = errors.Unwrap(err); err != nil; {
-			errorType = reflect.TypeOf(err).String()
+		for err2 := errors.Unwrap(err); err2 != nil; {
+			if err2.Error() == err.Error() { // TODO: investigation needed - this should never happen, but it does!
+				break
+			}
+			errorType = reflect.TypeOf(err2).String()
 			if !slices.Contains(wrapErrorTypes, errorType) {
 				break
 			}
+			err = err2
 		}
 	}
-	for err != nil {
-		if err = errors.Unwrap(err); err != nil {
-			rootErrorType = reflect.TypeOf(err).String()
+	for err2 := errors.Unwrap(err); err2 != nil; {
+		if err2.Error() == err.Error() { // just in case if unwrap returns the same error, see TODO above
+			break
 		}
+		rootErrorType = reflect.TypeOf(err2).String()
+		err = err2
 	}
 	return
 }
