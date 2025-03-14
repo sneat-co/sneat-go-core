@@ -13,7 +13,6 @@ import (
 	"io"
 	"net/http"
 	"reflect"
-	"slices"
 )
 
 type errorDetails struct {
@@ -88,26 +87,23 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 func getErrorTypes(err error) (errorType, rootErrorType string) {
 	errorType = reflect.TypeOf(err).String()
 
-	wrapErrorTypes := []string{"*fmt.wrapError"}
+	const wrapErrorType = "*fmt.wrapError"
 
-	if slices.Contains(wrapErrorTypes, errorType) {
-		for err2 := errors.Unwrap(err); err2 != nil; {
-			if err2.Error() == err.Error() { // TODO: investigation needed - this should never happen, but it does!
-				break
-			}
-			errorType = reflect.TypeOf(err2).String()
-			if !slices.Contains(wrapErrorTypes, errorType) {
-				break
-			}
-			err = err2
-		}
-	}
-	for err2 := errors.Unwrap(err); err2 != nil; {
-		if err2.Error() == err.Error() { // just in case if unwrap returns the same error, see TODO above
+	for errorType == wrapErrorType {
+		if err = errors.Unwrap(err); err == nil {
 			break
 		}
-		rootErrorType = reflect.TypeOf(err2).String()
-		err = err2
+		errorType = reflect.TypeOf(err).String()
+	}
+	for {
+		if err = errors.Unwrap(err); err == nil {
+			break
+		}
+		if errType := reflect.TypeOf(err).String(); errType == "*errors.errorString" {
+			break
+		} else if errType != wrapErrorType {
+			rootErrorType = errType
+		}
 	}
 	return
 }
