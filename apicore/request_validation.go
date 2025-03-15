@@ -139,14 +139,15 @@ var VerifyRequest = func(w http.ResponseWriter, r *http.Request, options verify.
 func DecodeRequestBody(w http.ResponseWriter, r *http.Request, request facade.Request) (err error) {
 	if r.Method != http.MethodPost && r.Method != http.MethodDelete && r.Method != http.MethodPut {
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		err = fmt.Errorf("unsupported method: %v", r.Method)
+		err = fmt.Errorf("decoding request body is not supported for %s method", r.Method)
 		_, _ = fmt.Fprint(w, err.Error())
 		return err
 	}
 	if r.ContentLength > 0 {
 		ctx := r.Context()
 		var reader io.Reader = r.Body
-		if strings.HasPrefix(r.Host, "localhost:") {
+		// In local dev  we log request body
+		if r.Host == "local-api.sneat.ws" || strings.HasPrefix(r.Host, "localhost:") {
 			var body []byte
 			if body, err = io.ReadAll(r.Body); err != nil {
 				_, _ = fmt.Fprintf(w, "Failed to read request body: %v", err)
