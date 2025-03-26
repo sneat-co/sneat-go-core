@@ -37,6 +37,8 @@ github.com/strongo/strongoapp v0.26.6 h1:NuanIYlDVS/1yho4BqrkbfHtHG1aDYhhKAodL1z
 github.com/strongo/strongoapp v0.26.6/go.mod h1:tXScXwuO0aywBKrFc/50ychTQAbbZgDJSWnNnk+h/bo=
 github.com/strongo/strongoapp v0.26.8 h1:6lpSjgAzqAhQQFyh2qb7qfw1T3B4CGXMkVjL/lhr9X8=
 github.com/strongo/strongoapp v0.26.8/go.mod h1:NpH0QJ0P8VOJpo7mk5leT1f32PKpfbUM39Faz80bloM=
+github.com/strongo/strongoapp v0.27.0 h1:nC9rzSSC4e8kyIH57ODLCGInIqLSyTdZe/eSE6xIYmk=
+github.com/strongo/strongoapp v0.27.0/go.mod h1:NpH0QJ0P8VOJpo7mk5leT1f32PKpfbUM39Faz80bloM=
 github.com/strongo/validation v0.0.7 h1:gs6YkwPsYtVsepQaQOB+ZF+T0Gu5+nk4ZMND8F85e+U=
 github.com/strongo/validation v0.0.7/go.mod h1:YUwoPEItLJd/Bc9X1OCUm03ofhvm3kwZvuihU7/jz58=
 go.uber.org/mock v0.5.0 h1:KAMbZvZPyBPWgD14IrIQ38QCyjwpvVVV6K/bHl1IwQU=
