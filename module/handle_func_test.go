@@ -6,7 +6,7 @@ import (
 )
 
 func TestHttpHandleFunc(t *testing.T) {
-	var f HTTPHandleFunc = func(method, path string, handler http.HandlerFunc) {
+	var f = func(method, path string, handler http.HandlerFunc) {
 	}
 	f("GET", "/apicore/endpoint", nil)
 }

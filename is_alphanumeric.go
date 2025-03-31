@@ -1,5 +1,7 @@
 package core
 
+import "unicode"
+
 // IsAlphanumericOrUnderscore checks the given string contains only letters and digits or underscore
 // and does not have any other characters.
 func IsAlphanumericOrUnderscore(v string) bool {
@@ -7,9 +9,10 @@ func IsAlphanumericOrUnderscore(v string) bool {
 		return false
 	}
 	for _, c := range v {
-		if !(c == '_' || 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9') {
-			return false
+		if unicode.IsLetter(c) || unicode.IsDigit(c) || c == '_' {
+			continue
 		}
+		return false
 	}
 	return true
 }

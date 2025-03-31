@@ -15,12 +15,12 @@ func TestIsValidateTime(t *testing.T) {
 		{Name: "12:34", Input: "12:34", ExpectedOutput: ""},
 		{Name: "23:59", Input: "23:59", ExpectedOutput: ""},
 		{Name: "24:00", Input: "24:00", ExpectedOutput: ""},
-		{Name: "34:56", Input: "34:56", ExpectedOutput: invalidTimeNumbers.Error()},
-		{Name: "12345", Input: "12345", ExpectedOutput: shouldBeHHMMFormat.Error()},
-		{Name: "H1:34", Input: "H1:34", ExpectedOutput: shouldBeHHMMFormat.Error()},
-		{Name: "1H:34", Input: "1H:34", ExpectedOutput: shouldBeHHMMFormat.Error()},
-		{Name: "12:M4", Input: "12:M4", ExpectedOutput: shouldBeHHMMFormat.Error()},
-		{Name: "12:3M", Input: "12:3M", ExpectedOutput: shouldBeHHMMFormat.Error()},
+		{Name: "34:56", Input: "34:56", ExpectedOutput: errInvalidTimeNumbers.Error()},
+		{Name: "12345", Input: "12345", ExpectedOutput: errShouldBeHHMMFormat.Error()},
+		{Name: "H1:34", Input: "H1:34", ExpectedOutput: errShouldBeHHMMFormat.Error()},
+		{Name: "1H:34", Input: "1H:34", ExpectedOutput: errShouldBeHHMMFormat.Error()},
+		{Name: "12:M4", Input: "12:M4", ExpectedOutput: errShouldBeHHMMFormat.Error()},
+		{Name: "12:3M", Input: "12:3M", ExpectedOutput: errShouldBeHHMMFormat.Error()},
 	}
 
 	for _, test := range testCases {

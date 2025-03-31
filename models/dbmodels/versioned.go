@@ -65,6 +65,6 @@ func (v *WithUpdatedAndVersion) Validate() error {
 func (v *WithUpdatedAndVersion) GetUpdates() []update.Update {
 	return append(
 		v.WithVersion.GetUpdates(),
-		v.UpdatedFields.UpdatesWhenUpdatedFieldsChanged()...,
+		v.UpdatesWhenUpdatedFieldsChanged()...,
 	)
 }
