@@ -10,6 +10,8 @@ github.com/dal-go/mocks4dalgo v0.2.3 h1:ttyRcpGwc2X/+Uai4rENf6HxbjMyKiH+RPCJ3vgm
 github.com/dal-go/mocks4dalgo v0.2.3/go.mod h1:1yZaWk2DwBwf5mzcJeyCe5xo5xV/enrKQtwshZYdBk4=
 github.com/dal-go/mocks4dalgo v0.2.4 h1:zud//F8regnoxkVRabLx7+blY8M2BfU8J0dveimf8Sk=
 github.com/dal-go/mocks4dalgo v0.2.4/go.mod h1:DEV5aq1K2l1UsJoFFlNxPX/y0U6t2Zpvj8ElQ+PQcng=
+github.com/dal-go/mocks4dalgo v0.2.5 h1:xibzY7OQwd3Xi0JR3Nos1aySd5vkmeeC167tT8V+v6c=
+github.com/dal-go/mocks4dalgo v0.2.5/go.mod h1:aHjFq327YV8lkass1tdTqX9rG4nDABDwTSG2Pg3StKo=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
