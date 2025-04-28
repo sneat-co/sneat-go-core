@@ -26,8 +26,13 @@ type ContextWithUser interface {
 
 var userContextKey = "contextWithUser"
 
-func NewContextWithUser(ctx context.Context, userID string) ContextWithUser {
-	ctxWithUser := contextWithUser{user: NewUserContext(userID)}
+func NewContextWithUserID(ctx context.Context, userID string) ContextWithUser {
+	userCtx := NewUserContext(userID)
+	return NewContextWithUserContext(ctx, userCtx)
+}
+
+func NewContextWithUserContext(ctx context.Context, userCtx UserContext) ContextWithUser {
+	ctxWithUser := contextWithUser{user: userCtx}
 	ctxWithUser.Context = context.WithValue(ctx, &userContextKey, ctxWithUser.user)
 	return ctxWithUser
 }

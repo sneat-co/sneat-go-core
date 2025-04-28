@@ -67,7 +67,7 @@ var VerifyRequestAndCreateUserContext = func(
 		return
 	}
 	if token := sneatauth.AuthTokenFromContext(ctx); token != nil {
-		ctxWithUser = facade.NewContextWithUser(ctx, token.UID)
+		ctxWithUser = facade.NewContextWithUserID(ctx, token.UID)
 	}
 	//if ctxWithUser, err = authContext.userContext(r.Context(), options.AuthenticationRequired()); err != nil {
 	//	httpserver.HandleError(err, from, w, r)

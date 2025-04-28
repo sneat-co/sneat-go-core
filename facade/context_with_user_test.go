@@ -6,7 +6,7 @@ import (
 )
 
 func TestNewContextWithUser(t *testing.T) {
-	ctx := NewContextWithUser(context.Background(), "123")
+	ctx := NewContextWithUserID(context.Background(), "123")
 	userCtx := ctx.User()
 	if userCtx.GetUserID() != "123" {
 		t.Errorf("userCtx.GetUserIDFromContext() != \"123\": %v", userCtx.GetUserID())
@@ -14,7 +14,7 @@ func TestNewContextWithUser(t *testing.T) {
 }
 
 func TestGetUserContext(t *testing.T) {
-	var ctx context.Context = NewContextWithUser(context.Background(), "123")
+	var ctx context.Context = NewContextWithUserID(context.Background(), "123")
 	var key = "abc"
 	ctx = context.WithValue(ctx, &key, "def")
 	userCtx := GetUserContext(ctx)
