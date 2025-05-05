@@ -4,6 +4,8 @@ github.com/crediterra/money v0.3.0 h1:dHWEZhkMGGxkHTAbGQOaeg8eYbL8qJSCgcqdOTbNg2
 github.com/crediterra/money v0.3.0/go.mod h1:0BT7dzPk4Wv+Wi8J6sxlFbCknYioLWVVQM4ciMJh6TI=
 github.com/dal-go/dalgo v0.18.2 h1:KMHfJgkf7wKtyM/VAlg4ZCQa+kFrFdErrgXPCFxPqc4=
 github.com/dal-go/dalgo v0.18.2/go.mod h1:BoMNGwDE9FdjynV7xCn5f/GdVJxvfePwjsMldn+BhqA=
+github.com/dal-go/dalgo v0.18.3 h1:z1C+ReAgwURw2Zwu0HLKdBRIDhAYCZIMq8bkpqgBS+4=
+github.com/dal-go/dalgo v0.18.3/go.mod h1:BoMNGwDE9FdjynV7xCn5f/GdVJxvfePwjsMldn+BhqA=
 github.com/dal-go/mocks4dalgo v0.2.5 h1:xibzY7OQwd3Xi0JR3Nos1aySd5vkmeeC167tT8V+v6c=
 github.com/dal-go/mocks4dalgo v0.2.5/go.mod h1:aHjFq327YV8lkass1tdTqX9rG4nDABDwTSG2Pg3StKo=
 github.com/dal-go/mocks4dalgo v0.2.6 h1:X9UOkNmZLRcaviWQ4ZnGDRabbolZNg9QHpKCNHVeuXk=
