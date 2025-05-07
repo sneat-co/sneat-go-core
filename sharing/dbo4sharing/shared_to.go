@@ -8,9 +8,6 @@ type To struct {
 }
 
 func (v To) Validate() error {
-	if len(v.Spaces) == 0 && len(v.Users) == 0 {
-		return validation.NewErrRecordIsMissingRequiredField("spaces|users")
-	}
 	for id, shared := range v.Spaces {
 		if err := shared.Validate(); err != nil {
 			return validation.NewErrBadRecordFieldValue("spaces["+id+"]", err.Error())
