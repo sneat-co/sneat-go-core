@@ -1,7 +1,7 @@
 package verify
 
 // RequestOptions - options for request verification
-type RequestOptions interface { // TODO: move to shared Sneat package
+type RequestOptions interface { // TODO: move to sharing Sneat package
 	MinimumContentLength() int64
 	MaximumContentLength() int64
 	AuthenticationRequired() bool
