@@ -1,38 +1,44 @@
 package dbo4sharing
 
-import (
-	"fmt"
-	"github.com/sneat-co/sneat-go-core/sharing"
-	"github.com/strongo/strongoapp/with"
-	"github.com/strongo/validation"
-)
-
-type Shared struct {
-	ID          string              `json:"id" firestore:"id"` // This an ID of the shared item in the receiver space
-	Permissions sharing.Permissions `json:"permissions" firestore:"permissions"`
-}
+import "github.com/strongo/validation"
 
 type To struct {
-	Spaces map[string]Shared              `json:"spaces" firestore:"spaces"`
-	Users  map[string]sharing.Permissions `json:"users" firestore:"users"`
+	Spaces map[string]Shared      `json:"spaces" firestore:"spaces"`
+	Users  map[string]Permissions `json:"users" firestore:"users"`
 }
 
-type OfferDbo struct {
-	with.CreatedFields
-	Permissions []sharing.Permission `json:"permissions" firestore:"permissions"`
+func (v To) Validate() error {
+	if len(v.Spaces) == 0 && len(v.Users) == 0 {
+		return validation.NewErrRecordIsMissingRequiredField("spaces|users")
+	}
+	for id, shared := range v.Spaces {
+		if err := shared.Validate(); err != nil {
+			return validation.NewErrBadRecordFieldValue("spaces["+id+"]", err.Error())
+		}
+	}
+	for id, permissions := range v.Users {
+		if err := permissions.Validate(); err != nil {
+			return validation.NewErrBadRecordFieldValue("users["+id+"]", err.Error())
+		}
+	}
+	return nil
 }
 
-func (v OfferDbo) Validate() error {
-	if err := v.CreatedFields.Validate(); err != nil {
-		return err
+type Shared struct {
+	ID          string      `json:"id" firestore:"id"` // This an ID of the shared item in the receiver space
+	Permissions Permissions `json:"permissions" firestore:"permissions"`
+}
+
+func (v Shared) Validate() error {
+	if v.ID == "" {
+		return validation.NewErrRecordIsMissingRequiredField("id")
 	}
 	if len(v.Permissions) == 0 {
 		return validation.NewErrRecordIsMissingRequiredField("permissions")
 	}
-	for i, p := range v.Permissions {
-		if p == "" {
-			return validation.NewErrBadRecordFieldValue(fmt.Sprint("permissions[%d]", i), "empty string")
-		}
+
+	if err := v.Permissions.Validate(); err != nil {
+		return validation.NewErrBadRecordFieldValue("permissions", err.Error())
 	}
 	return nil
 }
