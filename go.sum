@@ -14,6 +14,8 @@ github.com/dal-go/mocks4dalgo v0.2.6 h1:X9UOkNmZLRcaviWQ4ZnGDRabbolZNg9QHpKCNHVe
 github.com/dal-go/mocks4dalgo v0.2.6/go.mod h1:x/4489RWgb9rXC38nIP4Z57WymujMzvcGAdvDi3eAzQ=
 github.com/dal-go/mocks4dalgo v0.2.7 h1:617+yXKS99kUqq4Gp5OfAFDWNu93O2oW2qtngb22efQ=
 github.com/dal-go/mocks4dalgo v0.2.7/go.mod h1:67r+lkp1BAzqA589AQUTzyBqrBQcSYhPDXplWWE0LdE=
+github.com/dal-go/mocks4dalgo v0.2.8 h1:JTT/iT91D6QXPn+MKJfLKh5+u23D90FgZhCpPzNzF5U=
+github.com/dal-go/mocks4dalgo v0.2.8/go.mod h1:otD/1Unr+mC8UyVDEziRcuFgUPuZwRNx1GhAJSZo224=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -41,6 +43,8 @@ github.com/strongo/strongoapp v0.30.0 h1:pLTbjenZ4D5o+KfPkUqauC+q/kJaXmlJ7YUjUNI
 github.com/strongo/strongoapp v0.30.0/go.mod h1:hNDDbY2ajZ7adR+xVZoDbdQI0AbUfoazoh3QVYpeaHo=
 github.com/strongo/strongoapp v0.31.1 h1:NyHqAvHoYI5uoYeuz2zBPLCNvc2LmjuQdTt13TdlO1I=
 github.com/strongo/strongoapp v0.31.1/go.mod h1:hNDDbY2ajZ7adR+xVZoDbdQI0AbUfoazoh3QVYpeaHo=
+github.com/strongo/strongoapp v0.31.2 h1:guw9sLa5Aylz8K5ChXz3bBR4jQglEbSSF9M2tCgP4Yo=
+github.com/strongo/strongoapp v0.31.2/go.mod h1:5B7WEskni830D82/wsxFr55K+LAFUMEcrAgbfmUjtDw=
 github.com/strongo/validation v0.0.7 h1:gs6YkwPsYtVsepQaQOB+ZF+T0Gu5+nk4ZMND8F85e+U=
 github.com/strongo/validation v0.0.7/go.mod h1:YUwoPEItLJd/Bc9X1OCUm03ofhvm3kwZvuihU7/jz58=
 go.uber.org/mock v0.5.1 h1:ASgazW/qBmR+A32MYFDB6E2POoTgOwT509VP0CT/fjs=
