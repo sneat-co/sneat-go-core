@@ -8,6 +8,8 @@ github.com/dal-go/dalgo v0.18.3 h1:z1C+ReAgwURw2Zwu0HLKdBRIDhAYCZIMq8bkpqgBS+4=
 github.com/dal-go/dalgo v0.18.3/go.mod h1:BoMNGwDE9FdjynV7xCn5f/GdVJxvfePwjsMldn+BhqA=
 github.com/dal-go/dalgo v0.19.0 h1:kltVLDpS/LCRVQKazHP413KbKYETSE4MH88Ljag2nOQ=
 github.com/dal-go/dalgo v0.19.0/go.mod h1:BoMNGwDE9FdjynV7xCn5f/GdVJxvfePwjsMldn+BhqA=
+github.com/dal-go/dalgo v0.21.0 h1:dtUi3x4LgZkg94vegDYSoBwxbsguyYoBFAS1rLaCSpA=
+github.com/dal-go/dalgo v0.21.0/go.mod h1:BoMNGwDE9FdjynV7xCn5f/GdVJxvfePwjsMldn+BhqA=
 github.com/dal-go/mocks4dalgo v0.2.5 h1:xibzY7OQwd3Xi0JR3Nos1aySd5vkmeeC167tT8V+v6c=
 github.com/dal-go/mocks4dalgo v0.2.5/go.mod h1:aHjFq327YV8lkass1tdTqX9rG4nDABDwTSG2Pg3StKo=
 github.com/dal-go/mocks4dalgo v0.2.6 h1:X9UOkNmZLRcaviWQ4ZnGDRabbolZNg9QHpKCNHVeuXk=
@@ -16,6 +18,8 @@ github.com/dal-go/mocks4dalgo v0.2.7 h1:617+yXKS99kUqq4Gp5OfAFDWNu93O2oW2qtngb22
 github.com/dal-go/mocks4dalgo v0.2.7/go.mod h1:67r+lkp1BAzqA589AQUTzyBqrBQcSYhPDXplWWE0LdE=
 github.com/dal-go/mocks4dalgo v0.2.8 h1:JTT/iT91D6QXPn+MKJfLKh5+u23D90FgZhCpPzNzF5U=
 github.com/dal-go/mocks4dalgo v0.2.8/go.mod h1:otD/1Unr+mC8UyVDEziRcuFgUPuZwRNx1GhAJSZo224=
+github.com/dal-go/mocks4dalgo v0.3.0 h1:Fv5V+wR6blBe0FMldMWRiEk6Yi6DEEpSV+gjuZcrk/4=
+github.com/dal-go/mocks4dalgo v0.3.0/go.mod h1:cfn9mN5r97rKBhAKxl/+1KykiQfB1MRAoM6BS04dUw4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
