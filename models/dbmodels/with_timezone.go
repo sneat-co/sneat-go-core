@@ -5,7 +5,7 @@ import (
 	"github.com/dal-go/dalgo/update"
 	"github.com/sneat-co/sneat-go-core"
 	"github.com/strongo/validation"
-	"regexp"
+	"strings"
 )
 
 var _ core.Validatable = (*ByUser)(nil)
@@ -19,11 +19,11 @@ func (v *WithTimezone) Validate() error {
 	return v.Timezone.Validate()
 }
 
-func (v *WithTimezone) SetTimezone(iana string, utcOffset string) (updates []update.Update) {
-	if v.Timezone == nil || v.Timezone.Iana != iana || v.Timezone.UtcOffset != utcOffset {
+func (v *WithTimezone) SetTimezone(iana string, offsetMinutes int) (updates []update.Update) {
+	if v.Timezone == nil || v.Timezone.Iana != iana || v.Timezone.OffsetMinutes != offsetMinutes {
 		v.Timezone = &Timezone{
-			Iana:      iana,
-			UtcOffset: utcOffset,
+			Iana:          iana,
+			OffsetMinutes: offsetMinutes,
 		}
 		updates = append(updates, update.ByFieldName("timezone", v.Timezone))
 	}
@@ -32,11 +32,9 @@ func (v *WithTimezone) SetTimezone(iana string, utcOffset string) (updates []upd
 
 // Timezone record
 type Timezone struct { // https://www.iana.org/time-zones
-	Iana      string `json:"iana,omitempty" firestore:"iana,omitempty"`
-	UtcOffset string `json:"utcOffset,omitempty" firestore:"utcOffset,omitempty"`
+	Iana          string `json:"iana,omitempty" firestore:"iana,omitempty"`
+	OffsetMinutes int    `json:"offsetMinutes,omitempty" firestore:"offsetMinutes,omitempty"`
 }
-
-var reTimezoneOffset = regexp.MustCompile(`[+-][01]\d+:[0-5][05]`)
 
 // Validate validates Timezone record
 func (v *Timezone) Validate() error {
@@ -46,9 +44,18 @@ func (v *Timezone) Validate() error {
 	if v.Iana == "" {
 		return validation.NewErrRecordIsMissingRequiredField("iana")
 	}
-	if v.UtcOffset != "" && !reTimezoneOffset.MatchString(v.UtcOffset) {
-		return validation.NewErrBadRecordFieldValue("utcOffset",
-			fmt.Sprintf("does not match '±HH:MM' pattern, got: [%v]", v.UtcOffset))
+	if !strings.Contains(v.Iana, "/") {
+		switch v.Iana {
+		case "UTC", "GMT": // OK
+		default:
+			return validation.NewErrBadRecordFieldValue("iana", "should be UTC or GMT or have / separator")
+		}
+	} else if slashes := strings.Count(v.Iana, "/"); slashes > 1 {
+		return validation.NewErrBadRecordFieldValue("iana", fmt.Sprintf("should be at most 1 '/' separator, got %d", slashes))
+	}
+	if v.OffsetMinutes%15 != 0 {
+		return validation.NewErrBadRecordFieldValue("offsetMinutes",
+			fmt.Sprintf("should be divided by 15, got: %d", v.OffsetMinutes))
 	}
 	return nil
 }
