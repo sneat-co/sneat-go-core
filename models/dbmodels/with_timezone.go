@@ -6,6 +6,7 @@ import (
 	"github.com/sneat-co/sneat-go-core"
 	"github.com/strongo/validation"
 	"strings"
+	"time"
 )
 
 var _ core.Validatable = (*ByUser)(nil)
@@ -19,15 +20,31 @@ func (v *WithTimezone) Validate() error {
 	return v.Timezone.Validate()
 }
 
-func (v *WithTimezone) SetTimezone(iana string, offsetMinutes int) (updates []update.Update) {
-	if v.Timezone == nil || v.Timezone.Iana != iana || v.Timezone.OffsetMinutes != offsetMinutes {
+func (v *WithTimezone) SetTimezone(ianaLocName string) (updates []update.Update, err error) {
+	var offsetMinutes int
+	if offsetMinutes, err = getOffsetMinutes(ianaLocName, time.Now()); err != nil {
+		return
+	}
+	if v.Timezone == nil || v.Timezone.Iana != ianaLocName || v.Timezone.OffsetMinutes != offsetMinutes {
 		v.Timezone = &Timezone{
-			Iana:          iana,
+			Iana:          ianaLocName,
 			OffsetMinutes: offsetMinutes,
 		}
 		updates = append(updates, update.ByFieldName("timezone", v.Timezone))
 	}
 	return
+}
+
+func getOffsetMinutes(locName string, t time.Time) (int, error) {
+	if locName == "" {
+		return 0, fmt.Errorf("timezone name cannot be empty")
+	}
+	loc, err := time.LoadLocation(locName)
+	if err != nil {
+		return 0, err
+	}
+	_, offsetSeconds := t.In(loc).Zone()
+	return offsetSeconds / 60, nil // Convert to minutes
 }
 
 // Timezone record

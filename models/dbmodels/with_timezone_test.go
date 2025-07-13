@@ -4,6 +4,7 @@ import (
 	"github.com/dal-go/dalgo/update"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestTimezone_Validate(t *testing.T) {
@@ -133,19 +134,17 @@ func TestTimezone_Validate(t *testing.T) {
 func TestWithTimezone_SetTimezone(t *testing.T) {
 	t.Run("nil_timezone", func(t *testing.T) {
 		v := &WithTimezone{}
-		updates := v.SetTimezone("America/New_York", -300) // -5 hours = -300 minutes
+		updates, err := v.SetTimezone("America/New_York")
 
+		assert.NoError(t, err, "Should not return an error for valid timezone")
 		assert.NotNil(t, v.Timezone, "Timezone should not be nil after setting")
 		assert.Equal(t, "America/New_York", v.Timezone.Iana, "Iana should be set correctly")
-		assert.Equal(t, -300, v.Timezone.OffsetMinutes, "OffsetMinutes should be set correctly")
+		assert.NotZero(t, v.Timezone.OffsetMinutes, "OffsetMinutes should be set")
 		assert.Len(t, updates, 1, "Should return 1 update")
 
-		expectedTimezone := &Timezone{
-			Iana:          "America/New_York",
-			OffsetMinutes: -300,
-		}
-		expectedUpdates := []update.Update{update.ByFieldName("timezone", expectedTimezone)}
-		assert.Equal(t, expectedUpdates, updates, "Updates should match expected")
+		// Check that the update is of the correct type
+		expectedUpdate := update.ByFieldName("timezone", v.Timezone)
+		assert.Equal(t, expectedUpdate, updates[0], "Update should be of the correct type")
 	})
 
 	t.Run("existing_timezone_different_values", func(t *testing.T) {
@@ -155,18 +154,12 @@ func TestWithTimezone_SetTimezone(t *testing.T) {
 				OffsetMinutes: 0, // +0 hours = 0 minutes
 			},
 		}
-		updates := v.SetTimezone("America/New_York", -300) // -5 hours = -300 minutes
+		updates, err := v.SetTimezone("America/New_York")
 
+		assert.NoError(t, err, "Should not return an error for valid timezone")
 		assert.Equal(t, "America/New_York", v.Timezone.Iana, "Iana should be updated")
-		assert.Equal(t, -300, v.Timezone.OffsetMinutes, "OffsetMinutes should be updated")
+		assert.NotZero(t, v.Timezone.OffsetMinutes, "OffsetMinutes should be updated")
 		assert.Len(t, updates, 1, "Should return 1 update")
-
-		expectedTimezone := &Timezone{
-			Iana:          "America/New_York",
-			OffsetMinutes: -300,
-		}
-		expectedUpdates := []update.Update{update.ByFieldName("timezone", expectedTimezone)}
-		assert.Equal(t, expectedUpdates, updates, "Updates should match expected")
 	})
 
 	t.Run("existing_timezone_same_values", func(t *testing.T) {
@@ -176,53 +169,37 @@ func TestWithTimezone_SetTimezone(t *testing.T) {
 				OffsetMinutes: -300, // -5 hours = -300 minutes
 			},
 		}
-		updates := v.SetTimezone("America/New_York", -300)
 
+		// First get the current offset minutes for the timezone
+		offsetMinutes, err := getOffsetMinutes("America/New_York", time.Now())
+		assert.NoError(t, err, "Should not return an error for valid timezone")
+
+		// Set the timezone with the current offset
+		v.Timezone.OffsetMinutes = offsetMinutes
+
+		updates, err := v.SetTimezone("America/New_York")
+
+		assert.NoError(t, err, "Should not return an error for valid timezone")
 		assert.Equal(t, "America/New_York", v.Timezone.Iana, "Iana should remain the same")
-		assert.Equal(t, -300, v.Timezone.OffsetMinutes, "OffsetMinutes should remain the same")
-		assert.Len(t, updates, 0, "Should return no updates when values are the same")
-		assert.Nil(t, updates, "Updates should be nil when no changes are made")
+		assert.Equal(t, offsetMinutes, v.Timezone.OffsetMinutes, "OffsetMinutes should remain the same")
+		assert.Empty(t, updates, "Should return no updates when values are the same")
 	})
 
-	t.Run("change_only_iana", func(t *testing.T) {
-		v := &WithTimezone{
-			Timezone: &Timezone{
-				Iana:          "Europe/London",
-				OffsetMinutes: -300, // -5 hours = -300 minutes
-			},
-		}
-		updates := v.SetTimezone("America/New_York", -300)
+	t.Run("invalid_timezone_name", func(t *testing.T) {
+		v := &WithTimezone{}
+		updates, err := v.SetTimezone("Invalid/Timezone")
 
-		assert.Equal(t, "America/New_York", v.Timezone.Iana, "Iana should be updated")
-		assert.Equal(t, -300, v.Timezone.OffsetMinutes, "OffsetMinutes should remain the same")
-		assert.Len(t, updates, 1, "Should return 1 update")
-
-		expectedTimezone := &Timezone{
-			Iana:          "America/New_York",
-			OffsetMinutes: -300,
-		}
-		expectedUpdates := []update.Update{update.ByFieldName("timezone", expectedTimezone)}
-		assert.Equal(t, expectedUpdates, updates, "Updates should match expected")
+		assert.Error(t, err, "Should return an error for invalid timezone name")
+		assert.Nil(t, updates, "Should not return any updates when error occurs")
+		assert.Nil(t, v.Timezone, "Timezone should remain nil when error occurs")
 	})
 
-	t.Run("change_only_utcOffset", func(t *testing.T) {
-		v := &WithTimezone{
-			Timezone: &Timezone{
-				Iana:          "America/New_York",
-				OffsetMinutes: 0, // +0 hours = 0 minutes
-			},
-		}
-		updates := v.SetTimezone("America/New_York", -300) // -5 hours = -300 minutes
+	t.Run("empty_timezone_name", func(t *testing.T) {
+		v := &WithTimezone{}
+		updates, err := v.SetTimezone("")
 
-		assert.Equal(t, "America/New_York", v.Timezone.Iana, "Iana should remain the same")
-		assert.Equal(t, -300, v.Timezone.OffsetMinutes, "OffsetMinutes should be updated")
-		assert.Len(t, updates, 1, "Should return 1 update")
-
-		expectedTimezone := &Timezone{
-			Iana:          "America/New_York",
-			OffsetMinutes: -300,
-		}
-		expectedUpdates := []update.Update{update.ByFieldName("timezone", expectedTimezone)}
-		assert.Equal(t, expectedUpdates, updates, "Updates should match expected")
+		assert.Error(t, err, "Should return an error for empty timezone name")
+		assert.Nil(t, updates, "Should not return any updates when error occurs")
+		assert.Nil(t, v.Timezone, "Timezone should remain nil when error occurs")
 	})
 }
