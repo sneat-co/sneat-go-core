@@ -1,6 +1,7 @@
 package module
 
 import (
+	"context"
 	"fmt"
 	"github.com/sneat-co/sneat-go-core/coretypes"
 	"github.com/strongo/delaying"
@@ -39,9 +40,10 @@ func NewModuleRegistrationArgs(handle HTTPHandleFunc, mustRegisterDelayFunc func
 var _ Module = (*config)(nil)
 
 type config struct {
-	id             coretypes.ModuleID
-	registerRoutes func(handle HTTPHandleFunc)
-	registerDelays func(mustRegisterFunc func(key string, i any) delaying.Delayer)
+	id                  coretypes.ModuleID
+	registerRoutes      func(handle HTTPHandleFunc)
+	registerDelays      func(mustRegisterFunc func(key string, i any) delaying.Delayer)
+	registerNotificator func(createNotificationMessage func(ctx context.Context, args NotificationArgs) (m any, err error))
 }
 
 func (m *config) Register(args RegistrationArgs) {
@@ -69,13 +71,14 @@ func (m *config) ID() coretypes.ModuleID {
 
 type Option func(m *config)
 
-func NewModule(id coretypes.ModuleID, options ...Option) Module {
+func NewExtension(id coretypes.ModuleID, options ...Option) Module {
 	m := &config{id: id}
 	for _, option := range options {
 		option(m)
 	}
 	return m
 }
+
 func RegisterRoutes(registerRoutes func(handle HTTPHandleFunc)) Option {
 	return func(m *config) {
 		m.registerRoutes = registerRoutes
@@ -83,6 +86,12 @@ func RegisterRoutes(registerRoutes func(handle HTTPHandleFunc)) Option {
 }
 
 func RegisterDelays(registerDelays func(mustRegisterFunc func(key string, i any) delaying.Delayer)) Option {
+	return func(m *config) {
+		m.registerDelays = registerDelays
+	}
+}
+
+func RegisterNotificator(registerDelays func(mustRegisterFunc func(key string, i any) delaying.Delayer)) Option {
 	return func(m *config) {
 		m.registerDelays = registerDelays
 	}

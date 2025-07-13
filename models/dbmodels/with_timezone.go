@@ -2,12 +2,33 @@ package dbmodels
 
 import (
 	"fmt"
+	"github.com/dal-go/dalgo/update"
 	"github.com/sneat-co/sneat-go-core"
 	"github.com/strongo/validation"
 	"regexp"
 )
 
 var _ core.Validatable = (*ByUser)(nil)
+
+// WithTimezone needs to be moved into "with" package
+type WithTimezone struct {
+	Timezone *Timezone `json:"timezone,omitempty" firestore:"timezone,omitempty"`
+}
+
+func (v *WithTimezone) Validate() error {
+	return v.Timezone.Validate()
+}
+
+func (v *WithTimezone) SetTimezone(iana string, utcOffset string) (updates []update.Update) {
+	if v.Timezone == nil || v.Timezone.Iana != iana || v.Timezone.UtcOffset != utcOffset {
+		v.Timezone = &Timezone{
+			Iana:      iana,
+			UtcOffset: utcOffset,
+		}
+		updates = append(updates, update.ByFieldName("timezone", v.Timezone))
+	}
+	return
+}
 
 // Timezone record
 type Timezone struct { // https://www.iana.org/time-zones

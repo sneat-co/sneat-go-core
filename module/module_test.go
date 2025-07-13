@@ -6,6 +6,6 @@ import (
 )
 
 func TestNewModule(t *testing.T) {
-	m := NewModule("test")
+	m := NewExtension("test")
 	assert.NotNil(t, m)
 }
