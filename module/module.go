@@ -16,6 +16,7 @@ type Module interface {
 type RegistrationArgs interface {
 	Handle() HTTPHandleFunc
 	MustRegisterDelayFunc() func(key string, i any) delaying.Delayer
+	CreateNotificationFunc() CreateNotificationFunc
 }
 
 var _ RegistrationArgs = (*registrationArgs)(nil)
@@ -23,6 +24,11 @@ var _ RegistrationArgs = (*registrationArgs)(nil)
 type registrationArgs struct {
 	handle                HTTPHandleFunc
 	mustRegisterDelayFunc func(key string, i any) delaying.Delayer
+	createNotification    CreateNotificationFunc
+}
+
+func (a registrationArgs) CreateNotificationFunc() CreateNotificationFunc {
+	return a.createNotification
 }
 
 func (a registrationArgs) Handle() HTTPHandleFunc {
@@ -39,11 +45,13 @@ func NewModuleRegistrationArgs(handle HTTPHandleFunc, mustRegisterDelayFunc func
 
 var _ Module = (*config)(nil)
 
+type CreateNotificationFunc func(ctx context.Context, args NotificationArgs) (m any, err error)
+
 type config struct {
 	id                  coretypes.ModuleID
 	registerRoutes      func(handle HTTPHandleFunc)
 	registerDelays      func(mustRegisterFunc func(key string, i any) delaying.Delayer)
-	registerNotificator func(createNotificationMessage func(ctx context.Context, args NotificationArgs) (m any, err error))
+	registerNotificator func(createNotification CreateNotificationFunc)
 }
 
 func (m *config) Register(args RegistrationArgs) {
@@ -62,6 +70,10 @@ func (m *config) Register(args RegistrationArgs) {
 			panic(fmt.Sprintf("can not register module as mustRegisterDelayFunc has not been provided (moduleID=%s)", m.id))
 		}
 		m.registerDelays(mustRegisterDelayFunc)
+	}
+
+	if m.registerNotificator != nil {
+		m.registerNotificator(args.CreateNotificationFunc())
 	}
 }
 
@@ -91,8 +103,8 @@ func RegisterDelays(registerDelays func(mustRegisterFunc func(key string, i any)
 	}
 }
 
-func RegisterNotificator(registerDelays func(mustRegisterFunc func(key string, i any) delaying.Delayer)) Option {
+func RegisterNotificator(registerNotificator func(createNotificationMessage CreateNotificationFunc)) Option {
 	return func(m *config) {
-		m.registerDelays = registerDelays
+		m.registerNotificator = registerNotificator
 	}
 }
