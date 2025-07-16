@@ -2,6 +2,8 @@ package facade
 
 import (
 	"context"
+	"github.com/strongo/analytics"
+	"github.com/strongo/logus"
 )
 
 var _ ContextWithUser = (*contextWithUser)(nil)
@@ -18,7 +20,18 @@ func (v contextWithUser) User() UserContext {
 }
 
 func (v contextWithUser) Analytics() UserAnalytics {
+	if v.ua == nil {
+		return noAnalytics{}
+	}
 	return v.ua
+}
+
+type noAnalytics struct{}
+
+func (n noAnalytics) Send(msg analytics.Message) {
+	logus.Errorf(context.Background(),
+		"user context has no analytics: message{event: %s, category: %s}",
+		msg.Event(), msg.Category())
 }
 
 var _ context.Context = &contextWithUser{}
