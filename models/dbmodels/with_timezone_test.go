@@ -136,7 +136,7 @@ func TestWithTimezone_SetTimezone(t *testing.T) {
 		v := &WithTimezone{}
 		loc, err := time.LoadLocation("America/New_York")
 		assert.NoError(t, err, "Should be able to load location")
-		
+
 		updates, err := v.SetTimezone(loc)
 
 		assert.NoError(t, err, "Should not return an error for valid timezone")
@@ -159,7 +159,7 @@ func TestWithTimezone_SetTimezone(t *testing.T) {
 		}
 		loc, err := time.LoadLocation("America/New_York")
 		assert.NoError(t, err, "Should be able to load location")
-		
+
 		updates, err := v.SetTimezone(loc)
 
 		assert.NoError(t, err, "Should not return an error for valid timezone")
@@ -198,11 +198,11 @@ func TestWithTimezone_SetTimezone(t *testing.T) {
 	t.Run("invalid_timezone_name", func(t *testing.T) {
 		v := &WithTimezone{}
 		loc, err := time.LoadLocation("Invalid/Timezone")
-		
+
 		// The LoadLocation should fail for an invalid timezone
 		assert.Error(t, err, "Should return an error for invalid timezone name")
 		assert.Nil(t, loc, "Location should be nil for invalid timezone")
-		
+
 		// Since LoadLocation failed, we can't call SetTimezone
 		// The Timezone field should remain nil
 		assert.Nil(t, v.Timezone, "Timezone should remain nil when error occurs")
@@ -210,12 +210,12 @@ func TestWithTimezone_SetTimezone(t *testing.T) {
 
 	t.Run("nil_location", func(t *testing.T) {
 		v := &WithTimezone{}
-		
+
 		// The implementation should panic when a nil location is passed
 		assert.Panics(t, func() {
-			v.SetTimezone(nil)
+			_, _ = v.SetTimezone(nil)
 		}, "Should panic when a nil location is passed")
-		
+
 		// The Timezone field should remain nil
 		assert.Nil(t, v.Timezone, "Timezone should remain nil")
 	})
