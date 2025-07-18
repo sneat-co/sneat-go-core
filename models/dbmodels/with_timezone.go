@@ -20,14 +20,18 @@ func (v *WithTimezone) Validate() error {
 	return v.Timezone.Validate()
 }
 
-func (v *WithTimezone) SetTimezone(ianaLocName string) (updates []update.Update, err error) {
+func (v *WithTimezone) SetTimezone(loc *time.Location) (updates []update.Update, err error) {
+	if loc == nil {
+		panic("required argument is nil: WithTimezone.SetTimezone(loc==nil)")
+	}
 	var offsetMinutes int
-	if offsetMinutes, err = getOffsetMinutes(ianaLocName, time.Now()); err != nil {
+	if offsetMinutes, err = getOffsetMinutes(loc, time.Now()); err != nil {
 		return
 	}
-	if v.Timezone == nil || v.Timezone.Iana != ianaLocName || v.Timezone.OffsetMinutes != offsetMinutes {
+	tzName := loc.String()
+	if v.Timezone == nil || v.Timezone.Iana != tzName || v.Timezone.OffsetMinutes != offsetMinutes {
 		v.Timezone = &Timezone{
-			Iana:          ianaLocName,
+			Iana:          tzName,
 			OffsetMinutes: offsetMinutes,
 		}
 		updates = append(updates, update.ByFieldName("timezone", v.Timezone))
@@ -35,14 +39,7 @@ func (v *WithTimezone) SetTimezone(ianaLocName string) (updates []update.Update,
 	return
 }
 
-func getOffsetMinutes(locName string, t time.Time) (int, error) {
-	if locName == "" {
-		return 0, fmt.Errorf("timezone name cannot be empty")
-	}
-	loc, err := time.LoadLocation(locName)
-	if err != nil {
-		return 0, err
-	}
+func getOffsetMinutes(loc *time.Location, t time.Time) (int, error) {
 	_, offsetSeconds := t.In(loc).Zone()
 	return offsetSeconds / 60, nil // Convert to minutes
 }

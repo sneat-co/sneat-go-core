@@ -134,7 +134,10 @@ func TestTimezone_Validate(t *testing.T) {
 func TestWithTimezone_SetTimezone(t *testing.T) {
 	t.Run("nil_timezone", func(t *testing.T) {
 		v := &WithTimezone{}
-		updates, err := v.SetTimezone("America/New_York")
+		loc, err := time.LoadLocation("America/New_York")
+		assert.NoError(t, err, "Should be able to load location")
+		
+		updates, err := v.SetTimezone(loc)
 
 		assert.NoError(t, err, "Should not return an error for valid timezone")
 		assert.NotNil(t, v.Timezone, "Timezone should not be nil after setting")
@@ -154,7 +157,10 @@ func TestWithTimezone_SetTimezone(t *testing.T) {
 				OffsetMinutes: 0, // +0 hours = 0 minutes
 			},
 		}
-		updates, err := v.SetTimezone("America/New_York")
+		loc, err := time.LoadLocation("America/New_York")
+		assert.NoError(t, err, "Should be able to load location")
+		
+		updates, err := v.SetTimezone(loc)
 
 		assert.NoError(t, err, "Should not return an error for valid timezone")
 		assert.Equal(t, "America/New_York", v.Timezone.Iana, "Iana should be updated")
@@ -170,14 +176,18 @@ func TestWithTimezone_SetTimezone(t *testing.T) {
 			},
 		}
 
+		// Load the location
+		loc, err := time.LoadLocation("America/New_York")
+		assert.NoError(t, err, "Should be able to load location")
+
 		// First get the current offset minutes for the timezone
-		offsetMinutes, err := getOffsetMinutes("America/New_York", time.Now())
+		offsetMinutes, err := getOffsetMinutes(loc, time.Now())
 		assert.NoError(t, err, "Should not return an error for valid timezone")
 
 		// Set the timezone with the current offset
 		v.Timezone.OffsetMinutes = offsetMinutes
 
-		updates, err := v.SetTimezone("America/New_York")
+		updates, err := v.SetTimezone(loc)
 
 		assert.NoError(t, err, "Should not return an error for valid timezone")
 		assert.Equal(t, "America/New_York", v.Timezone.Iana, "Iana should remain the same")
@@ -187,19 +197,26 @@ func TestWithTimezone_SetTimezone(t *testing.T) {
 
 	t.Run("invalid_timezone_name", func(t *testing.T) {
 		v := &WithTimezone{}
-		updates, err := v.SetTimezone("Invalid/Timezone")
-
+		loc, err := time.LoadLocation("Invalid/Timezone")
+		
+		// The LoadLocation should fail for an invalid timezone
 		assert.Error(t, err, "Should return an error for invalid timezone name")
-		assert.Nil(t, updates, "Should not return any updates when error occurs")
+		assert.Nil(t, loc, "Location should be nil for invalid timezone")
+		
+		// Since LoadLocation failed, we can't call SetTimezone
+		// The Timezone field should remain nil
 		assert.Nil(t, v.Timezone, "Timezone should remain nil when error occurs")
 	})
 
-	t.Run("empty_timezone_name", func(t *testing.T) {
+	t.Run("nil_location", func(t *testing.T) {
 		v := &WithTimezone{}
-		updates, err := v.SetTimezone("")
-
-		assert.Error(t, err, "Should return an error for empty timezone name")
-		assert.Nil(t, updates, "Should not return any updates when error occurs")
-		assert.Nil(t, v.Timezone, "Timezone should remain nil when error occurs")
+		
+		// The implementation should panic when a nil location is passed
+		assert.Panics(t, func() {
+			v.SetTimezone(nil)
+		}, "Should panic when a nil location is passed")
+		
+		// The Timezone field should remain nil
+		assert.Nil(t, v.Timezone, "Timezone should remain nil")
 	})
 }
