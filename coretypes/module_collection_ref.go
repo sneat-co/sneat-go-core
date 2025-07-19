@@ -3,8 +3,8 @@ package coretypes
 import "github.com/strongo/validation"
 
 type ModuleCollectionRef struct {
-	ModuleID   ModuleID `json:"moduleID" firestore:"moduleID"`
-	Collection string   `json:"collection" firestore:"collection"`
+	ModuleID   ExtID  `json:"moduleID" firestore:"moduleID"`
+	Collection string `json:"collection" firestore:"collection"`
 }
 
 func (v *ModuleCollectionRef) Validate() error {

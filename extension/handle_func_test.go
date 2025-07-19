@@ -1,4 +1,4 @@
-package module
+package extension
 
 import (
 	"net/http"

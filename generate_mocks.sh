@@ -1,1 +1,1 @@
-mockgen ./module Module > mock_module/mock_module.go
+mockgen ./extension Config > mock_extension/mock_config.go

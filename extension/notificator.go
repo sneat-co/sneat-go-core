@@ -1,4 +1,4 @@
-package module
+package extension
 
 type NotificationArgs struct {
 	UserID   string `json:"userID"`

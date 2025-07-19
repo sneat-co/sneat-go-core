@@ -1,4 +1,4 @@
-package module
+package extension
 
 import (
 	"context"
@@ -9,17 +9,17 @@ import (
 )
 
 type Expected struct {
-	ModuleID      coretypes.ModuleID
+	ExtID         coretypes.ExtID
 	HandlersCount int
 	DelayersCount int
 }
 
-func AssertModule(t *testing.T, m Module, expected Expected) {
+func AssertExtension(t *testing.T, m Config, expected Expected) {
 	if m == nil {
-		t.Fatalf("Module() must not return nil")
+		t.Fatalf("Config() must not return nil")
 	}
-	if m.ID() != expected.ModuleID {
-		t.Fatalf("Module().userID() must return %q but got %q", expected.ModuleID, m.ID())
+	if m.ID() != expected.ExtID {
+		t.Fatalf("Config().userID() must return %q but got %q", expected.ExtID, m.ID())
 	}
 	var handle HTTPHandleFunc
 	handlersCount := 0
@@ -41,9 +41,9 @@ func AssertModule(t *testing.T, m Module, expected Expected) {
 	args := NewModuleRegistrationArgs(handle, mustRegisterDelayFunc)
 	m.Register(args)
 	if handlersCount != expected.HandlersCount {
-		t.Errorf("Module().Register() must register %d handlers but got %d", expected.HandlersCount, handlersCount)
+		t.Errorf("Config().Register() must register %d handlers but got %d", expected.HandlersCount, handlersCount)
 	}
 	if delayersCount != expected.DelayersCount {
-		t.Errorf("Module().Register() must register %d delayers but got %d", expected.DelayersCount, delayersCount)
+		t.Errorf("Config().Register() must register %d delayers but got %d", expected.DelayersCount, delayersCount)
 	}
 }

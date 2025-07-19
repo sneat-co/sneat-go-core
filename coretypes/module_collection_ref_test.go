@@ -4,7 +4,7 @@ import "testing"
 
 func TestModuleCollectionRef_Validate(t *testing.T) {
 	type fields struct {
-		ModuleID   ModuleID
+		ModuleID   ExtID
 		Collection string
 	}
 	tests := []struct {

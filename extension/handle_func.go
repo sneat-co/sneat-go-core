@@ -1,4 +1,4 @@
-package module
+package extension
 
 import (
 	"github.com/sneat-co/sneat-go-core/facade"

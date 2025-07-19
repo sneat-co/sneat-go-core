@@ -2,4 +2,4 @@ package coretypes
 
 type SpaceID string
 
-type ModuleID string
+type ExtID string

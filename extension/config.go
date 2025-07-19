@@ -1,4 +1,4 @@
-package module
+package extension
 
 import (
 	"context"
@@ -7,9 +7,12 @@ import (
 	"github.com/strongo/delaying"
 )
 
-// Module is the interface for config definition that all module must implement.
-type Module interface {
-	ID() coretypes.ModuleID
+type OptionID string
+
+// Config is the interface for extension configuration that every extension must implement.
+type Config interface {
+	internal()
+	ID() coretypes.ExtID
 	Register(args RegistrationArgs)
 }
 
@@ -43,16 +46,25 @@ func NewModuleRegistrationArgs(handle HTTPHandleFunc, mustRegisterDelayFunc func
 	return &registrationArgs{handle: handle, mustRegisterDelayFunc: mustRegisterDelayFunc}
 }
 
-var _ Module = (*config)(nil)
+var _ Config = (*config)(nil)
 
 type CreateNotificationFunc func(ctx context.Context, args NotificationArgs) (m any, err error)
 
+type BotProfileParams struct {
+}
+
+var _ Config = (*config)(nil)
+
+// config implements Config interface
 type config struct {
-	id                  coretypes.ModuleID
+	id                  coretypes.ExtID
 	registerRoutes      func(handle HTTPHandleFunc)
 	registerDelays      func(mustRegisterFunc func(key string, i any) delaying.Delayer)
 	registerNotificator func(createNotification CreateNotificationFunc)
+	registerBotProfile  func(params BotProfileParams)
 }
+
+func (m *config) internal() {}
 
 func (m *config) Register(args RegistrationArgs) {
 
@@ -77,13 +89,13 @@ func (m *config) Register(args RegistrationArgs) {
 	}
 }
 
-func (m *config) ID() coretypes.ModuleID {
+func (m *config) ID() coretypes.ExtID {
 	return m.id
 }
 
-type Option func(m *config)
+type Option func(m Config)
 
-func NewExtension(id coretypes.ModuleID, options ...Option) Module {
+func NewExtension(id coretypes.ExtID, options ...Option) Config {
 	m := &config{id: id}
 	for _, option := range options {
 		option(m)
@@ -92,19 +104,20 @@ func NewExtension(id coretypes.ModuleID, options ...Option) Module {
 }
 
 func RegisterRoutes(registerRoutes func(handle HTTPHandleFunc)) Option {
-	return func(m *config) {
-		m.registerRoutes = registerRoutes
+	return func(m Config) {
+
+		m.(*config).registerRoutes = registerRoutes
 	}
 }
 
 func RegisterDelays(registerDelays func(mustRegisterFunc func(key string, i any) delaying.Delayer)) Option {
-	return func(m *config) {
-		m.registerDelays = registerDelays
+	return func(m Config) {
+		m.(*config).registerDelays = registerDelays
 	}
 }
 
 func RegisterNotificator(registerNotificator func(createNotificationMessage CreateNotificationFunc)) Option {
-	return func(m *config) {
-		m.registerNotificator = registerNotificator
+	return func(m Config) {
+		m.(*config).registerNotificator = registerNotificator
 	}
 }
