@@ -61,7 +61,6 @@ type config struct {
 	registerRoutes      func(handle HTTPHandleFunc)
 	registerDelays      func(mustRegisterFunc func(key string, i any) delaying.Delayer)
 	registerNotificator func(createNotification CreateNotificationFunc)
-	registerBotProfile  func(params BotProfileParams)
 }
 
 func (m *config) internal() {}
