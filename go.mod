@@ -6,8 +6,8 @@ go 1.24.3
 
 require (
 	github.com/crediterra/money v0.3.0
-	github.com/dal-go/dalgo v0.26.5
-	github.com/dal-go/mocks4dalgo v0.3.10
+	github.com/dal-go/dalgo v0.29.3
+	github.com/dal-go/mocks4dalgo v0.3.11
 	github.com/stretchr/testify v1.11.1
 	github.com/strongo/analytics v0.2.2
 	github.com/strongo/delaying v0.2.1
