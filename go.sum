@@ -7,10 +7,8 @@ github.com/bits-and-blooms/bitset v1.24.4 h1:95H15Og1clikBrKr/DuzMXkQzECs1M6hhoG
 github.com/bits-and-blooms/bitset v1.24.4/go.mod h1:7hO7Gc7Pp1vODcmWvKMRA9BNmbv6a/7QIWpPxHddWR8=
 github.com/crediterra/money v0.3.0 h1:dHWEZhkMGGxkHTAbGQOaeg8eYbL8qJSCgcqdOTbNg20=
 github.com/crediterra/money v0.3.0/go.mod h1:0BT7dzPk4Wv+Wi8J6sxlFbCknYioLWVVQM4ciMJh6TI=
-github.com/dal-go/dalgo v0.36.0 h1:srq74jTwvGS1hwFV/EDv7aqf4ALgfoAP37iZ2nSf1po=
-github.com/dal-go/dalgo v0.36.0/go.mod h1:/dO2kbsiQuqjq7BEK5cDDcroQ3mmpA/j7mloUrkxoaY=
-github.com/dal-go/mocks4dalgo v0.3.12 h1:qfiQk6fLwzQtgDGSPx82LSUVNiPY2Koq4raYSuslnY0=
-github.com/dal-go/mocks4dalgo v0.3.12/go.mod h1:Y5YwXTtq+ZBt1CuKsp8oEZXL/wKKw0XHGfLbth9BpDs=
+github.com/dal-go/dalgo v0.40.0 h1:hRZwKdC7pr2qa8IWnpVEVfT+BBDzSyvL+KvWNlN4EQU=
+github.com/dal-go/dalgo v0.40.0/go.mod h1:BJQ/N3I40KjoT0+diGNfST1nCU9TP0Hjjy6gM20GPhI=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

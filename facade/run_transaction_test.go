@@ -3,12 +3,13 @@ package facade
 import (
 	"context"
 	"errors"
-	"github.com/dal-go/dalgo/dal"
-	"github.com/dal-go/mocks4dalgo/mock_dal"
-	"github.com/sneat-co/sneat-go-core/consts4dal"
-	"go.uber.org/mock/gomock"
 	"testing"
 	"time"
+
+	"github.com/dal-go/dalgo/dal"
+	"github.com/dal-go/dalgo/mocks/mock_dal"
+	"github.com/sneat-co/sneat-go-core/consts4dal"
+	"go.uber.org/mock/gomock"
 )
 
 func TestRunReadwriteTransaction(t *testing.T) {
