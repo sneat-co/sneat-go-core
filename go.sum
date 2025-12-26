@@ -9,6 +9,8 @@ github.com/crediterra/money v0.3.0 h1:dHWEZhkMGGxkHTAbGQOaeg8eYbL8qJSCgcqdOTbNg2
 github.com/crediterra/money v0.3.0/go.mod h1:0BT7dzPk4Wv+Wi8J6sxlFbCknYioLWVVQM4ciMJh6TI=
 github.com/dal-go/dalgo v0.40.0 h1:hRZwKdC7pr2qa8IWnpVEVfT+BBDzSyvL+KvWNlN4EQU=
 github.com/dal-go/dalgo v0.40.0/go.mod h1:BJQ/N3I40KjoT0+diGNfST1nCU9TP0Hjjy6gM20GPhI=
+github.com/dal-go/dalgo v0.40.1 h1:1cH3go6+z6uJGdWVr2dL3cbM8ABKuELlxu//Nrngl58=
+github.com/dal-go/dalgo v0.40.1/go.mod h1:9BiVqlOZmpaDEHCU1uqB4CPYiu6WlaM84oUNiR0ptlo=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -35,6 +37,8 @@ github.com/strongo/slice v0.3.3 h1:ekhETQiWeH1kyfjZm1InzdZ/1c5SC2z7/i1pK4WrKj4=
 github.com/strongo/slice v0.3.3/go.mod h1:Tymvuhp8oV6T4vswWR4F/JmGFxOcMWFTM5qp0WlV0sk=
 github.com/strongo/strongoapp v0.31.10 h1:QB2y7ljkbDwFudNIItLuubD7TgMwpqx9R4QCs5QjxBA=
 github.com/strongo/strongoapp v0.31.10/go.mod h1:ag8ztx4ovCV4UnzMogmg6G5iqU5+UlN38HGI8udeah8=
+github.com/strongo/strongoapp v0.31.11 h1:hW9Pwh8xSEHLZISvTNLX9QdMAIyXsM1C6C12ENm+QNg=
+github.com/strongo/strongoapp v0.31.11/go.mod h1:K8R8TjuQz59JMjJtWU5q9S060dUAiH7uvNp1EGRSHBo=
 github.com/strongo/validation v0.0.7 h1:gs6YkwPsYtVsepQaQOB+ZF+T0Gu5+nk4ZMND8F85e+U=
 github.com/strongo/validation v0.0.7/go.mod h1:YUwoPEItLJd/Bc9X1OCUm03ofhvm3kwZvuihU7/jz58=
 go.uber.org/mock v0.6.0 h1:hyF9dfmbgIX5EfOdasqLsWD6xqpNZlXblLB/Dbnwv3Y=
