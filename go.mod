@@ -12,7 +12,7 @@ require (
 	github.com/strongo/delaying v0.2.1
 	github.com/strongo/logus v0.4.0
 	github.com/strongo/slice v0.3.3
-	github.com/strongo/strongoapp v0.31.12
+	github.com/strongo/strongoapp v0.31.13
 	github.com/strongo/validation v0.0.7
 	go.uber.org/mock v0.6.0
 )
