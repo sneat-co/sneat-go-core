@@ -11,14 +11,6 @@ func (t testData) Validate() error {
 	return nil
 }
 
-type invalidTestData struct {
-	Value string
-}
-
-func (t invalidTestData) Validate() error {
-	return nil
-}
-
 func TestDtoWithID_Validate(t *testing.T) {
 	tests := []struct {
 		name    string
