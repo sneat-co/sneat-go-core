@@ -5,6 +5,54 @@ import (
 	"testing"
 )
 
+func TestWithPrimaryCurrency_Validate(t *testing.T) {
+	tests := []struct {
+		name            string
+		primaryCurrency money.CurrencyCode
+		wantErr         bool
+	}{
+		{
+			name:            "empty currency",
+			primaryCurrency: "",
+			wantErr:         false,
+		},
+		{
+			name:            "valid USD",
+			primaryCurrency: "USD",
+			wantErr:         false,
+		},
+		{
+			name:            "valid EUR",
+			primaryCurrency: "EUR",
+			wantErr:         false,
+		},
+		{
+			name:            "valid GBP",
+			primaryCurrency: "GBP",
+			wantErr:         false,
+		},
+		{
+			name:            "invalid currency",
+			primaryCurrency: "XXX",
+			wantErr:         true,
+		},
+		{
+			name:            "lowercase currency",
+			primaryCurrency: "usd",
+			wantErr:         true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := &WithPrimaryCurrency{PrimaryCurrency: tt.primaryCurrency}
+			err := v.Validate()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("WithPrimaryCurrency.Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestWithPrimaryCurrency_SetPrimaryCurrency(t *testing.T) {
 	v := &WithPrimaryCurrency{}
 	const code3 money.CurrencyCode = "USD"
