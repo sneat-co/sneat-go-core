@@ -75,6 +75,8 @@ github.com/strongo/strongoapp v0.31.19 h1:ey7CUrjwg2ldtcnJoHQaXmSaCSDv12FyFA5y0I
 github.com/strongo/strongoapp v0.31.19/go.mod h1:nkUB/Tl9ah49MyMuZsdb+hruXxlZ29UKbUM6GLbGh9E=
 github.com/strongo/strongoapp v0.31.20 h1:xRgQAeniKpk19lnXOnC4cUEcDSVraxNTk56E7N0b3PE=
 github.com/strongo/strongoapp v0.31.20/go.mod h1:nkUB/Tl9ah49MyMuZsdb+hruXxlZ29UKbUM6GLbGh9E=
+github.com/strongo/strongoapp v0.31.21 h1:sbI50bfc0snNp5heqkAKwN0ZkFIAOGCXyL0KtDg+3uE=
+github.com/strongo/strongoapp v0.31.21/go.mod h1:jVYGKnSDPfgIAMOmovSC/mbX9NYILMapfKXGg2GvMNU=
 github.com/strongo/validation v0.0.7 h1:gs6YkwPsYtVsepQaQOB+ZF+T0Gu5+nk4ZMND8F85e+U=
 github.com/strongo/validation v0.0.7/go.mod h1:YUwoPEItLJd/Bc9X1OCUm03ofhvm3kwZvuihU7/jz58=
 github.com/strongo/validation v0.0.8 h1:LL3FODf1MTOROKa8fHJuwYxiKHcvd1W2Vs0OXc1H46U=
