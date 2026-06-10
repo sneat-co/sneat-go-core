@@ -57,34 +57,38 @@ var _ Config = (*config)(nil)
 
 // config implements Config interface
 type config struct {
-	id                  coretypes.ExtID
-	registerRoutes      func(handle HTTPHandleFunc)
-	registerDelays      func(mustRegisterFunc func(key string, i any) delaying.Delayer)
-	registerNotificator func(createNotification CreateNotificationFunc)
+	id                   coretypes.ExtID
+	registerRoutes       []func(handle HTTPHandleFunc)
+	registerDelays       []func(mustRegisterFunc func(key string, i any) delaying.Delayer)
+	registerNotificators []func(createNotification CreateNotificationFunc)
 }
 
 func (m *config) internal() {}
 
 func (m *config) Register(args RegistrationArgs) {
 
-	if m.registerRoutes != nil {
+	if len(m.registerRoutes) > 0 {
 		handle := args.Handle()
 		if handle == nil {
 			panic(fmt.Sprintf("can not register module as HTTP handle has not been provided (moduleID=%s)", m.id))
 		}
-		m.registerRoutes(handle)
+		for _, r := range m.registerRoutes {
+			r(handle)
+		}
 	}
 
-	if m.registerDelays != nil {
+	if len(m.registerDelays) > 0 {
 		mustRegisterDelayFunc := args.MustRegisterDelayFunc()
 		if mustRegisterDelayFunc == nil {
 			panic(fmt.Sprintf("can not register module as mustRegisterDelayFunc has not been provided (moduleID=%s)", m.id))
 		}
-		m.registerDelays(mustRegisterDelayFunc)
+		for _, r := range m.registerDelays {
+			r(mustRegisterDelayFunc)
+		}
 	}
 
-	if m.registerNotificator != nil {
-		m.registerNotificator(args.CreateNotificationFunc())
+	for _, r := range m.registerNotificators {
+		r(args.CreateNotificationFunc())
 	}
 }
 
@@ -104,19 +108,21 @@ func NewExtension(id coretypes.ExtID, options ...Option) Config {
 
 func RegisterRoutes(registerRoutes func(handle HTTPHandleFunc)) Option {
 	return func(m Config) {
-
-		m.(*config).registerRoutes = registerRoutes
+		c := m.(*config)
+		c.registerRoutes = append(c.registerRoutes, registerRoutes)
 	}
 }
 
 func RegisterDelays(registerDelays func(mustRegisterFunc func(key string, i any) delaying.Delayer)) Option {
 	return func(m Config) {
-		m.(*config).registerDelays = registerDelays
+		c := m.(*config)
+		c.registerDelays = append(c.registerDelays, registerDelays)
 	}
 }
 
 func RegisterNotificator(registerNotificator func(createNotificationMessage CreateNotificationFunc)) Option {
 	return func(m Config) {
-		m.(*config).registerNotificator = registerNotificator
+		c := m.(*config)
+		c.registerNotificators = append(c.registerNotificators, registerNotificator)
 	}
 }
