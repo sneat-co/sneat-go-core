@@ -56,6 +56,8 @@ github.com/dal-go/dalgo v0.43.3 h1:7hdXb3ysVCr6prOyEZKvnzjz0kjv+ramKjotw4vbwj4=
 github.com/dal-go/dalgo v0.43.3/go.mod h1:WdTy5jE3v9LjiOeHVkMgHEi8nn0GeImQmjfuuJpYISY=
 github.com/dal-go/dalgo v0.44.2 h1:+eJG5WTiGcy82jAgJrNzuDhlpyWISDfIAnMJ3l7G7wE=
 github.com/dal-go/dalgo v0.44.2/go.mod h1:HHMUuCMutAlYEblDTVws7jeZs56jvOCbOuxVs6I01tE=
+github.com/dal-go/dalgo v0.62.1 h1:HBQLjQcuYO0vExKD4Tm/Qo8kM9Ji9wuJbxi7+f5Tfu0=
+github.com/dal-go/dalgo v0.62.1/go.mod h1:csGX33TfUj0H6Yod5HgZs7Fjij7avifVU8dc/nZSxkg=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -125,6 +127,8 @@ github.com/strongo/strongoapp v0.31.31 h1:QY8hhkRlhZA8XLn4RrhaoP7/xTrici9UkRvvGs
 github.com/strongo/strongoapp v0.31.31/go.mod h1:3Z85L7cRTo7i+Ufp4V2zSCpfAvEIB8jtraVUC0bInd4=
 github.com/strongo/strongoapp v0.31.32 h1:A3n7v8FuWhnOla6EoH/zyiykHQbfE8OmQ/+nsH3NSOs=
 github.com/strongo/strongoapp v0.31.32/go.mod h1:PxssJbpQ/YB+L2pXzRmwMTFjtG+mLCerRoLNPSngEyo=
+github.com/strongo/strongoapp v0.31.35 h1:H2Rwtx0KDzZI2zIClpXN9DBDxy333gdN7miOcySlWGE=
+github.com/strongo/strongoapp v0.31.35/go.mod h1:CWY4qfw3bf2XGKq3+XzL2WhPPNPp7vk3IsvphmuSj/s=
 github.com/strongo/validation v0.0.7 h1:gs6YkwPsYtVsepQaQOB+ZF+T0Gu5+nk4ZMND8F85e+U=
 github.com/strongo/validation v0.0.7/go.mod h1:YUwoPEItLJd/Bc9X1OCUm03ofhvm3kwZvuihU7/jz58=
 github.com/strongo/validation v0.0.8 h1:LL3FODf1MTOROKa8fHJuwYxiKHcvd1W2Vs0OXc1H46U=
