@@ -54,6 +54,19 @@ func TestRegisterRoutes_composes(t *testing.T) {
 	assert.Equal(t, []int{1, 2}, calls, "both RegisterRoutes options must be called in order")
 }
 
+func TestRegisterKnownHosts_composes(t *testing.T) {
+	m := NewExtension("test",
+		RegisterKnownHosts("a.example"),
+		RegisterKnownHosts("b.example", "c.example"),
+	)
+	assert.Equal(t, []string{"a.example", "b.example", "c.example"}, m.KnownHosts())
+}
+
+func TestKnownHosts_emptyByDefault(t *testing.T) {
+	m := NewExtension("test")
+	assert.Empty(t, m.KnownHosts())
+}
+
 func TestRegisterDelays_composes(t *testing.T) {
 	var calls []int
 	d1 := func(mustRegisterFunc func(key string, i any) delaying.Delayer) { calls = append(calls, 1) }

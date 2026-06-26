@@ -14,6 +14,10 @@ type Config interface {
 	internal()
 	ID() coretypes.ExtID
 	Register(args RegistrationArgs)
+	// KnownHosts returns the extra hosts (e.g. "gameboard.live") whose origins
+	// this extension's API server must accept for CORS. The scheme is derived by
+	// the security package (see security.AddKnownHosts).
+	KnownHosts() []string
 }
 
 type RegistrationArgs interface {
@@ -58,12 +62,15 @@ var _ Config = (*config)(nil)
 // config implements Config interface
 type config struct {
 	id                   coretypes.ExtID
+	knownHosts           []string
 	registerRoutes       []func(handle HTTPHandleFunc)
 	registerDelays       []func(mustRegisterFunc func(key string, i any) delaying.Delayer)
 	registerNotificators []func(createNotification CreateNotificationFunc)
 }
 
 func (m *config) internal() {}
+
+func (m *config) KnownHosts() []string { return m.knownHosts }
 
 func (m *config) Register(args RegistrationArgs) {
 
@@ -104,6 +111,16 @@ func NewExtension(id coretypes.ExtID, options ...Option) Config {
 		option(m)
 	}
 	return m
+}
+
+// RegisterKnownHosts declares extra hosts (e.g. "gameboard.live") whose origins
+// this extension's API server must accept for CORS. Hosts are exposed via
+// Config.KnownHosts() and applied by the server at module registration time.
+func RegisterKnownHosts(hosts ...string) Option {
+	return func(m Config) {
+		c := m.(*config)
+		c.knownHosts = append(c.knownHosts, hosts...)
+	}
 }
 
 func RegisterRoutes(registerRoutes func(handle HTTPHandleFunc)) Option {
