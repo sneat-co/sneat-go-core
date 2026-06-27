@@ -25,6 +25,10 @@ const (
 
 	// SpaceTypeClub is a "club" space type
 	SpaceTypeClub SpaceType = "club"
+
+	// SpaceTypeSystem is a platform-owned "system" space type for shared,
+	// cross-user records that are not tied to per-user membership.
+	SpaceTypeSystem SpaceType = "system"
 )
 
 const FamilyWeekSpaceRef = SpaceRef(SpaceTypeFamily)
@@ -84,7 +88,7 @@ func NewWeakSpaceRef(spaceType SpaceType) SpaceRef {
 // IsValidSpaceType checks if space has a valid/known type
 func IsValidSpaceType(v SpaceType) bool {
 	switch v {
-	case SpaceTypeFamily, SpaceTypePrivate, SpaceTypeGroup, SpaceTypeCompany, SpaceTypeSpace, SpaceTypeClub:
+	case SpaceTypeFamily, SpaceTypePrivate, SpaceTypeGroup, SpaceTypeCompany, SpaceTypeSpace, SpaceTypeClub, SpaceTypeSystem:
 		return true
 	default:
 		return false

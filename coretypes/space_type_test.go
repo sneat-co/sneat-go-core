@@ -15,6 +15,7 @@ func TestIsValidSpaceType(t *testing.T) {
 		want bool
 	}{
 		{"SpaceTypePrivate", args{SpaceTypePrivate}, true},
+		{"SpaceTypeSystem", args{SpaceTypeSystem}, true},
 		{"EmptySpaceType", args{""}, false},
 		{"InvalidSpaceType", args{"Foo"}, false},
 	}
