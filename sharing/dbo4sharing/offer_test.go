@@ -1,7 +1,7 @@
 package dbo4sharing
 
 import (
-	"github.com/sneat-co/sneat-go-core/sharing/const4sharing"
+	"github.com/sneat-co/sneat-go-core/acl/const4acl"
 	"github.com/strongo/strongoapp/with"
 	"testing"
 	"time"
@@ -21,7 +21,7 @@ func TestOfferDbo_Validate(t *testing.T) {
 					CreatedAtField: with.CreatedAtField{CreatedAt: now},
 					CreatedByField: with.CreatedByField{CreatedBy: "user1"},
 				},
-				Permissions: []const4sharing.Permission{"read"},
+				Permissions: []const4acl.Permission{"read"},
 			},
 			wantErr: false,
 		},
@@ -32,7 +32,7 @@ func TestOfferDbo_Validate(t *testing.T) {
 					CreatedAtField: with.CreatedAtField{CreatedAt: now},
 					CreatedByField: with.CreatedByField{CreatedBy: "user1"},
 				},
-				Permissions: []const4sharing.Permission{},
+				Permissions: []const4acl.Permission{},
 			},
 			wantErr: true,
 		},
@@ -54,7 +54,7 @@ func TestOfferDbo_Validate(t *testing.T) {
 					CreatedAtField: with.CreatedAtField{CreatedAt: now},
 					CreatedByField: with.CreatedByField{CreatedBy: "user1"},
 				},
-				Permissions: []const4sharing.Permission{"read", ""},
+				Permissions: []const4acl.Permission{"read", ""},
 			},
 			wantErr: true,
 		},
@@ -65,7 +65,7 @@ func TestOfferDbo_Validate(t *testing.T) {
 					CreatedAtField: with.CreatedAtField{CreatedAt: now},
 					CreatedByField: with.CreatedByField{CreatedBy: "user1"},
 				},
-				Permissions: []const4sharing.Permission{"read", "write"},
+				Permissions: []const4acl.Permission{"read", "write"},
 			},
 			wantErr: false,
 		},

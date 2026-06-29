@@ -1,10 +1,12 @@
 package dbo4sharing
 
 import (
-	"github.com/sneat-co/sneat-go-core/sharing/const4sharing"
-	"github.com/strongo/strongoapp/with"
 	"testing"
 	"time"
+
+	"github.com/sneat-co/sneat-go-core/acl/const4acl"
+	"github.com/sneat-co/sneat-go-core/acl/dbo4acl"
+	"github.com/strongo/strongoapp/with"
 )
 
 func TestTo_Validate(t *testing.T) {
@@ -25,8 +27,8 @@ func TestTo_Validate(t *testing.T) {
 				Spaces: map[string]Shared{
 					"space1": {
 						ID: "item1",
-						Permissions: Permissions{
-							const4sharing.PermittedToView: with.CreatedFields{
+						Permissions: dbo4acl.Permissions{
+							const4acl.PermittedToView: with.CreatedFields{
 								CreatedAtField: with.CreatedAtField{CreatedAt: now},
 								CreatedByField: with.CreatedByField{CreatedBy: "user1"},
 							},
@@ -42,8 +44,8 @@ func TestTo_Validate(t *testing.T) {
 				Spaces: map[string]Shared{
 					"space1": {
 						ID: "",
-						Permissions: Permissions{
-							const4sharing.PermittedToView: with.CreatedFields{
+						Permissions: dbo4acl.Permissions{
+							const4acl.PermittedToView: with.CreatedFields{
 								CreatedAtField: with.CreatedAtField{CreatedAt: now},
 								CreatedByField: with.CreatedByField{CreatedBy: "user1"},
 							},
@@ -56,11 +58,13 @@ func TestTo_Validate(t *testing.T) {
 		{
 			name: "valid users",
 			to: To{
-				Users: map[string]Permissions{
-					"user1": {
-						const4sharing.PermittedToView: with.CreatedFields{
-							CreatedAtField: with.CreatedAtField{CreatedAt: now},
-							CreatedByField: with.CreatedByField{CreatedBy: "user1"},
+				ACL: dbo4acl.ACL{
+					Users: map[string]dbo4acl.Permissions{
+						"user1": {
+							const4acl.PermittedToView: with.CreatedFields{
+								CreatedAtField: with.CreatedAtField{CreatedAt: now},
+								CreatedByField: with.CreatedByField{CreatedBy: "user1"},
+							},
 						},
 					},
 				},
@@ -70,8 +74,10 @@ func TestTo_Validate(t *testing.T) {
 		{
 			name: "invalid users - empty permissions",
 			to: To{
-				Users: map[string]Permissions{
-					"user1": {},
+				ACL: dbo4acl.ACL{
+					Users: map[string]dbo4acl.Permissions{
+						"user1": {},
+					},
 				},
 			},
 			wantErr: false,
@@ -98,8 +104,8 @@ func TestShared_Validate(t *testing.T) {
 			name: "valid shared",
 			shared: Shared{
 				ID: "item1",
-				Permissions: Permissions{
-					const4sharing.PermittedToView: with.CreatedFields{
+				Permissions: dbo4acl.Permissions{
+					const4acl.PermittedToView: with.CreatedFields{
 						CreatedAtField: with.CreatedAtField{CreatedAt: now},
 						CreatedByField: with.CreatedByField{CreatedBy: "user1"},
 					},
@@ -111,8 +117,8 @@ func TestShared_Validate(t *testing.T) {
 			name: "empty ID",
 			shared: Shared{
 				ID: "",
-				Permissions: Permissions{
-					const4sharing.PermittedToView: with.CreatedFields{
+				Permissions: dbo4acl.Permissions{
+					const4acl.PermittedToView: with.CreatedFields{
 						CreatedAtField: with.CreatedAtField{CreatedAt: now},
 						CreatedByField: with.CreatedByField{CreatedBy: "user1"},
 					},
@@ -124,7 +130,7 @@ func TestShared_Validate(t *testing.T) {
 			name: "empty permissions",
 			shared: Shared{
 				ID:          "item1",
-				Permissions: Permissions{},
+				Permissions: dbo4acl.Permissions{},
 			},
 			wantErr: true,
 		},

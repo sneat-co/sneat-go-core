@@ -2,14 +2,14 @@ package dbo4sharing
 
 import (
 	"fmt"
-	"github.com/sneat-co/sneat-go-core/sharing/const4sharing"
+	"github.com/sneat-co/sneat-go-core/acl/const4acl"
 	"github.com/strongo/strongoapp/with"
 	"github.com/strongo/validation"
 )
 
 type OfferDbo struct {
 	with.CreatedFields
-	Permissions []const4sharing.Permission `json:"permissions" firestore:"permissions"`
+	Permissions []const4acl.Permission `json:"permissions" firestore:"permissions"`
 }
 
 func (v OfferDbo) Validate() error {

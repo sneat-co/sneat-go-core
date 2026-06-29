@@ -1,10 +1,11 @@
-package dbo4sharing
+package dbo4acl
 
 import (
-	"github.com/sneat-co/sneat-go-core/sharing/const4sharing"
-	"github.com/strongo/strongoapp/with"
 	"testing"
 	"time"
+
+	"github.com/sneat-co/sneat-go-core/acl/const4acl"
+	"github.com/strongo/strongoapp/with"
 )
 
 func TestPermissions_Validate(t *testing.T) {
@@ -15,7 +16,7 @@ func TestPermissions_Validate(t *testing.T) {
 	}{
 		{
 			name: "valid",
-			v: Permissions{const4sharing.PermittedToView: with.CreatedFields{
+			v: Permissions{const4acl.PermittedToView: with.CreatedFields{
 				CreatedAtField: with.CreatedAtField{
 					CreatedAt: time.Now(),
 				},
