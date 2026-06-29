@@ -4,7 +4,7 @@
 // It is the grant core shared by record-level authorization and by the richer
 // sharing model (sharing/dbo4sharing.To embeds ACL and adds cross-space sharing).
 //
-// specscore: features/reserved-extension-space-ids/R4
+// specscore: decisions/0002-reserved-extension-space-ids
 package dbo4acl
 
 import (

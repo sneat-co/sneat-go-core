@@ -1,7 +1,7 @@
 // Package const4acl defines the permission vocabulary for per-record access
 // control (ACL). These capabilities are referenced by an ACL's per-user grants.
 //
-// specscore: features/reserved-extension-space-ids/R4
+// specscore: decisions/0002-reserved-extension-space-ids
 package const4acl
 
 // Permission is a capability that may be granted to a user on a record.
