@@ -87,6 +87,8 @@ github.com/strongo/delaying v0.2.1 h1:vpugNAmvwF81ZcICARgAzMWjACi3UXDSTLxfe9fB/4
 github.com/strongo/delaying v0.2.1/go.mod h1:6PnWp2IL3UDo7tQyFVIOxBiIiHSj0eVZ6VfrleGNjzA=
 github.com/strongo/delaying v0.2.2 h1:c+uqQWD0h7TTLJNpMiCKchw9y4z18d/Sk68Lv77UnnU=
 github.com/strongo/delaying v0.2.2/go.mod h1:6PnWp2IL3UDo7tQyFVIOxBiIiHSj0eVZ6VfrleGNjzA=
+github.com/strongo/gotwilio v0.0.0-20160123000810-f024bbefe80f h1:nLD1340Ys0nXjVurNp5O/7CoDuZTo++7qydiikwxKho=
+github.com/strongo/gotwilio v0.0.0-20160123000810-f024bbefe80f/go.mod h1:AOBNKIosqbvHdXh8+u8QBWz7xeHz9sjDS0zVJjspzN8=
 github.com/strongo/logus v0.4.0 h1:EdwNafWX1eGWvPqMvu3gHVqXtBOUvV9KWbxm6tCU+dU=
 github.com/strongo/logus v0.4.0/go.mod h1:sd8gjJklqGQAg+Q0mlP5MWgzguAuxR25YYFSkfVOPdc=
 github.com/strongo/logus v0.4.1 h1:jEkcT5JzawDYjexRVHkCQiG4tv6Bm2a/c/ZdLk0IPqM=
