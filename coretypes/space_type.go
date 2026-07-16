@@ -29,7 +29,29 @@ const (
 	// SpaceTypeSystem is a platform-owned "system" space type for shared,
 	// cross-user records that are not tied to per-user membership.
 	SpaceTypeSystem SpaceType = "system"
+
+	// SpaceTypeSpot is a venue-scoped space that owns a ToGethered Spot's shared
+	// records (happenings, spot-days, and — after migration — all spot-scoped
+	// ToGethered records).  Membership is empty in MVP: followers are
+	// subscriptions, not members; moderators may become members in a later
+	// phase.
+	SpaceTypeSpot SpaceType = "spot"
 )
+
+// SpotSpaceIDPrefix is the reserved prefix used by SpotSpaceID to construct
+// deterministic, human-readable space IDs for ToGethered Spots.
+// The "~" separator is chosen because it cannot appear in randomly-generated
+// Firestore document IDs (which use base-62 characters) and is not used by
+// any other SpaceID separator in the codebase (SpaceRefSeparator="!",
+// SpaceItemIDSeparator="_"), so it is guaranteed not to collide.
+const SpotSpaceIDPrefix = "spot~"
+
+// SpotSpaceID returns the deterministic SpaceID for the ToGethered Spot with
+// the given spotID.  The ID has the form "spot~<spotID>", e.g. "spot~acme-gym".
+// The "spot~" prefix is reserved and must not be used for any other purpose.
+func SpotSpaceID(spotID string) SpaceID {
+	return SpaceID(SpotSpaceIDPrefix + spotID)
+}
 
 const FamilyWeekSpaceRef = SpaceRef(SpaceTypeFamily)
 const PrivateWeekSpaceRef = SpaceRef(SpaceTypePrivate)
@@ -88,7 +110,7 @@ func NewWeakSpaceRef(spaceType SpaceType) SpaceRef {
 // IsValidSpaceType checks if space has a valid/known type
 func IsValidSpaceType(v SpaceType) bool {
 	switch v {
-	case SpaceTypeFamily, SpaceTypePrivate, SpaceTypeGroup, SpaceTypeCompany, SpaceTypeSpace, SpaceTypeClub, SpaceTypeSystem:
+	case SpaceTypeFamily, SpaceTypePrivate, SpaceTypeGroup, SpaceTypeCompany, SpaceTypeSpace, SpaceTypeClub, SpaceTypeSystem, SpaceTypeSpot:
 		return true
 	default:
 		return false

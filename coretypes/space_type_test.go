@@ -16,6 +16,7 @@ func TestIsValidSpaceType(t *testing.T) {
 	}{
 		{"SpaceTypePrivate", args{SpaceTypePrivate}, true},
 		{"SpaceTypeSystem", args{SpaceTypeSystem}, true},
+		{"SpaceTypeSpot", args{SpaceTypeSpot}, true},
 		{"EmptySpaceType", args{""}, false},
 		{"InvalidSpaceType", args{"Foo"}, false},
 	}
@@ -23,6 +24,24 @@ func TestIsValidSpaceType(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsValidSpaceType(tt.args.v); got != tt.want {
 				t.Errorf("IsValidSpaceType() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSpotSpaceID(t *testing.T) {
+	tests := []struct {
+		name   string
+		spotID string
+		want   SpaceID
+	}{
+		{"simple", "acme-gym", SpaceID("spot~acme-gym")},
+		{"with_digits", "venue42", SpaceID("spot~venue42")},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SpotSpaceID(tt.spotID); got != tt.want {
+				t.Errorf("SpotSpaceID() = %v, want %v", got, tt.want)
 			}
 		})
 	}
