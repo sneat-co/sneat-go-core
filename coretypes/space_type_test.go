@@ -14,6 +14,7 @@ func TestIsValidSpaceType(t *testing.T) {
 		args args
 		want bool
 	}{
+		{"SpaceTypePersonal", args{SpaceTypePersonal}, true},
 		{"SpaceTypePrivate", args{SpaceTypePrivate}, true},
 		{"SpaceTypeSystem", args{SpaceTypeSystem}, true},
 		{"SpaceTypeSpot", args{SpaceTypeSpot}, true},
@@ -145,6 +146,11 @@ func TestNewWeakSpaceRef(t *testing.T) {
 		expectPanic []string
 	}{
 		{
+			name: "personal",
+			args: args{SpaceTypePersonal},
+			want: SpaceRef(SpaceTypePersonal),
+		},
+		{
 			name: "private",
 			args: args{SpaceTypePrivate},
 			want: SpaceRef(SpaceTypePrivate),
@@ -157,7 +163,7 @@ func TestNewWeakSpaceRef(t *testing.T) {
 		{
 			name:        "empty",
 			args:        args{""},
-			expectPanic: []string{"family", "private"},
+			expectPanic: []string{"family", "personal", "private"},
 		},
 	}
 	for _, tt := range tests {
@@ -191,6 +197,7 @@ func TestWeakSpaceRef(t *testing.T) {
 		want     SpaceRef
 	}{
 		{"family", FamilyWeekSpaceRef, SpaceRef(SpaceTypeFamily)},
+		{"personal", PersonalWeekSpaceRef, SpaceRef(SpaceTypePersonal)},
 		{"private", PrivateWeekSpaceRef, SpaceRef(SpaceTypePrivate)},
 	}
 	for _, tt := range tests {
