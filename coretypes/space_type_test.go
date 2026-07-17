@@ -15,7 +15,7 @@ func TestIsValidSpaceType(t *testing.T) {
 		want bool
 	}{
 		{"SpaceTypePersonal", args{SpaceTypePersonal}, true},
-		{"SpaceTypePrivate", args{SpaceTypePrivate}, true},
+		{"private-now-invalid", args{"private"}, false},
 		{"SpaceTypeSystem", args{SpaceTypeSystem}, true},
 		{"SpaceTypeSpot", args{SpaceTypeSpot}, true},
 		{"EmptySpaceType", args{""}, false},
@@ -58,9 +58,9 @@ func TestNewSpaceRef(t *testing.T) {
 		args args
 		want SpaceRef
 	}{
-		{"ShouldPass", args{SpaceTypePrivate, "foo"}, "private!foo"},
+		{"ShouldPass", args{SpaceTypePersonal, "foo"}, "personal!foo"},
 		{"EmptySpaceType", args{"", "foo"}, ""},
-		{"ShouldPass", args{SpaceTypePrivate, ""}, ""},
+		{"ShouldPass", args{SpaceTypePersonal, ""}, ""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -104,8 +104,8 @@ func TestSpaceRef_SpaceType(t *testing.T) {
 		v    SpaceRef
 		want SpaceType
 	}{
-		{"full", "private!foo", "private"},
-		{"no_spaceID", "private!", "private"},
+		{"full", "personal!foo", "personal"},
+		{"no_spaceID", "personal!", "personal"},
 		{"no_spaceType", "!foo", ""},
 		{"empty", "", ""},
 	}
@@ -124,7 +124,7 @@ func TestSpaceRef_UrlPath(t *testing.T) {
 		v    SpaceRef
 		want string
 	}{
-		{"ShouldPass", "private!foo", "private/foo"},
+		{"ShouldPass", "personal!foo", "personal/foo"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -151,11 +151,6 @@ func TestNewWeakSpaceRef(t *testing.T) {
 			want: SpaceRef(SpaceTypePersonal),
 		},
 		{
-			name: "private",
-			args: args{SpaceTypePrivate},
-			want: SpaceRef(SpaceTypePrivate),
-		},
-		{
 			name: "family",
 			args: args{SpaceTypeFamily},
 			want: SpaceRef(SpaceTypeFamily),
@@ -163,7 +158,7 @@ func TestNewWeakSpaceRef(t *testing.T) {
 		{
 			name:        "empty",
 			args:        args{""},
-			expectPanic: []string{"family", "personal", "private"},
+			expectPanic: []string{"family", "personal"},
 		},
 	}
 	for _, tt := range tests {
@@ -198,7 +193,6 @@ func TestWeakSpaceRef(t *testing.T) {
 	}{
 		{"family", FamilyWeekSpaceRef, SpaceRef(SpaceTypeFamily)},
 		{"personal", PersonalWeekSpaceRef, SpaceRef(SpaceTypePersonal)},
-		{"private", PrivateWeekSpaceRef, SpaceRef(SpaceTypePrivate)},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

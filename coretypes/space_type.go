@@ -10,11 +10,9 @@ type SpaceType string
 
 const (
 	// SpaceTypePersonal is a "personal" space type used for a user's personal/home space.
+	// (A distinct restricted-visibility "private" type may be introduced later if a
+	// real use case arises; it was intentionally not reserved as an unused value.)
 	SpaceTypePersonal SpaceType = "personal"
-
-	// SpaceTypePrivate is reserved/parked for future restricted-visibility spaces.
-	// Do NOT use for new personal-space logic — use SpaceTypePersonal instead.
-	SpaceTypePrivate SpaceType = "private"
 
 	// SpaceTypeFamily is a "family" space type
 	SpaceTypeFamily SpaceType = "family"
@@ -62,9 +60,6 @@ const FamilyWeekSpaceRef = SpaceRef(SpaceTypeFamily)
 // PersonalWeekSpaceRef is a weak space reference for the personal space.
 const PersonalWeekSpaceRef = SpaceRef(SpaceTypePersonal)
 
-// PrivateWeekSpaceRef is parked/reserved — use PersonalWeekSpaceRef for personal spaces.
-const PrivateWeekSpaceRef = SpaceRef(SpaceTypePrivate)
-
 type SpaceRef string
 
 func (v SpaceRef) SpaceType() SpaceType {
@@ -109,17 +104,17 @@ func NewSpaceRef(spaceType SpaceType, spaceID SpaceID) SpaceRef {
 // NewWeakSpaceRef creates a new weak SpaceRef, e.g. only with space type, no space userID
 func NewWeakSpaceRef(spaceType SpaceType) SpaceRef {
 	switch spaceType {
-	case SpaceTypeFamily, SpaceTypePersonal, SpaceTypePrivate:
+	case SpaceTypeFamily, SpaceTypePersonal:
 		return SpaceRef(spaceType)
 	default:
-		panic(fmt.Sprintf("only 'family', 'personal', and 'private' space types are supported for weak space referencing at the moment, got: %s", spaceType))
+		panic(fmt.Sprintf("only 'family' and 'personal' space types are supported for weak space referencing at the moment, got: %s", spaceType))
 	}
 }
 
 // IsValidSpaceType checks if space has a valid/known type
 func IsValidSpaceType(v SpaceType) bool {
 	switch v {
-	case SpaceTypePersonal, SpaceTypeFamily, SpaceTypePrivate, SpaceTypeGroup, SpaceTypeCompany, SpaceTypeSpace, SpaceTypeClub, SpaceTypeSystem, SpaceTypeSpot:
+	case SpaceTypePersonal, SpaceTypeFamily, SpaceTypeGroup, SpaceTypeCompany, SpaceTypeSpace, SpaceTypeClub, SpaceTypeSystem, SpaceTypeSpot:
 		return true
 	default:
 		return false
