@@ -33,3 +33,14 @@ func TestNewMemoryDB_RejectsReadsAfterWrites(t *testing.T) {
 		t.Fatal("strict test DB accepted a read after a write")
 	}
 }
+
+func TestNewStrictSchemaMemoryDB_RejectsUndefinedCollections(t *testing.T) {
+	db := sneatcoretesting.NewStrictSchemaMemoryDB()
+	err := db.Get(context.Background(), dal.NewRecordWithData(
+		dal.NewKeyWithID("undefined", "record"),
+		new(struct{}),
+	))
+	if err == nil {
+		t.Fatal("strict schema test DB accepted an undefined collection")
+	}
+}

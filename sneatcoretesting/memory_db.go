@@ -20,6 +20,16 @@ func NewMemoryDB() dal.DB {
 	return dalgo2memory.NewDB(dalgo2memory.WithNoReadsAfterWritesInTransaction())
 }
 
+// NewStrictSchemaMemoryDB creates a strict in-memory database with no defined
+// collections. Accessing an undefined collection returns a schema error while
+// transactions still reject reads after their first write.
+func NewStrictSchemaMemoryDB() dal.DB {
+	return dalgo2memory.NewDB(
+		dalgo2memory.WithNoReadsAfterWritesInTransaction(),
+		dalgo2memory.WithSchema(false),
+	)
+}
+
 // SetupMemoryDB creates a strict in-memory database and installs it as the
 // facade DB for the lifetime of t. The previous getter is restored at cleanup.
 func SetupMemoryDB(t *testing.T) dal.DB {
