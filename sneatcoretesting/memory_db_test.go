@@ -10,8 +10,9 @@ import (
 )
 
 func TestSetupMemoryDB(t *testing.T) {
-	db := sneatcoretesting.SetupMemoryDB(t)
-	got, err := facade.GetSneatDB(context.Background())
+	t.Parallel()
+	ctx, db := sneatcoretesting.SetupMemoryDB(t)
+	got, err := facade.GetSneatDB(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -20,7 +21,24 @@ func TestSetupMemoryDB(t *testing.T) {
 	}
 }
 
+func TestSetupMemoryDB_ParallelIsolation(t *testing.T) {
+	for _, name := range []string{"first", "second"} {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			ctx, db := sneatcoretesting.SetupMemoryDB(t)
+			got, err := facade.GetSneatDB(ctx)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got != db {
+				t.Error("parallel test did not resolve its database")
+			}
+		})
+	}
+}
+
 func TestNewMemoryDB_RejectsReadsAfterWrites(t *testing.T) {
+	t.Parallel()
 	db := sneatcoretesting.NewMemoryDB()
 	key := dal.NewKeyWithID("records", "strict-ordering")
 	err := db.RunReadwriteTransaction(context.Background(), func(ctx context.Context, tx dal.ReadwriteTransaction) error {
