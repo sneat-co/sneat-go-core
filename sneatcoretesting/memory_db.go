@@ -20,13 +20,17 @@ func NewMemoryDB() dal.DB {
 	return dalgo2memory.NewDB(dalgo2memory.WithNoReadsAfterWritesInTransaction())
 }
 
-// SetupMemoryDB creates a strict in-memory database and installs it as the
-// facade DB for the lifetime of t. The previous getter is restored at cleanup.
-func SetupMemoryDB(t *testing.T) dal.DB {
-	t.Helper()
+// ContextWithMemoryDB returns a child context with a new strict in-memory
+// database installed as its facade DB.
+func ContextWithMemoryDB(parent context.Context) (context.Context, dal.DB) {
 	db := NewMemoryDB()
-	previous := facade.GetSneatDB
-	facade.GetSneatDB = func(context.Context) (dal.DB, error) { return db, nil }
-	t.Cleanup(func() { facade.GetSneatDB = previous })
-	return db
+	return facade.WithSneatDB(parent, db), db
+}
+
+// SetupMemoryDB creates a strict in-memory database and installs it as the
+// facade DB in a new context. It does not mutate application-wide state, so
+// tests using it can call t.Parallel safely.
+func SetupMemoryDB(t *testing.T) (context.Context, dal.DB) {
+	t.Helper()
+	return ContextWithMemoryDB(context.Background())
 }

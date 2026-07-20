@@ -25,24 +25,22 @@ func TestRunReadwriteTransaction(t *testing.T) {
 		}
 	})
 
-	mockGetSneatDB := func() {
-		GetSneatDB = func(_ context.Context) (dal.DB, error) {
-			ctrl := gomock.NewController(t)
-			mockDB := mock_dal.NewMockDB(ctrl)
-			mockDB.EXPECT().RunReadwriteTransaction(gomock.Any(), gomock.Any()).DoAndReturn(func(ctx context.Context, f dal.RWTxWorker, options ...dal.TransactionOption) error {
-				err := f(ctx, mock_dal.NewMockReadwriteTransaction(ctrl))
-				if deadline, ok := ctx.Deadline(); ok && time.Until(deadline) <= 0 {
-					return context.DeadlineExceeded
-				}
-				return err
-			})
-			return mockDB, nil
-		}
+	contextWithMockDB := func(t *testing.T) context.Context {
+		ctrl := gomock.NewController(t)
+		mockDB := mock_dal.NewMockDB(ctrl)
+		mockDB.EXPECT().RunReadwriteTransaction(gomock.Any(), gomock.Any()).DoAndReturn(func(ctx context.Context, f dal.RWTxWorker, options ...dal.TransactionOption) error {
+			err := f(ctx, mock_dal.NewMockReadwriteTransaction(ctrl))
+			if deadline, ok := ctx.Deadline(); ok && time.Until(deadline) <= 0 {
+				return context.DeadlineExceeded
+			}
+			return err
+		})
+		return WithSneatDB(context.Background(), mockDB)
 	}
 
 	t.Run("no_error", func(t *testing.T) {
-		mockGetSneatDB()
-		ctx := context.Background()
+		t.Parallel()
+		ctx := contextWithMockDB(t)
 		err := RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
 			return nil
 		})
@@ -52,8 +50,8 @@ func TestRunReadwriteTransaction(t *testing.T) {
 	})
 
 	t.Run("returns_expected_error", func(t *testing.T) {
-		mockGetSneatDB()
-		ctx := context.Background()
+		t.Parallel()
+		ctx := contextWithMockDB(t)
 		expectedErr := errors.New("expected error")
 		err := RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
 			return expectedErr
@@ -64,15 +62,16 @@ func TestRunReadwriteTransaction(t *testing.T) {
 	})
 
 	t.Run("deadline", func(t *testing.T) {
-		mockGetSneatDB()
+		ctx := contextWithMockDB(t)
 		const deadline = time.Millisecond
 		withDefaultDeadLineCalled := 0
+		previousWithDefaultDeadLine := consts4dal.WithDefaultDeadLine
+		t.Cleanup(func() { consts4dal.WithDefaultDeadLine = previousWithDefaultDeadLine })
 		consts4dal.WithDefaultDeadLine = func(ctx context.Context) (context.Context, context.CancelFunc) {
 			withDefaultDeadLineCalled++
 			return context.WithDeadline(ctx, time.Now().Add(deadline))
 		}
 
-		ctx := context.Background()
 		err := RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
 			time.Sleep(deadline + time.Millisecond)
 			return nil
