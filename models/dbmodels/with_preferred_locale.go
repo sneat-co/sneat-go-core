@@ -2,7 +2,7 @@ package dbmodels
 
 import (
 	"fmt"
-	"github.com/dal-go/dalgo/update"
+	"github.com/dal-go/record/update"
 )
 
 type WithPreferredLocale struct {

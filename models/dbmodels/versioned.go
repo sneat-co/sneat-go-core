@@ -2,7 +2,7 @@ package dbmodels
 
 import (
 	"errors"
-	"github.com/dal-go/dalgo/update"
+	"github.com/dal-go/record/update"
 	"github.com/sneat-co/sneat-go-core"
 	"github.com/strongo/strongoapp/with"
 	"github.com/strongo/validation"

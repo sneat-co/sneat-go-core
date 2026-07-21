@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/dal-go/dalgo/dal"
+	"github.com/dal-go/record"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/sneatcoretesting"
 )
@@ -40,12 +41,12 @@ func TestSetupMemoryDB_ParallelIsolation(t *testing.T) {
 func TestNewMemoryDB_RejectsReadsAfterWrites(t *testing.T) {
 	t.Parallel()
 	db := sneatcoretesting.NewMemoryDB()
-	key := dal.NewKeyWithID("records", "strict-ordering")
+	key := record.NewKeyWithID("records", "strict-ordering")
 	err := db.RunReadwriteTransaction(context.Background(), func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		if err := tx.Set(ctx, dal.NewRecordWithData(key, new(struct{}))); err != nil {
+		if err := tx.Set(ctx, record.NewRecordWithData(key, new(struct{}))); err != nil {
 			return err
 		}
-		return tx.Get(ctx, dal.NewRecordWithData(key, new(struct{})))
+		return tx.Get(ctx, record.NewRecordWithData(key, new(struct{})))
 	})
 	if err == nil {
 		t.Fatal("strict test DB accepted a read after a write")
