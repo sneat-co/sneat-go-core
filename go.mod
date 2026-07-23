@@ -5,7 +5,7 @@ module github.com/sneat-co/sneat-go-core
 go 1.24.3
 
 require (
-	github.com/crediterra/money v0.3.1
+	github.com/crediterra/money v0.3.3
 	github.com/dal-go/dalgo v0.63.1
 	github.com/stretchr/testify v1.11.1
 	github.com/strongo/analytics v0.2.5
