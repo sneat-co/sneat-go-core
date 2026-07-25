@@ -100,6 +100,14 @@ func TestNormalizeText(t *testing.T) {
 		"milk, 2 liters":   "milk 2 liters",
 		"  bought   milk ": "bought milk",
 		"What's on it?":    "what s on it",
+		// A decimal separator is not punctuation: stripping it turned "80.5"
+		// into "80 5" and the measurement stopped parsing.
+		"my weight is 80.5": "my weight is 80.5",
+		"ran 2.5 km":        "ran 2.5 km",
+		"80,5 kg":           "80,5 kg",
+		// A period that is NOT between digits is still punctuation.
+		"bought milk. bought bread": "bought milk bought bread",
+		"2. milk":                   "2 milk",
 	} {
 		if got := NormalizeText(input); got != want {
 			t.Errorf("NormalizeText(%q) = %q, want %q", input, got, want)

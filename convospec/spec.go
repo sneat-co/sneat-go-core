@@ -134,13 +134,23 @@ func (c Catalog) MatchesTriggers(text string) bool {
 // words in chat messages into single spaces, so a declared trigger like
 // "push-ups" matches "Push-ups: 20" and "20 PUSH-UPS!". Hyphens are preserved
 // because triggers themselves are hyphenated.
+//
+// A '.' or ',' BETWEEN DIGITS is preserved, because it is a decimal separator
+// rather than punctuation: stripping it silently turned "80.5" into "80 5" and
+// "2.5 km" into "2 5 km", which then failed to parse as a measurement.
 func NormalizeText(text string) string {
-	lowered := strings.ToLower(text)
+	lowered := []rune(strings.ToLower(text))
 	var b strings.Builder
 	b.Grow(len(lowered))
-	for _, r := range lowered {
+	for i, r := range lowered {
 		switch r {
-		case ',', '.', ':', ';', '!', '?', '(', ')', '[', ']', '"', '\'', '\n', '\t':
+		case '.', ',':
+			if isDigit(prevRune(lowered, i)) && isDigit(nextRune(lowered, i)) {
+				b.WriteRune(r) // decimal separator
+			} else {
+				b.WriteByte(' ')
+			}
+		case ':', ';', '!', '?', '(', ')', '[', ']', '"', '\'', '\n', '\t':
 			b.WriteByte(' ')
 		default:
 			b.WriteRune(r)
@@ -148,6 +158,22 @@ func NormalizeText(text string) string {
 	}
 	return strings.Join(strings.Fields(b.String()), " ")
 }
+
+func prevRune(runes []rune, i int) rune {
+	if i == 0 {
+		return 0
+	}
+	return runes[i-1]
+}
+
+func nextRune(runes []rune, i int) rune {
+	if i+1 >= len(runes) {
+		return 0
+	}
+	return runes[i+1]
+}
+
+func isDigit(r rune) bool { return r >= '0' && r <= '9' }
 
 // ValidateArgs checks the given arguments against the definition and returns
 // a normalized copy: JSON numbers are converted for int args, []any of
