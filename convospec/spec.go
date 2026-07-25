@@ -99,16 +99,31 @@ func (c Catalog) Action(id string) (ActionDef, bool) {
 	return ActionDef{}, false
 }
 
-// MatchesTriggers reports whether any of the catalog's declared triggers
-// occurs in text. text is expected to be already normalized (lowercase);
-// NormalizeText produces the expected form. A catalog with no triggers never
-// matches, so it can only ever be reached through the unnarrowed action set.
+// MatchesTriggers reports whether any of the catalog's declared triggers occurs
+// in text as a WHOLE WORD (or whole run of words, for multi-word triggers).
+// text is expected to be already normalized; NormalizeText produces that form.
+//
+// Word-boundary rather than substring matching is deliberate. A routing
+// prefilter that narrows on a single matching catalog can only ever misroute
+// through a false positive, and substring matching manufactures them: a trigger
+// "km" would match "kmart", sending a shopping-list message to a tracker. The
+// cost is that morphological variants must be declared explicitly ("buy" does
+// not match "buying"), which is the right trade — an explicitly listed trigger
+// is reviewable, an accidental substring hit is not.
+//
+// A catalog with no triggers never matches, so it can only be reached through
+// the unnarrowed action set.
 func (c Catalog) MatchesTriggers(text string) bool {
+	if text == "" {
+		return false
+	}
+	padded := " " + text + " "
 	for _, trigger := range c.Triggers {
+		trigger = strings.TrimSpace(strings.ToLower(trigger))
 		if trigger == "" {
 			continue
 		}
-		if strings.Contains(text, trigger) {
+		if strings.Contains(padded, " "+trigger+" ") {
 			return true
 		}
 	}

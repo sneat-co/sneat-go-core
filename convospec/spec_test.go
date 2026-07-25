@@ -133,8 +133,40 @@ func TestCatalogWithoutTriggersNeverMatches(t *testing.T) {
 // An empty-string trigger must not turn into a match-everything rule, which is
 // what strings.Contains would do if it were not skipped.
 func TestEmptyTriggerIsIgnored(t *testing.T) {
-	sloppy := Catalog{ID: "sloppy", Triggers: []string{""}}
+	sloppy := Catalog{ID: "sloppy", Triggers: []string{"", "   "}}
 	if sloppy.MatchesTriggers(NormalizeText("milk")) {
 		t.Error("empty trigger must not match")
+	}
+}
+
+// Triggers match whole words only. Substring matching would let a short trigger
+// like "km" claim "kmart" and misroute the message, and a single false-positive
+// catalog is the only way a fail-open prefilter can route wrongly.
+func TestTriggersMatchWholeWordsOnly(t *testing.T) {
+	trackus := Catalog{ID: "trackus", Triggers: []string{"km", "kg", "ran"}}
+	for _, text := range []string{"ran 10 km", "weighed 80 kg", "10 KM"} {
+		if !trackus.MatchesTriggers(NormalizeText(text)) {
+			t.Errorf("expected %q to match", text)
+		}
+	}
+	for _, text := range []string{
+		"buy socks at kmart",  // km inside kmart
+		"branding guidelines", // ran inside branding
+		"kgb documentary",     // kg inside kgb
+	} {
+		if trackus.MatchesTriggers(NormalizeText(text)) {
+			t.Errorf("substring match leaked: %q must not match", text)
+		}
+	}
+}
+
+// A multi-word trigger must match as a contiguous run of words.
+func TestMultiWordTrigger(t *testing.T) {
+	listus := Catalog{ID: "listus", Triggers: []string{"shopping list"}}
+	if !listus.MatchesTriggers(NormalizeText("add milk to my shopping list, please")) {
+		t.Error("expected multi-word trigger to match")
+	}
+	if listus.MatchesTriggers(NormalizeText("shopping for a list of books")) {
+		t.Error("multi-word trigger must match contiguous words only")
 	}
 }
