@@ -145,8 +145,14 @@ func NormalizeText(text string) string {
 	for i, r := range lowered {
 		switch r {
 		case '.':
-			if isDigit(prevRune(lowered, i)) && isDigit(nextRune(lowered, i)) {
-				b.WriteRune(r) // decimal separator
+			// A '.' is a separator only when it ENDS a token. Between two
+			// alphanumerics it is part of the token and must survive:
+			// "80.5" is a decimal, "jane@example.com" is an address, and
+			// dropping it there made an email impossible to extract at all —
+			// the rule never saw a dot to match. "bought milk. bought bread"
+			// still splits, because that '.' is followed by a space.
+			if isAlnum(prevRune(lowered, i)) && isAlnum(nextRune(lowered, i)) {
+				b.WriteRune(r)
 			} else {
 				b.WriteByte(' ')
 			}
@@ -196,6 +202,8 @@ func nextRune(runes []rune, i int) rune {
 func isDigit(r rune) bool { return r >= '0' && r <= '9' }
 
 func isLetter(r rune) bool { return r >= 'a' && r <= 'z' }
+
+func isAlnum(r rune) bool { return isDigit(r) || isLetter(r) }
 
 // ValidateArgs checks the given arguments against the definition and returns
 // a normalized copy: JSON numbers are converted for int args, []any of
