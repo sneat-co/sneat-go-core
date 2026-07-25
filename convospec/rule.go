@@ -4,7 +4,32 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
+
+// ActionCall is one typed action invocation: the specification's own notion of
+// "what the interpreter decided to do". It is declared here, rather than only in
+// the runtime's transport model, so that a contract lib can express a
+// deterministic interpretation without importing the runtime.
+type ActionCall struct {
+	ActionID string         `json:"actionID"`
+	Args     map[string]any `json:"args,omitempty"`
+}
+
+// RuleFunc is the escape hatch for interpretations a declarative Rule cannot
+// express: a message that must produce SEVERAL action calls, one that needs
+// relative-date arithmetic against a clock, or one whose target depends on a
+// condition ("bought X" is a set-done, not an add).
+//
+// It returns calls plus matched, and takes the clock explicitly so a test can
+// pin "tomorrow" without touching global state. Its signature deliberately uses
+// only this module's own types and the standard library, so an extension can
+// declare one from its dependency-free contract lib.
+//
+// Prefer a declarative Rule when one suffices — it is inspectable data, and it
+// is validated against the action's ArgDefs. Reach for RuleFunc only for the
+// cases above.
+type RuleFunc func(normalizedText string, now time.Time) (calls []ActionCall, matched bool)
 
 // Rule is one deterministic interpretation: a pattern over the user's message
 // and the action call it produces. Rules let an extension ship a reproducible
