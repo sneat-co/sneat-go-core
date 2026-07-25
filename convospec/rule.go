@@ -31,6 +31,40 @@ type ActionCall struct {
 // cases above.
 type RuleFunc func(normalizedText string, now time.Time) (calls []ActionCall, matched bool)
 
+// ScopedRuleFunc is a RuleFunc that also sees WHICH actions are on offer for
+// this turn.
+//
+// A few interpretations are legitimately scope-dependent: a bare item name like
+// "milk" should only be read as "add it to the shopping list" when Listus is the
+// only thing listening, and a catch-all fallback must not fire when another
+// extension is also in scope. Without this, such a rule either has to stay in a
+// shared mock package — defeating extension-owned grammars — or silently change
+// behaviour when a host composes one more extension.
+//
+// availableActionIDs holds the action IDs offered this turn, already narrowed by
+// the runtime's prefilter, and always includes the clarify pseudo-action.
+type ScopedRuleFunc func(normalizedText string, now time.Time, availableActionIDs []string) (calls []ActionCall, matched bool)
+
+// OnlyCatalogInScope reports whether every offered action belongs to the given
+// extension prefix (e.g. "lists."), ignoring the clarify pseudo-action.
+//
+// This is the check a scope-dependent rule usually wants: "am I the only one
+// listening?" It is provided here so each extension does not re-implement it,
+// and so the semantics of "exclusive scope" stay identical across extensions.
+func OnlyCatalogInScope(availableActionIDs []string, actionPrefix string) bool {
+	sawOwn := false
+	for _, id := range availableActionIDs {
+		if id == "clarify" {
+			continue
+		}
+		if !strings.HasPrefix(id, actionPrefix) {
+			return false
+		}
+		sawOwn = true
+	}
+	return sawOwn
+}
+
 // Rule is one deterministic interpretation: a pattern over the user's message
 // and the action call it produces. Rules let an extension ship a reproducible
 // stand-in for a language model alongside its action declarations, so tests do

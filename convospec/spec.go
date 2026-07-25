@@ -150,7 +150,15 @@ func NormalizeText(text string) string {
 			} else {
 				b.WriteByte(' ')
 			}
-		case ':', ';', '!', '?', '(', ')', '[', ']', '"', '\'', '\n', '\t':
+		case '\'', '\u2019':
+			// An apostrophe INSIDE a word is elided, not spaced: "what's"
+			// becomes "whats", so a pattern written as `what'?s` still matches.
+			// Turning it into a space split the word in two and silently broke
+			// every such rule.
+			if !isLetter(prevRune(lowered, i)) || !isLetter(nextRune(lowered, i)) {
+				b.WriteByte(' ')
+			}
+		case ':', ';', '!', '?', '(', ')', '[', ']', '"', '\n', '\t':
 			b.WriteByte(' ')
 		default:
 			b.WriteRune(r)
@@ -174,6 +182,8 @@ func nextRune(runes []rune, i int) rune {
 }
 
 func isDigit(r rune) bool { return r >= '0' && r <= '9' }
+
+func isLetter(r rune) bool { return r >= 'a' && r <= 'z' }
 
 // ValidateArgs checks the given arguments against the definition and returns
 // a normalized copy: JSON numbers are converted for int args, []any of
