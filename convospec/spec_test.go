@@ -111,9 +111,13 @@ func TestNormalizeText(t *testing.T) {
 		"my weight is 80.5": "my weight is 80.5",
 		"ran 2.5 km":        "ran 2.5 km",
 		"80,5 kg":           "80,5 kg",
-		// A period that is NOT between digits is still punctuation.
+		// A period that ENDS a token is still punctuation.
 		"bought milk. bought bread": "bought milk bought bread",
 		"2. milk":                   "2 milk",
+		// ...but between alphanumerics it is part of the token. Dropping it
+		// here made an email impossible to extract: the rule never saw a dot.
+		"add jane jane@example.com to contacts": "add jane jane@example.com to contacts",
+		"visit sneat.app today":                 "visit sneat.app today",
 	} {
 		if got := NormalizeText(input); got != want {
 			t.Errorf("NormalizeText(%q) = %q, want %q", input, got, want)
