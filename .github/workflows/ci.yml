@@ -20,6 +20,47 @@ on:
 
 jobs:
 
+  # The convospec module is NESTED inside this repo and therefore invisible to
+  # the shared workflow below, which builds the root module only. Without this
+  # job it would ship with no build, vet or test coverage at all — and every
+  # extension contract lib depends on it.
+  convospec_module:
+    name: convospec (nested module)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: convospec
+    env:
+      # This repo may be checked out inside a multi-module workspace; the nested
+      # module must always be verified on its own.
+      GOWORK: "off"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: convospec/go.mod
+      - name: Assert the module stays dependency-free
+        run: |
+          # Extension contract libs are themselves dependency-free and import
+          # this module; a single require here would push a dependency tree into
+          # every one of them. `go list -m all` prints only the module itself
+          # when nothing is required.
+          deps="$(go list -m all | grep -v '^github.com/sneat-co/sneat-go-core/convospec$' || true)"
+          if [ -n "$deps" ]; then
+            echo "convospec must have no dependencies, found:" >&2
+            echo "$deps" >&2
+            exit 1
+          fi
+      - name: Build, vet and test
+        run: |
+          go build ./...
+          go vet ./...
+          go test -race ./...
+      - name: Verify module files are tidy
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+
   strongo_workflow:
     uses: strongo/cicd/.github/workflows/workflow.yml@main
     permissions:
