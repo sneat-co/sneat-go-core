@@ -144,12 +144,24 @@ func NormalizeText(text string) string {
 	b.Grow(len(lowered))
 	for i, r := range lowered {
 		switch r {
-		case '.', ',':
+		case '.':
 			if isDigit(prevRune(lowered, i)) && isDigit(nextRune(lowered, i)) {
 				b.WriteRune(r) // decimal separator
 			} else {
 				b.WriteByte(' ')
 			}
+		case ',':
+			if isDigit(prevRune(lowered, i)) && isDigit(nextRune(lowered, i)) {
+				b.WriteRune(r) // decimal separator, e.g. "80,5"
+				break
+			}
+			// A comma is kept as its OWN token rather than dropped, because it
+			// is a list delimiter: "buy milk, bread, eggs and apples" is four
+			// items, and replacing the commas with spaces left nothing to split
+			// on but "and" — collapsing three items into one titled
+			// "milk bread eggs". Spacing it keeps word-boundary trigger
+			// matching intact while leaving the delimiter visible to rules.
+			b.WriteString(" , ")
 		case '\'', '\u2019':
 			// An apostrophe INSIDE a word is elided, not spaced: "what's"
 			// becomes "whats", so a pattern written as `what'?s` still matches.

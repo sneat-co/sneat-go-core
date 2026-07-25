@@ -95,13 +95,17 @@ func TestActionDefArg(t *testing.T) {
 
 func TestNormalizeText(t *testing.T) {
 	for input, want := range map[string]string{
-		"Push-ups: 20":     "push-ups 20",
-		"20 PUSH-UPS!":     "20 push-ups",
-		"milk, 2 liters":   "milk 2 liters",
-		"  bought   milk ": "bought milk",
-		"What's on it?":    "whats on it",
-		"who's going?":     "whos going",
-		"'quoted' words":   "quoted words",
+		"Push-ups: 20": "push-ups 20",
+		"20 PUSH-UPS!": "20 push-ups",
+		// A comma is a LIST DELIMITER and must survive as its own token:
+		// dropping it left "buy milk, bread, eggs and apples" with nothing to
+		// split on but "and", collapsing three items into one.
+		"milk, 2 liters":                   "milk , 2 liters",
+		"buy milk, bread, eggs and apples": "buy milk , bread , eggs and apples",
+		"  bought   milk ":                 "bought milk",
+		"What's on it?":                    "whats on it",
+		"who's going?":                     "whos going",
+		"'quoted' words":                   "quoted words",
 		// A decimal separator is not punctuation: stripping it turned "80.5"
 		// into "80 5" and the measurement stopped parsing.
 		"my weight is 80.5": "my weight is 80.5",
