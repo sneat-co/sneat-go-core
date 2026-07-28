@@ -15,6 +15,7 @@ func TestIsValidSpaceType(t *testing.T) {
 		want bool
 	}{
 		{"SpaceTypePersonal", args{SpaceTypePersonal}, true},
+		{"SpaceTypeGroup", args{SpaceTypeGroup}, true},
 		{"private-now-invalid", args{"private"}, false},
 		{"SpaceTypeSystem", args{SpaceTypeSystem}, true},
 		{"SpaceTypeSpot", args{SpaceTypeSpot}, true},
@@ -27,6 +28,23 @@ func TestIsValidSpaceType(t *testing.T) {
 				t.Errorf("IsValidSpaceType() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestSpaceTypeGroupFullRefRoundTrip(t *testing.T) {
+	spaceRef := NewSpaceRef(SpaceTypeGroup, "circle-1")
+
+	if got, want := spaceRef, SpaceRef("group!circle-1"); got != want {
+		t.Errorf("NewSpaceRef() = %q, want %q", got, want)
+	}
+	if got, want := spaceRef.SpaceType(), SpaceTypeGroup; got != want {
+		t.Errorf("SpaceType() = %q, want %q", got, want)
+	}
+	if got, want := spaceRef.SpaceID(), SpaceID("circle-1"); got != want {
+		t.Errorf("SpaceID() = %q, want %q", got, want)
+	}
+	if got, want := spaceRef.UrlPath(), "group/circle-1"; got != want {
+		t.Errorf("UrlPath() = %q, want %q", got, want)
 	}
 }
 
