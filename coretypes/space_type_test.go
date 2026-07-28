@@ -178,6 +178,11 @@ func TestNewWeakSpaceRef(t *testing.T) {
 			args:        args{""},
 			expectPanic: []string{"family", "personal"},
 		},
+		{
+			name:        "group_requires_full_reference",
+			args:        args{SpaceTypeGroup},
+			expectPanic: []string{"family", "personal"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

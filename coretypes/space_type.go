@@ -18,7 +18,8 @@ const (
 	SpaceTypeFamily SpaceType = "family"
 
 	// SpaceTypeGroup is a member-managed group space, such as a Circleus
-	// circle. Group spaces are always referenced with a full SpaceRef.
+	// circle. NewSpaceRef constructs its full references; NewWeakSpaceRef
+	// deliberately rejects this type because a group reference needs an ID.
 	SpaceTypeGroup SpaceType = "group"
 
 	// SpaceTypeCompany is a "company" space type
