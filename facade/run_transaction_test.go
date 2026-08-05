@@ -27,7 +27,9 @@ func TestRunReadwriteTransaction(t *testing.T) {
 
 	contextWithMockDB := func(t *testing.T) context.Context {
 		ctrl := gomock.NewController(t)
-		mockDB := mock_dal.NewMockDB(ctrl)
+		// dalgo v0.64 seals dal.DB, so the generated mock is a MockBackend and
+		// the test hands it to dal.NewDB to get the DB the facade expects.
+		mockDB := mock_dal.NewMockBackend(ctrl)
 		mockDB.EXPECT().RunReadwriteTransaction(gomock.Any(), gomock.Any()).DoAndReturn(func(ctx context.Context, f dal.RWTxWorker, options ...dal.TransactionOption) error {
 			err := f(ctx, mock_dal.NewMockReadwriteTransaction(ctrl))
 			if deadline, ok := ctx.Deadline(); ok && time.Until(deadline) <= 0 {
@@ -35,7 +37,7 @@ func TestRunReadwriteTransaction(t *testing.T) {
 			}
 			return err
 		})
-		return WithSneatDB(context.Background(), mockDB)
+		return WithSneatDB(context.Background(), dal.NewDB(mockDB))
 	}
 
 	t.Run("no_error", func(t *testing.T) {
