@@ -2,8 +2,10 @@ package sneatcoretesting_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
+	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/record"
 	"github.com/sneat-co/sneat-go-core/facade"
@@ -48,7 +50,19 @@ func TestNewMemoryDB_RejectsReadsAfterWrites(t *testing.T) {
 		}
 		return tx.Get(ctx, record.NewRecordWithData(key, new(struct{})))
 	})
+	if !errors.Is(err, dalgo2memory.ErrReadAfterWriteInTransaction) {
+		t.Fatalf("strict test DB read-after-write error = %v, want %v", err, dalgo2memory.ErrReadAfterWriteInTransaction)
+	}
+}
+
+func TestNewStrictSchemaMemoryDB_RejectsUndefinedCollections(t *testing.T) {
+	t.Parallel()
+	db := sneatcoretesting.NewStrictSchemaMemoryDB()
+	err := db.Get(context.Background(), record.NewRecordWithData(
+		record.NewKeyWithID("undefined", "record"),
+		new(struct{}),
+	))
 	if err == nil {
-		t.Fatal("strict test DB accepted a read after a write")
+		t.Fatal("strict schema test DB accepted an undefined collection")
 	}
 }

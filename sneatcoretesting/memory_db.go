@@ -20,6 +20,16 @@ func NewMemoryDB() dal.DB {
 	return dalgo2memory.NewDB(dalgo2memory.WithNoReadsAfterWritesInTransaction())
 }
 
+// NewStrictSchemaMemoryDB creates an empty strict-schema in-memory database
+// for tests that must reject accesses to undeclared collections. It retains the
+// Firestore-compatible transaction ordering enforced by NewMemoryDB.
+func NewStrictSchemaMemoryDB() dal.DB {
+	return dalgo2memory.NewDB(
+		dalgo2memory.WithNoReadsAfterWritesInTransaction(),
+		dalgo2memory.WithSchema(false),
+	)
+}
+
 // ContextWithMemoryDB returns a child context with a new strict in-memory
 // database installed as its facade DB.
 func ContextWithMemoryDB(parent context.Context) (context.Context, dal.DB) {
