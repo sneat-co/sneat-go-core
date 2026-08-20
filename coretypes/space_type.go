@@ -41,6 +41,11 @@ const (
 	// subscriptions, not members; moderators may become members in a later
 	// phase.
 	SpaceTypeSpot SpaceType = "spot"
+
+	// SpaceTypeCommunityCentre is a community-centre / local-venue space type,
+	// used by NoticeBoard.cc (communitycentrum). Centre staff are members;
+	// public participants are customers (see Competios decision 0009).
+	SpaceTypeCommunityCentre SpaceType = "community-center"
 )
 
 // SpotSpaceIDPrefix is the reserved prefix used by SpotSpaceID to construct
@@ -117,7 +122,7 @@ func NewWeakSpaceRef(spaceType SpaceType) SpaceRef {
 // IsValidSpaceType checks if space has a valid/known type
 func IsValidSpaceType(v SpaceType) bool {
 	switch v {
-	case SpaceTypePersonal, SpaceTypeFamily, SpaceTypeGroup, SpaceTypeCompany, SpaceTypeSpace, SpaceTypeClub, SpaceTypeSystem, SpaceTypeSpot:
+	case SpaceTypePersonal, SpaceTypeFamily, SpaceTypeGroup, SpaceTypeCompany, SpaceTypeSpace, SpaceTypeClub, SpaceTypeSystem, SpaceTypeSpot, SpaceTypeCommunityCentre:
 		return true
 	default:
 		return false
