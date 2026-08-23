@@ -6,7 +6,7 @@ go 1.24.3
 
 require (
 	github.com/crediterra/money v0.3.5
-	github.com/dal-go/dalgo v0.65.0
+	github.com/dal-go/dalgo v0.66.0
 	github.com/stretchr/testify v1.12.1
 	github.com/strongo/analytics v0.2.5
 	github.com/strongo/delaying v0.2.3
@@ -25,7 +25,7 @@ require (
 	github.com/RoaringBitmap/roaring/v2 v2.25.0 // indirect
 	github.com/alexsergivan/transliterator v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.24.6 // indirect
-	github.com/dal-go/record v0.1.2
+	github.com/dal-go/record v0.1.3
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/strongo/decimal v0.1.2 // indirect
 	github.com/strongo/random v0.0.1 // indirect

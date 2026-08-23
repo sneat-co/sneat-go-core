@@ -32,14 +32,23 @@ import (
 // store the exact string that was claimed rather than re-deriving it.
 //
 // Claim never reads before it writes: the only database operation it performs
-// is a single tx.Insert at the claim's fixed document ID. Insert failing is
-// therefore reported as ErrSlugTaken unconditionally — there is no cross-
-// backend sentinel in dalgo for "insert failed because the document already
-// exists" (adapters currently return a plain error), but at a key this
-// package has already validated, an insert's only expected failure mode is
-// that the document is already there. This mirrors Bookius'
-// ErrBookingTypeSlugTaken, the prior art this package is consolidating (see
-// Decision 0001).
+// is a single tx.Insert at the claim's fixed document ID, which is what makes
+// the claim atomic without depending on a read.
+//
+// A failed insert is reported as ErrSlugTaken only when the adapter identifies
+// it as a duplicate key, via record.IsAlreadyExists. Any other failure is
+// returned as itself. The distinction matters to end users: reporting every
+// insert failure as "taken" tells someone their chosen name is unavailable
+// when the real problem was a deadline or a permission error, and sends them
+// off to invent a different name for no reason.
+//
+// Note the asymmetry: record.IsAlreadyExists returning false is NOT proof that
+// the key was free. An adapter that does not classify its duplicate-key errors
+// never returns the sentinel, so against one of those a genuine conflict
+// surfaces as a plain error rather than ErrSlugTaken. That is the safer
+// direction to fail — an honest error beats a confident wrong answer — and it
+// is a visible, tracked state rather than a silent one, because dalgo's shared
+// conformance suite has an unconditional check for exactly this behaviour.
 func Claim(ctx context.Context, tx dal.ReadwriteTransaction, namespace Namespace, slug, targetID string, targetKind TargetKind, opts ...Option) (Slug, error) {
 	if err := ValidateNamespace(namespace); err != nil {
 		return "", err
@@ -62,7 +71,10 @@ func Claim(ctx context.Context, tx dal.ReadwriteTransaction, namespace Namespace
 	}
 	rec := record.NewRecordWithData(claimKey(namespace, Slug(normalised)), data)
 	if err := tx.Insert(ctx, rec); err != nil {
-		return "", fmt.Errorf("%w: %q in namespace %q: %w", ErrSlugTaken, normalised, namespace, err)
+		if record.IsAlreadyExists(err) {
+			return "", fmt.Errorf("%w: %q in namespace %q: %w", ErrSlugTaken, normalised, namespace, err)
+		}
+		return "", fmt.Errorf("slugs: claiming %q in namespace %q: %w", normalised, namespace, err)
 	}
 	return Slug(normalised), nil
 }

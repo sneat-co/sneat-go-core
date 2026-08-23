@@ -58,7 +58,18 @@ on a preceding read to establish uniqueness: a read-then-write is only safe unde
 backend that detects the conflict, and the package must be correct without assuming
 it. A failed claim MUST return an error identifiable by an exported predicate
 (`IsSlugTaken` or equivalent), so callers can map it to their own contract — for
-example Bookius' HTTP 409.
+example Bookius' HTTP 409. That error MUST be returned **only** when the adapter
+identifies the failure as a duplicate key (`record.IsAlreadyExists`); every other
+insert failure MUST be returned as itself. Reporting an unclassified failure as
+*taken* tells a user their chosen name is unavailable when the real problem was a
+deadline or a permission error.
+
+The asymmetry MUST be respected: `record.IsAlreadyExists` returning false is **not**
+proof the key was free. An adapter that does not classify duplicates never returns
+the sentinel, so against one of those a genuine conflict surfaces as a plain error
+rather than as *taken*. That is the safer direction to fail, and it is a tracked
+state rather than a silent one — dalgo's shared conformance suite carries an
+unconditional check for this behaviour.
 
 #### REQ: claim-joins-the-caller-transaction
 
@@ -134,6 +145,13 @@ caller's transaction, so a rename cannot half-happen.
 **Given** a backend that surfaces write conflicts
 **When** two transactions concurrently claim the same slug in the same namespace
 **Then** exactly one commits and the other fails as *taken* or as a retryable conflict, and there is no state in which both hold the claim.
+
+### AC: non-duplicate-failure-is-not-taken (verifies REQ:claim-is-atomic)
+
+**Scenario:** a backend problem is not a naming problem
+**Given** an insert that fails for a reason other than a duplicate key
+**When** a slug is claimed
+**Then** the error is returned as itself, `IsSlugTaken` reports false, and the caller is not told the slug is taken.
 
 ### AC: claim-and-record-commit-together (verifies REQ:claim-joins-the-caller-transaction)
 
