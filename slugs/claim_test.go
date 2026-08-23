@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/slugs"
 	"github.com/sneat-co/sneat-go-core/sneatcoretesting"
@@ -38,49 +39,35 @@ func TestClaim_SecondClaimIsRefused(t *testing.T) {
 	}
 }
 
-// TestClaim_RollbackLeavesNoOrphanClaim is meant to verify
+// TestClaim_RollbackLeavesNoOrphanClaim verifies
 // AC:claim-and-record-commit-together: a caller transaction that claims a
 // slug and then fails before commit should roll back, leaving no claim
 // document — the slug free.
 //
-// It is SKIPPED. dalgo2memory, the only backend available to this repo's
-// tests, does not implement transaction rollback at all: a write made
-// through tx.Insert/tx.Update is applied to the shared in-memory store the
-// moment it is called, and returning a non-nil error from the
-// RunReadwriteTransaction callback does not undo it afterwards. This was
-// confirmed directly against the adapter before writing this test: a
-// transaction that inserts a record and then returns an error leaves that
-// record present, Exists()==true, once RunReadwriteTransaction returns.
-//
-// This is a second, previously undocumented instance of the same class of
-// gap the Feature already names for AC:concurrent-claims-yield-one-winner —
-// that one is the adapter's global lock preventing two transactions from
-// ever contending; this one is that the adapter has no commit/rollback
-// boundary at all, so there is nothing for a returned error to roll back.
-// Both stem from dalgo2memory being an intentionally minimal in-memory
-// stand-in rather than a faithful transactional emulator.
-//
-// What this package can and does guarantee today is structural, not
-// runtime: Claim/Release/Rename all take a dal.ReadwriteTransaction, never a
-// dal.DB, so there is no code path in this package that could open or commit
-// a transaction of its own — see the exported function signatures. Proving
-// the other half (that a backend's failed commit actually discards the
-// prior writes) needs either a real transactional backend (a Firestore
-// emulator, a SQL adapter) or dal-go/dalgo growing rollback support for
-// dalgo2memory, which the spec already tracks alongside the concurrency-mode
-// work.
+// This is proved against dalgo2memory's WithOptimisticConcurrency() mode
+// (dal-go/dalgo v0.65.0): a transaction created in that mode buffers every
+// read and write locally and never touches the shared engine until commit,
+// which runs only if the callback returns nil (see
+// runOptimisticReadwriteTransaction in adapters/dalgo2memory/optimistic.go).
+// A callback that returns an error short-circuits before commit is even
+// attempted, so Claim's tx.Insert — buffered, never applied — is discarded
+// along with everything else the transaction did. This is genuine rollback,
+// not merely "the caller saw an error": the assertion below reads the slug
+// back from the database afterwards to confirm nothing was ever written.
 func TestClaim_RollbackLeavesNoOrphanClaim(t *testing.T) {
-	t.Skip("dalgo2memory has no transaction rollback: a write made via tx.Insert/tx.Update is never undone when the transaction callback returns an error, so this AC cannot be proven against it — see the comment on this test")
-
-	db := sneatcoretesting.NewMemoryDB()
+	db := dalgo2memory.NewDB(dalgo2memory.WithOptimisticConcurrency())
 	ctx := context.Background()
 
-	_ = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+	simulatedErr := errors.New("simulated failure writing the caller's own record")
+	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
 		if _, err := slugs.Claim(ctx, tx, "test:space", "orphan-check", "space-1", "space"); err != nil {
 			return err
 		}
-		return errors.New("simulated failure writing the caller's own record")
+		return simulatedErr
 	})
+	if !errors.Is(err, simulatedErr) {
+		t.Fatalf("expected the simulated failure to propagate out of RunReadwriteTransaction, got %v", err)
+	}
 
 	if _, err := slugs.Resolve(ctx, db, "test:space", "orphan-check"); !slugs.IsSlugNotFound(err) {
 		t.Errorf("resolving after a rolled-back claim: IsSlugNotFound(%v) = false, want true", err)

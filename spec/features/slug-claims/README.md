@@ -210,11 +210,13 @@ caller's transaction, so a rename cannot half-happen.
   and `spaceus`' `getUniqueSpaceID` (a *different* contract — ID generation with
   automatic collision suffixes — which is deliberately **not** changed; `spaceus`
   gains a public slug alongside its ID).
-- **Testing** — the in-memory dalgo adapter serialises every read-write transaction
-  under one global lock, so `concurrent-claims-yield-one-winner` cannot be proved
-  against it as it stands. That is being addressed in `dal-go/dalgo` separately;
-  until it lands, that AC is provable only against an emulator or a real backend,
-  and MUST NOT be marked satisfied by a test that would pass regardless.
+- **Testing** — `concurrent-claims-yield-one-winner`, `claim-and-record-commit-together`
+  and `rename-is-atomic` are proved against `dalgo2memory`'s opt-in
+  `WithOptimisticConcurrency()` mode (`dal-go/dalgo` v0.65.0), in which read-write
+  transactions genuinely interleave, buffer their reads and writes locally, and
+  fail at commit with `ErrTransactionConflict` if another transaction committed a
+  conflicting write in the meantime — giving both real contention and real
+  rollback, not a single global lock a test would pass against regardless.
 
 ## Not Doing
 

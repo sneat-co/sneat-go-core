@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/slugs"
 	"github.com/sneat-co/sneat-go-core/sneatcoretesting"
@@ -101,22 +102,20 @@ func TestRename_NewSlugTakenLeavesOldUntouched(t *testing.T) {
 	}
 }
 
-// TestRename_IsAtomic is meant to verify AC:rename-is-atomic: if the
-// caller's transaction fails after Rename has performed both writes, rolling
-// back must leave the old slug live and the new slug unclaimed.
+// TestRename_IsAtomic verifies AC:rename-is-atomic: if the caller's
+// transaction fails after Rename has performed both writes, rolling back
+// must leave the old slug live and the new slug unclaimed.
 //
-// It is SKIPPED for the same reason as
-// TestClaim_RollbackLeavesNoOrphanClaim in claim_test.go (see that test's
-// comment for the full explanation): dalgo2memory has no transaction
-// rollback, so a rename's two writes are never undone once made, regardless
-// of what the callback returns afterwards. This is a second, previously
-// undocumented instance of the same backend gap the Feature already names
-// for AC:concurrent-claims-yield-one-winner. Proving this AC needs a real
-// transactional backend or rollback support landing in dalgo2memory.
+// This is proved the same way as TestClaim_RollbackLeavesNoOrphanClaim in
+// claim_test.go (see that test's comment for the full explanation):
+// dalgo2memory's WithOptimisticConcurrency() mode (dal-go/dalgo v0.65.0)
+// buffers both of Rename's writes — the new slug's Insert and the old
+// slug's tombstoning Update — locally, and never reaches the shared engine
+// unless the callback returns nil. Returning an error after both writes
+// discards both together, proving the two really do rise and fall as one
+// operation rather than each being independently durable.
 func TestRename_IsAtomic(t *testing.T) {
-	t.Skip("dalgo2memory has no transaction rollback, so a rename's writes are never undone when the transaction callback returns an error — see the comment on this test and TestClaim_RollbackLeavesNoOrphanClaim")
-
-	db := sneatcoretesting.NewMemoryDB()
+	db := dalgo2memory.NewDB(dalgo2memory.WithOptimisticConcurrency())
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
@@ -127,12 +126,16 @@ func TestRename_IsAtomic(t *testing.T) {
 		t.Fatalf("initial claim: %v", err)
 	}
 
-	_ = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+	simulatedErr := errors.New("simulated failure after both writes")
+	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
 		if _, err := slugs.Rename(ctx, tx, "test:space", "st-marys-village-hall", "st-marys-hall", "space-1", "space"); err != nil {
 			return err
 		}
-		return errors.New("simulated failure after both writes")
+		return simulatedErr
 	})
+	if !errors.Is(err, simulatedErr) {
+		t.Fatalf("expected the simulated failure to propagate out of RunReadwriteTransaction, got %v", err)
+	}
 
 	oldInfo, err := slugs.Resolve(ctx, db, "test:space", "st-marys-village-hall")
 	if err != nil || oldInfo.Tombstoned {
