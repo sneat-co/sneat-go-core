@@ -18,6 +18,9 @@ type Config interface {
 	// this extension's API server must accept for CORS. The scheme is derived by
 	// the security package (see security.AddKnownHosts).
 	KnownHosts() []string
+	// SpaceProfile returns this extension's space-registration profile, or nil
+	// when it registers no Spaces of its own. See RegisterSpaceProfile.
+	SpaceProfile() *SpaceRegistrationProfile
 }
 
 type RegistrationArgs interface {
@@ -63,6 +66,7 @@ var _ Config = (*config)(nil)
 type config struct {
 	id                   coretypes.ExtID
 	knownHosts           []string
+	spaceProfile         *SpaceRegistrationProfile
 	registerRoutes       []func(handle HTTPHandleFunc)
 	registerDelays       []func(mustRegisterFunc func(key string, i any) delaying.Delayer)
 	registerNotificators []func(createNotification CreateNotificationFunc)
@@ -71,6 +75,8 @@ type config struct {
 func (m *config) internal() {}
 
 func (m *config) KnownHosts() []string { return m.knownHosts }
+
+func (m *config) SpaceProfile() *SpaceRegistrationProfile { return m.spaceProfile }
 
 func (m *config) Register(args RegistrationArgs) {
 

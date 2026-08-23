@@ -22,13 +22,23 @@ const (
 	// deliberately rejects this type because a group reference needs an ID.
 	SpaceTypeGroup SpaceType = "group"
 
-	// SpaceTypeCompany is a "company" space type
+	// SpaceTypeCompany is a "company" space type: an organisation whose staff
+	// are members and whose public are customers. This is what a school, a
+	// gaming venue and a community centre all register as — what the Space is
+	// *for* is recorded in SpaceDbo.Modules, not in its type. See sneat-specs
+	// decision 0006 (unified space registration).
 	SpaceTypeCompany SpaceType = "company"
 
-	// SpaceTypeSpace is a "space" space type
+	// SpaceTypeSpace is a "space" space type.
+	//
+	// Deprecated: no longer issued for new registrations (decision 0006 —
+	// products register a type describing membership, and this one describes
+	// nothing). Still accepted by IsValidSpaceType so existing records read.
 	SpaceTypeSpace SpaceType = "space"
 
-	// SpaceTypeClub is a "club" space type
+	// SpaceTypeClub is a "club" space type: a members' organisation, where
+	// membership *is* the relationship (a sports club's players, guardians,
+	// coaches and volunteers are members, not customers).
 	SpaceTypeClub SpaceType = "club"
 
 	// SpaceTypeSystem is a platform-owned "system" space type for shared,
@@ -41,11 +51,6 @@ const (
 	// subscriptions, not members; moderators may become members in a later
 	// phase.
 	SpaceTypeSpot SpaceType = "spot"
-
-	// SpaceTypeCommunityCentre is a community-centre / local-venue space type,
-	// used by NoticeBoard.cc (communitycentrum). Centre staff are members;
-	// public participants are customers (see Competios decision 0009).
-	SpaceTypeCommunityCentre SpaceType = "community-center"
 )
 
 // SpotSpaceIDPrefix is the reserved prefix used by SpotSpaceID to construct
@@ -122,7 +127,7 @@ func NewWeakSpaceRef(spaceType SpaceType) SpaceRef {
 // IsValidSpaceType checks if space has a valid/known type
 func IsValidSpaceType(v SpaceType) bool {
 	switch v {
-	case SpaceTypePersonal, SpaceTypeFamily, SpaceTypeGroup, SpaceTypeCompany, SpaceTypeSpace, SpaceTypeClub, SpaceTypeSystem, SpaceTypeSpot, SpaceTypeCommunityCentre:
+	case SpaceTypePersonal, SpaceTypeFamily, SpaceTypeGroup, SpaceTypeCompany, SpaceTypeSpace, SpaceTypeClub, SpaceTypeSystem, SpaceTypeSpot:
 		return true
 	default:
 		return false
