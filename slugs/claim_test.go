@@ -187,3 +187,37 @@ func TestClaim_ReservedSlugIsRefusedDistinctly(t *testing.T) {
 		t.Errorf("\"default\" should not be reserved outside the namespace that extended the list: %v", err)
 	}
 }
+
+// TestClaim_NonDuplicateFailureIsNotReportedAsTaken verifies that a failed
+// insert which is NOT a duplicate key is returned as itself rather than as
+// ErrSlugTaken.
+//
+// This is the regression this test exists to prevent. Claim used to report
+// every insert failure as ErrSlugTaken, because dalgo had no cross-backend
+// sentinel for "already exists". The visible symptom was a user being told
+// their chosen name was taken when the real problem was a deadline or a
+// permission error — sending them off to invent a different name for no
+// reason. Bookius inherited that when it migrated onto this package; its
+// hand-rolled predecessor had distinguished the two correctly.
+//
+// The non-duplicate failure here is induced with a schema that forbids
+// undefined collections, so the insert is rejected by the collection guard
+// long before anything could be duplicated.
+func TestClaim_NonDuplicateFailureIsNotReportedAsTaken(t *testing.T) {
+	db := dalgo2memory.NewDB(dalgo2memory.WithSchema(false))
+	ctx := context.Background()
+
+	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+		_, err := slugs.Claim(ctx, tx, "test:space", "Main Hall", "space-1", "space")
+		return err
+	})
+	if err == nil {
+		t.Fatal("expected the guarded insert to fail, got nil")
+	}
+	if slugs.IsSlugTaken(err) {
+		t.Errorf("IsSlugTaken(%v) = true, want false: a non-duplicate failure must not read as a taken slug", err)
+	}
+	if errors.Is(err, slugs.ErrSlugTaken) {
+		t.Errorf("errors.Is(%v, ErrSlugTaken) = true, want false", err)
+	}
+}
