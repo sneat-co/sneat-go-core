@@ -31,9 +31,11 @@ const (
 
 	// SpaceTypeSpace is a "space" space type.
 	//
-	// Deprecated: no longer issued for new registrations (decision 0006 —
-	// products register a type describing membership, and this one describes
-	// nothing). Still accepted by IsValidSpaceType so existing records read.
+	// No longer issued for new registrations: decision 0006 has products
+	// register a type that describes how membership works, and this one
+	// describes nothing. It stays valid so existing records still read, and is
+	// deliberately NOT marked Deprecated — the tests that cover legacy records
+	// must keep naming it without tripping a linter.
 	SpaceTypeSpace SpaceType = "space"
 
 	// SpaceTypeClub is a "club" space type: a members' organisation, where
