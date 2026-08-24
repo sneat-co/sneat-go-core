@@ -19,6 +19,7 @@ func TestIsValidSpaceType(t *testing.T) {
 		{"private-now-invalid", args{"private"}, false},
 		{"SpaceTypeSystem", args{SpaceTypeSystem}, true},
 		{"SpaceTypeSpot", args{SpaceTypeSpot}, true},
+		{"SpaceTypeTeam", args{SpaceTypeTeam}, true},
 		{"EmptySpaceType", args{""}, false},
 		{"InvalidSpaceType", args{"Foo"}, false},
 	}

@@ -53,6 +53,13 @@ const (
 	// subscriptions, not members; moderators may become members in a later
 	// phase.
 	SpaceTypeSpot SpaceType = "spot"
+
+	// SpaceTypeTeam is a child Space of an organisation Space — a club's squad
+	// ("Girls U14"), created via create_child_space and never registered as a
+	// vendor Space in its own right. It always carries ParentSpaceID; the
+	// parent's type says how the organisation's membership works, the team
+	// type says this Space is a subdivision of it.
+	SpaceTypeTeam SpaceType = "team"
 )
 
 // SpotSpaceIDPrefix is the reserved prefix used by SpotSpaceID to construct
@@ -129,7 +136,7 @@ func NewWeakSpaceRef(spaceType SpaceType) SpaceRef {
 // IsValidSpaceType checks if space has a valid/known type
 func IsValidSpaceType(v SpaceType) bool {
 	switch v {
-	case SpaceTypePersonal, SpaceTypeFamily, SpaceTypeGroup, SpaceTypeCompany, SpaceTypeSpace, SpaceTypeClub, SpaceTypeSystem, SpaceTypeSpot:
+	case SpaceTypePersonal, SpaceTypeFamily, SpaceTypeGroup, SpaceTypeCompany, SpaceTypeSpace, SpaceTypeClub, SpaceTypeSystem, SpaceTypeSpot, SpaceTypeTeam:
 		return true
 	default:
 		return false
