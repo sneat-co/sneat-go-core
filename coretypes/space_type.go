@@ -135,3 +135,28 @@ func IsValidSpaceType(v SpaceType) bool {
 		return false
 	}
 }
+
+// legacySpaceTypeAliases maps space-type values that were once written to
+// records but have since been renamed. Stored data outlives enums: a user
+// record from 2025 carries a space brief of type "private" (renamed to
+// "personal"), and rejecting it on load bricks every flow that runs through a
+// user worker — including registration, whose audience is the least likely to
+// have pristine records.
+//
+// The map is for READ tolerance only: request validation stays strict, so no
+// new record is ever written with a legacy value.
+var legacySpaceTypeAliases = map[SpaceType]SpaceType{
+	"private": SpaceTypePersonal,
+}
+
+// CanonicalSpaceType maps a legacy stored space-type value to its current
+// name, and returns any other value unchanged. Callers validating STORED data
+// should check IsValidSpaceType(CanonicalSpaceType(v)); callers validating
+// REQUESTS should keep calling IsValidSpaceType(v) directly, so the legacy
+// names stay unwritable.
+func CanonicalSpaceType(v SpaceType) SpaceType {
+	if canonical, ok := legacySpaceTypeAliases[v]; ok {
+		return canonical
+	}
+	return v
+}

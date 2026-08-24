@@ -225,3 +225,24 @@ func TestWeakSpaceRef(t *testing.T) {
 		})
 	}
 }
+
+func TestCanonicalSpaceType(t *testing.T) {
+	// The legacy "private" (renamed to "personal") must validate as stored
+	// data but never as a request value.
+	if got := CanonicalSpaceType("private"); got != SpaceTypePersonal {
+		t.Errorf("CanonicalSpaceType(private) = %q, want %q", got, SpaceTypePersonal)
+	}
+	if !IsValidSpaceType(CanonicalSpaceType("private")) {
+		t.Error("stored-data validation must accept legacy private")
+	}
+	if IsValidSpaceType("private") {
+		t.Error("request validation must keep rejecting legacy private")
+	}
+	// Modern values pass through unchanged.
+	if got := CanonicalSpaceType(SpaceTypeClub); got != SpaceTypeClub {
+		t.Errorf("CanonicalSpaceType(club) = %q, want %q", got, SpaceTypeClub)
+	}
+	if got := CanonicalSpaceType("nonsense"); got != "nonsense" {
+		t.Errorf("CanonicalSpaceType(nonsense) = %q, want unchanged", got)
+	}
+}
