@@ -2,11 +2,13 @@ module github.com/sneat-co/sneat-go-core
 
 // https://github.com/sneat-co/sneat-go-core/actions
 
-go 1.27.0
+go 1.26.0
+
+toolchain go1.27.0
 
 require (
 	github.com/crediterra/money v0.3.5
-	github.com/dal-go/dalgo v0.74.0
+	github.com/dal-go/dalgo v0.74.1
 	github.com/dal-go/record v0.1.3
 	github.com/stretchr/testify v1.12.1
 	github.com/strongo/analytics v0.2.5
