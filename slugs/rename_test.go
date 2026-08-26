@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/slugs"
 	"github.com/sneat-co/sneat-go-core/sneatcoretesting"
@@ -108,14 +107,14 @@ func TestRename_NewSlugTakenLeavesOldUntouched(t *testing.T) {
 //
 // This is proved the same way as TestClaim_RollbackLeavesNoOrphanClaim in
 // claim_test.go (see that test's comment for the full explanation):
-// dalgo2memory's WithOptimisticConcurrency() mode (dal-go/dalgo v0.65.0)
-// buffers both of Rename's writes — the new slug's Insert and the old
-// slug's tombstoning Update — locally, and never reaches the shared engine
-// unless the callback returns nil. Returning an error after both writes
-// discards both together, proving the two really do rise and fall as one
-// operation rather than each being independently durable.
+// sneatcoretesting.NewInMemoryTestDB's dalgo2memory.FirestoreProfile()
+// (dal-go/dalgo v0.74.0) buffers both of Rename's writes — the new slug's
+// Insert and the old slug's tombstoning Update — locally, and never reaches
+// the shared engine unless the callback returns nil. Returning an error
+// after both writes discards both together, proving the two really do rise
+// and fall as one operation rather than each being independently durable.
 func TestRename_IsAtomic(t *testing.T) {
-	db := dalgo2memory.NewDB(dalgo2memory.WithOptimisticConcurrency())
+	db := sneatcoretesting.NewInMemoryTestDB()
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {

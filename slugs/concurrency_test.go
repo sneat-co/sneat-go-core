@@ -7,6 +7,7 @@ import (
 	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/slugs"
+	"github.com/sneat-co/sneat-go-core/sneatcoretesting"
 )
 
 // TestClaim_ConcurrentClaimsYieldOneWinner verifies
@@ -14,10 +15,12 @@ import (
 // the same slug must settle with exactly one commit, and no observer can
 // ever see both holding the claim.
 //
-// This is proved against dalgo2memory's WithOptimisticConcurrency() mode
-// (dal-go/dalgo v0.65.0): unlike the package's default mode, that mode lets
-// two RunReadwriteTransaction calls genuinely interleave — each buffers its
-// reads and writes locally and touches no shared storage until commit, where
+// This is proved against sneatcoretesting.NewInMemoryTestDB's
+// dalgo2memory.FirestoreProfile() (dal-go/dalgo v0.74.0), which carries
+// optimistic concurrency as part of its Firestore-faithful bundle: unlike a
+// single-writer mode, that mode lets two RunReadwriteTransaction calls
+// genuinely interleave — each buffers its reads and writes locally and
+// touches no shared storage until commit, where
 // it is validated against every key it touched. Claim's only operation is a
 // single tx.Insert, so racing it against itself races Insert's own
 // touch-then-stage step; forcing both transactions past that step (via
@@ -32,7 +35,7 @@ import (
 // a paused transaction callback holds no lock while it waits — see that
 // test's doc comment for the full argument.
 func TestClaim_ConcurrentClaimsYieldOneWinner(t *testing.T) {
-	db := dalgo2memory.NewDB(dalgo2memory.WithOptimisticConcurrency())
+	db := sneatcoretesting.NewInMemoryTestDB()
 	ctx := context.Background()
 
 	const attempts = 2

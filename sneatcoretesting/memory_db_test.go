@@ -40,6 +40,21 @@ func TestSetupMemoryDB_ParallelIsolation(t *testing.T) {
 	}
 }
 
+func TestNewInMemoryTestDB_RejectsReadsAfterWrites(t *testing.T) {
+	t.Parallel()
+	db := sneatcoretesting.NewInMemoryTestDB()
+	key := record.NewKeyWithID("records", "firestore-ordering")
+	err := db.RunReadwriteTransaction(context.Background(), func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+		if err := tx.Set(ctx, record.NewRecordWithData(key, new(struct{}))); err != nil {
+			return err
+		}
+		return tx.Get(ctx, record.NewRecordWithData(key, new(struct{})))
+	})
+	if !errors.Is(err, dalgo2memory.ErrReadAfterWriteInTransaction) {
+		t.Fatalf("NewInMemoryTestDB read-after-write error = %v, want %v (Firestore's transaction ordering)", err, dalgo2memory.ErrReadAfterWriteInTransaction)
+	}
+}
+
 func TestNewMemoryDB_RejectsReadsAfterWrites(t *testing.T) {
 	t.Parallel()
 	db := sneatcoretesting.NewMemoryDB()
