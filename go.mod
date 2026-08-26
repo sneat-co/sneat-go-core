@@ -2,7 +2,9 @@ module github.com/sneat-co/sneat-go-core
 
 // https://github.com/sneat-co/sneat-go-core/actions
 
-go 1.27.0
+go 1.26.0
+
+toolchain go1.27.0
 
 require (
 	github.com/crediterra/money v0.3.5
