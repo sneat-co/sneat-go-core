@@ -44,10 +44,11 @@ func TestClaim_SecondClaimIsRefused(t *testing.T) {
 // slug and then fails before commit should roll back, leaving no claim
 // document — the slug free.
 //
-// This is proved against dalgo2memory's WithOptimisticConcurrency() mode
-// (dal-go/dalgo v0.65.0): a transaction created in that mode buffers every
-// read and write locally and never touches the shared engine until commit,
-// which runs only if the callback returns nil (see
+// This is proved against sneatcoretesting.NewInMemoryTestDB's
+// dalgo2memory.FirestoreProfile() (dal-go/dalgo v0.74.0): a transaction
+// created against that profile buffers every read and write locally and
+// never touches the shared engine until commit, which runs only if the
+// callback returns nil (see
 // runOptimisticReadwriteTransaction in adapters/dalgo2memory/optimistic.go).
 // A callback that returns an error short-circuits before commit is even
 // attempted, so Claim's tx.Insert — buffered, never applied — is discarded
@@ -55,7 +56,7 @@ func TestClaim_SecondClaimIsRefused(t *testing.T) {
 // not merely "the caller saw an error": the assertion below reads the slug
 // back from the database afterwards to confirm nothing was ever written.
 func TestClaim_RollbackLeavesNoOrphanClaim(t *testing.T) {
-	db := dalgo2memory.NewDB(dalgo2memory.WithOptimisticConcurrency())
+	db := sneatcoretesting.NewInMemoryTestDB()
 	ctx := context.Background()
 
 	simulatedErr := errors.New("simulated failure writing the caller's own record")
@@ -204,7 +205,7 @@ func TestClaim_ReservedSlugIsRefusedDistinctly(t *testing.T) {
 // undefined collections, so the insert is rejected by the collection guard
 // long before anything could be duplicated.
 func TestClaim_NonDuplicateFailureIsNotReportedAsTaken(t *testing.T) {
-	db := dalgo2memory.NewDB(dalgo2memory.WithSchema(false))
+	db := sneatcoretesting.NewInMemoryTestDB(dalgo2memory.WithSchema(false))
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {

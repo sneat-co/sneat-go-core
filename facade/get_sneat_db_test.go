@@ -9,6 +9,13 @@ import (
 	"github.com/dal-go/dalgo/dal"
 )
 
+// This file is package facade (an internal test file), and
+// sneatcoretesting.NewInMemoryTestDB itself imports facade (for
+// facade.WithSneatDB) — so importing sneatcoretesting here would be an import
+// cycle. Call dalgo2memory.New(dalgo2memory.FirestoreProfile(), ...) directly
+// instead; that is the same Firestore-profile choice NewInMemoryTestDB makes,
+// just inlined for this one package's tests.
+
 func TestGetDatabase(t *testing.T) {
 	ctx := context.Background()
 	defer mustPanicWithErrNotInitialized(t)
@@ -23,8 +30,8 @@ func TestGetDatabase(t *testing.T) {
 
 func TestWithSneatDB_IsolatesContexts(t *testing.T) {
 	t.Parallel()
-	db1 := dalgo2memory.NewDB()
-	db2 := dalgo2memory.NewDB()
+	db1 := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+	db2 := dalgo2memory.New(dalgo2memory.FirestoreProfile())
 	ctx1 := WithSneatDB(context.Background(), db1)
 	ctx2 := WithSneatDB(context.Background(), db2)
 
@@ -63,7 +70,7 @@ func TestDefaultSneatDBProviderConfiguration(t *testing.T) {
 	defaultSneatDBProviderMu.RUnlock()
 	t.Cleanup(func() { SetDefaultSneatDBProvider(previous) })
 
-	db := dalgo2memory.NewDB()
+	db := dalgo2memory.New(dalgo2memory.FirestoreProfile())
 	SetDefaultSneatDBProvider(func(context.Context) (dal.DB, error) {
 		return db, nil
 	})
