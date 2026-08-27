@@ -21,6 +21,14 @@ var (
 
 // GetSneatDB returns a context override when one is present, otherwise it uses
 // the default provider configured by the application at startup.
+//
+// Migration note: before v0.60.3, GetSneatDB was a package-level var
+// (func(ctx context.Context) (dal.DB, error)) that tests reassigned directly:
+//
+//	facade.GetSneatDB = func(ctx context.Context) (dal.DB, error) { ... } // no longer compiles
+//
+// Since v0.60.3 it is a plain func and cannot be reassigned. Tests must inject
+// a DB through the context instead, via WithSneatDB or WithSneatDBProvider.
 func GetSneatDB(ctx context.Context) (dal.DB, error) {
 	if provider, ok := ctx.Value(contextDBKey).(SneatDBProvider); ok {
 		return provider(ctx)
@@ -34,6 +42,10 @@ func GetSneatDB(ctx context.Context) (dal.DB, error) {
 
 // WithSneatDB returns a child context that resolves db through GetSneatDB.
 // This is useful for request-scoped database selection and parallel tests.
+//
+// This is the replacement for the pre-v0.60.3 pattern of reassigning the
+// package-level facade.GetSneatDB var directly (see the migration note on
+// GetSneatDB above).
 func WithSneatDB(ctx context.Context, db dal.DB) context.Context {
 	if db == nil {
 		panic("facade.WithSneatDB: nil DB")
