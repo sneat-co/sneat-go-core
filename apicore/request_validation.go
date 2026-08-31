@@ -9,11 +9,11 @@ import (
 	"github.com/sneat-co/sneat-go-core/apicore/verify"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/httpserver"
+	"github.com/sneat-co/sneat-go-core/security"
 	"github.com/sneat-co/sneat-go-core/sneatauth"
 	"github.com/strongo/logus"
 	"io"
 	"net/http"
-	"strings"
 )
 
 var errBadOrigin = errors.New("bad origin")
@@ -147,7 +147,7 @@ func DecodeRequestBody(w http.ResponseWriter, r *http.Request, request facade.Re
 		ctx := r.Context()
 		var reader io.Reader = r.Body
 		// In local dev  we log request body
-		if r.Host == "local-api.sneat.ws" || strings.HasPrefix(r.Host, "localhost:") {
+		if r.Host == "local-api.sneat.ws" || security.IsLocalhostHost(r.Host) {
 			var body []byte
 			if body, err = io.ReadAll(r.Body); err != nil {
 				_, _ = fmt.Fprintf(w, "Failed to read request body: %v", err)
