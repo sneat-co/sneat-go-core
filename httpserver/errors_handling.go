@@ -51,6 +51,8 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 		statusCode = http.StatusBadRequest
 	case IsUnauthorizedError(err):
 		statusCode = http.StatusUnauthorized
+	case IsForbiddenError(err):
+		statusCode = http.StatusForbidden
 	default:
 		statusCode = http.StatusInternalServerError
 	}

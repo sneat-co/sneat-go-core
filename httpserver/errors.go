@@ -13,3 +13,9 @@ var ErrNotABearerToken = fmt.Errorf("%w: authorization header is not a bearer to
 func IsUnauthorizedError(err error) bool {
 	return errors.Is(err, facade.ErrUnauthorized)
 }
+
+// IsForbiddenError returns true when the caller is authenticated but does not
+// have authority for the requested operation.
+func IsForbiddenError(err error) bool {
+	return errors.Is(err, facade.ErrForbidden)
+}
