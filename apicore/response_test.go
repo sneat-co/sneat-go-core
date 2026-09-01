@@ -3,11 +3,24 @@ package apicore
 import (
 	"context"
 	"errors"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/httpserver"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
 )
+
+func TestReturnJSONMapsForbiddenToHTTP403(t *testing.T) {
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest(http.MethodPost, "/protected", nil)
+
+	ReturnJSON(context.Background(), w, r, http.StatusOK, fmt.Errorf("space access: %w", facade.ErrForbidden), nil)
+
+	assert.Equal(t, http.StatusForbidden, w.Code)
+}
 
 func TestReturnError(t *testing.T) {
 	type args struct {
