@@ -15,6 +15,9 @@ func TestDefaultKnownHosts(t *testing.T) {
 }
 
 func TestVerifyOrigin(t *testing.T) {
+	knownHostSuffixesBackup := append([]string(nil), knownHostSuffixes...)
+	AddKnownHostSuffixes("datatug.app", "sneat.work")
+	t.Cleanup(func() { knownHostSuffixes = knownHostSuffixesBackup })
 	for _, origin := range []string{
 		"",
 		"http://localhost:8100",
@@ -23,6 +26,8 @@ func TestVerifyOrigin(t *testing.T) {
 		"https://listus-app.localhost:4315",
 		"https://SNEAT-API.LOCALHOST:4300",
 		"https://local-app.sneat.ws",
+		"https://acme.datatug.app",
+		"https://team.eu.sneat.work",
 	} {
 		t.Run("allows "+origin, func(t *testing.T) {
 			if err := VerifyOrigin(origin); err != nil {
@@ -38,6 +43,10 @@ func TestVerifyOrigin(t *testing.T) {
 		"https://listus-app.localhost@evil.example",
 		"https://evil-localhost:4315",
 		"https://evil.example",
+		"https://datatug.app.evil.example",
+		"https://acme.datatug.app:444",
+		"http://acme.datatug.app",
+		"https://datatug.app",
 		"https://.localhost:4315",
 		"https://two..dots.localhost:4315",
 		"https://bad_name.localhost:4315",
@@ -53,6 +62,10 @@ func TestVerifyOrigin(t *testing.T) {
 			assert.ErrorIs(t, VerifyOrigin(origin), ErrBadOrigin)
 		})
 	}
+}
+
+func TestAddKnownHostSuffixesRejectsInvalidSuffix(t *testing.T) {
+	assert.Panics(t, func() { AddKnownHostSuffixes("bad_name.example") })
 }
 
 func TestIsLocalhostHost(t *testing.T) {

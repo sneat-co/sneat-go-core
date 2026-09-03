@@ -38,7 +38,28 @@ func VerifyOrigin(origin string) error {
 	if slices.Contains(knownOrigins, origin) {
 		return nil
 	}
+	if isKnownHTTPSSubdomainOrigin(origin) {
+		return nil
+	}
 	return fmt.Errorf("%w: %s: known origins: %s", ErrBadOrigin, origin, strings.Join(knownOrigins, ", "))
+}
+
+func isKnownHTTPSSubdomainOrigin(origin string) bool {
+	parsed, err := url.Parse(origin)
+	if err != nil || parsed.Scheme != "https" || parsed.Host == "" || parsed.User != nil || parsed.Opaque != "" ||
+		parsed.Port() != "" || parsed.Path != "" || parsed.RawQuery != "" || parsed.Fragment != "" {
+		return false
+	}
+	host := strings.ToLower(strings.TrimSuffix(parsed.Hostname(), "."))
+	if !isValidHostname(host) {
+		return false
+	}
+	for _, suffix := range knownHostSuffixes {
+		if host != suffix && strings.HasSuffix(host, "."+suffix) {
+			return true
+		}
+	}
+	return false
 }
 
 // IsLocalhostHost reports whether host is the reserved localhost name or one
