@@ -17,7 +17,7 @@ require (
 	github.com/strongo/logus v0.4.3
 	github.com/strongo/slice v0.3.10
 	github.com/strongo/strongoapp v0.31.57
-	github.com/strongo/validation v0.0.12
+	github.com/strongo/validation v0.0.13
 	go.uber.org/mock v0.6.0
 	golang.org/x/text v0.41.0
 )
