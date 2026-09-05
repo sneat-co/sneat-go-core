@@ -16,7 +16,7 @@ require (
 	github.com/strongo/gotwilio v0.0.0-20160123000810-f024bbefe80f
 	github.com/strongo/logus v0.4.3
 	github.com/strongo/slice v0.3.10
-	github.com/strongo/strongoapp v0.31.57
+	github.com/strongo/strongoapp v0.31.58
 	github.com/strongo/validation v0.0.13
 	go.uber.org/mock v0.6.0
 	golang.org/x/text v0.41.0
