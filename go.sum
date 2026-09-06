@@ -2,6 +2,8 @@ github.com/RoaringBitmap/roaring/v2 v2.25.0 h1:HjcMG0PfmgO1rJcp2VHMarvQiulkB51qA
 github.com/RoaringBitmap/roaring/v2 v2.25.0/go.mod h1:SfT3of9nYh3vis1dIbCj4Yw6KQGujTN+f345nrN/0JA=
 github.com/RoaringBitmap/roaring/v2 v2.26.0 h1:K30ZxF4vZcIKvJsbmgfiep2K64f+dILJqkYGoj4xnwU=
 github.com/RoaringBitmap/roaring/v2 v2.26.0/go.mod h1:BZufmFbox589n3j5eOmyTaLSGXbRLc2LmQvjKjzSEGU=
+github.com/RoaringBitmap/roaring/v2 v2.27.0 h1:rTzs+cuH9YBj6j4L9GF2DcK2NmOfdUvLI+ZFhyLy8g8=
+github.com/RoaringBitmap/roaring/v2 v2.27.0/go.mod h1:BZufmFbox589n3j5eOmyTaLSGXbRLc2LmQvjKjzSEGU=
 github.com/alexsergivan/transliterator v1.0.1 h1:vON2ilWCHjq+S5Y4obhLGhHK4Y1VIhsHEtQlij5d9pI=
 github.com/alexsergivan/transliterator v1.0.1/go.mod h1:0IrumukulURJ4PD0z6UcdJKP2job1DYDhnHAP5y+5pE=
 github.com/bits-and-blooms/bitset v1.24.6 h1:qcrftZUVBIwfs+m+nhoCBAPT+ZPZZjti8SbHbDQQkZ4=
@@ -18,6 +20,8 @@ github.com/dal-go/dalgo v0.79.2 h1:7jGh15q6LILeurb9PbbAkjJFNnpdL06oFUf8vxotS6o=
 github.com/dal-go/dalgo v0.79.2/go.mod h1:p0VdxLWu+Z/+kNYj7EdZHR+k3LzlpaUBo8atVeUiKBs=
 github.com/dal-go/dalgo v0.79.3 h1:awEX08IaxK135rrftqutBbdi/fWwAMx756YWgF2+W44=
 github.com/dal-go/dalgo v0.79.3/go.mod h1:p0VdxLWu+Z/+kNYj7EdZHR+k3LzlpaUBo8atVeUiKBs=
+github.com/dal-go/dalgo v0.79.4 h1:gP+s77B8OWKhLN733O9g0QK2XB1tgePfnQYo3qtYGPQ=
+github.com/dal-go/dalgo v0.79.4/go.mod h1:t7F7LJGIHd4DOtQ0pJiGdGdznaqM70lfS9PVG9iSZOU=
 github.com/dal-go/record v0.1.3 h1:K85k/kSX08lTefMiMmPpC12nmCY2TVJk7+ZyC5PD9XU=
 github.com/dal-go/record v0.1.3/go.mod h1:quwsVJTT0f6y3Mhx+yHpTobY7luX1M6kyO6fdJ/AFYE=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
