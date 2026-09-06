@@ -12,7 +12,7 @@ import (
 
 const MaxReferences = 64
 
-var ErrReferenceNotFound = errors.New("Space entity reference not found")
+var ErrReferenceNotFound = errors.New("space entity reference not found")
 
 // ValidationRequest names entities owned by one extension in one Space. The
 // concrete owning extension resolves existence using the caller's DALgo read
