@@ -23,7 +23,7 @@ type ValidationRequest struct {
 }
 
 func (r ValidationRequest) Validate() error {
-	if strings.TrimSpace(string(r.SpaceID)) == "" || len(r.IDs) > MaxReferences {
+	if coretypes.ValidateSpaceID(r.SpaceID) != nil || len(r.IDs) > MaxReferences {
 		return fmt.Errorf("invalid Space entity reference request")
 	}
 	seen := make(map[string]struct{}, len(r.IDs))
