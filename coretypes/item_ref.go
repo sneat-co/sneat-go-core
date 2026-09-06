@@ -25,6 +25,10 @@ type ItemRef struct {
 	ExtID      ExtID  `json:"module" firestore:"module"` // TODO: change to `json:"extID" firestore:"extID"`?
 	Collection string `json:"collection" firestore:"collection"`
 	ItemID     string `json:"itemID" firestore:"itemID"`
+	// SubPath identifies an embedded item by stable keys, never array position.
+	// Empty retains the existing document-level reference. The owning extension
+	// must resolve and authorize it; a path does not grant access to its fields.
+	SubPath string `json:"subPath,omitempty" firestore:"subPath,omitempty"`
 	//SpaceID    SpaceID  `json:"spaceID,omitempty" firestore:"spaceID,omitempty"`
 }
 
@@ -89,17 +93,31 @@ func NewItemRefFromQueryString(values url.Values) (itemRef ItemRef, err error) {
 	if spaceID := values.Get("s"); spaceID != "" {
 		itemRef.ItemID = itemRef.ItemID + SpaceItemIDSeparator + spaceID
 	}
+	itemRef.SubPath = values.Get("p")
+	if _, err = ParseItemSubPath(itemRef.SubPath); err != nil {
+		return itemRef, err
+	}
 	return
 }
 
 // ID returns a stable, order-sensitive string identifier for the item
 // reference. The order is important for the RelatedIDs field.
 func (v ItemRef) ID() string {
+	if v.SubPath != "" {
+		// Encode every component on the new path so delimiters in an identifier
+		// cannot collide with the subpath parameter. Legacy IDs stay byte-identical.
+		// The p= prefix also separates these from legacy IDs, whose unescaped
+		// item IDs could themselves contain an apparent &p= query parameter.
+		return fmt.Sprintf("p=%s&m=%s&c=%s&i=%s", url.QueryEscape(v.SubPath), url.QueryEscape(string(v.ExtID)), url.QueryEscape(v.Collection), url.QueryEscape(v.ItemID))
+	}
 	return fmt.Sprintf("m=%s&c=%s&i=%s", v.ExtID, v.Collection, v.ItemID)
 }
 
 // String implements fmt.Stringer.
 func (v ItemRef) String() string {
+	if v.SubPath != "" {
+		return fmt.Sprintf("{ExtID=%s,Collection=%s,ItemID=%s,SubPath=%s}", v.ExtID, v.Collection, v.ItemID, v.SubPath)
+	}
 	return fmt.Sprintf("{ExtID=%s,Collection=%s,ItemID=%s}", v.ExtID, v.Collection, v.ItemID)
 }
 
@@ -115,6 +133,9 @@ func (v ItemRef) DocID() string {
 // Validate checks that the item reference has all required fields and that
 // any optional "@{spaceID}" suffix on ItemID is well-formed.
 func (v ItemRef) Validate() error {
+	if _, err := ParseItemSubPath(v.SubPath); err != nil {
+		return validation.NewErrBadRecordFieldValue("subPath", err.Error())
+	}
 	// SpaceID can be empty for global collections like Happening
 	if v.ExtID == "" {
 		return validation.NewErrRecordIsMissingRequiredField("moduleID")
