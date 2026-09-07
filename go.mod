@@ -14,7 +14,7 @@ require (
 	github.com/strongo/analytics v0.2.8
 	github.com/strongo/delaying v0.2.6
 	github.com/strongo/gotwilio v0.0.0-20160123000810-f024bbefe80f
-	github.com/strongo/logus v0.4.3
+	github.com/strongo/logus v0.4.4
 	github.com/strongo/slice v0.3.10
 	github.com/strongo/strongoapp v0.31.58
 	github.com/strongo/validation v0.0.13
