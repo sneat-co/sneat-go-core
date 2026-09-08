@@ -59,3 +59,11 @@ func TestAddKnownHosts(t *testing.T) {
 		})
 	}
 }
+
+func TestAddKnownHostSuffixes(t *testing.T) {
+	backup := append([]string(nil), knownHostSuffixes...)
+	t.Cleanup(func() { knownHostSuffixes = backup })
+	AddKnownHostSuffixes("*.DataTug.App", ".sneat.work")
+	assert.Contains(t, knownHostSuffixes, "datatug.app")
+	assert.Contains(t, knownHostSuffixes, "sneat.work")
+}
