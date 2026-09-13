@@ -11,7 +11,7 @@ require (
 	github.com/dal-go/dalgo v0.80.4
 	github.com/dal-go/record v0.1.3
 	github.com/stretchr/testify v1.12.1
-	github.com/strongo/analytics v0.2.8
+	github.com/strongo/analytics v0.2.9
 	github.com/strongo/delaying v0.2.6
 	github.com/strongo/gotwilio v0.0.0-20160123000810-f024bbefe80f
 	github.com/strongo/logus v0.4.4
