@@ -8,7 +8,7 @@ toolchain go1.27.1
 
 require (
 	github.com/crediterra/money v0.4.0
-	github.com/dal-go/dalgo v0.86.0
+	github.com/dal-go/dalgo v0.87.2
 	github.com/dal-go/record v0.1.3
 	github.com/stretchr/testify v1.12.1
 	github.com/strongo/analytics v0.2.9
@@ -23,7 +23,7 @@ require (
 )
 
 require (
-	github.com/RoaringBitmap/roaring/v2 v2.28.0 // indirect
+	github.com/RoaringBitmap/roaring/v2 v2.29.0 // indirect
 	github.com/alexsergivan/transliterator v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.24.6 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
