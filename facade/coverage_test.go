@@ -102,7 +102,8 @@ func TestGetSneatDB_Panics(t *testing.T) {
 				t.Fatal("expected panic")
 			}
 		}()
-		WithSneatDBProvider(nil, func(context.Context) (dal.DB, error) { return nil, nil })
+		var nilCtx context.Context
+		WithSneatDBProvider(nilCtx, func(context.Context) (dal.DB, error) { return nil, nil })
 	})
 
 	t.Run("WithSneatDBProvider_nil_provider", func(t *testing.T) {

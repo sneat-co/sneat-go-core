@@ -406,7 +406,7 @@ func TestWithLastCurrencies_Coverage(t *testing.T) {
 	}
 
 	// In list at index 1 -> moved to front
-	updates, err = wlc.SetLastCurrency(money.CurrencyEUR)
+	_, err = wlc.SetLastCurrency(money.CurrencyEUR)
 	if err != nil {
 		t.Fatalf("unexpected error moving EUR to front: %v", err)
 	}
@@ -506,7 +506,7 @@ func TestWithSpaceDates_Comprehensive(t *testing.T) {
 
 	// validateSpaceDates: duplicate space date
 	wsd.SpaceIDs = []coretypes.SpaceID{"s1", "s2"}
-	wsd.DatesFields.Dates = []string{"2025-01-01"}
+	wsd.Dates = []string{"2025-01-01"}
 	wsd.SpaceDates = []string{"s1:2025-01-01", "s1:2025-01-01"}
 	if err := wsd.Validate(); err == nil {
 		t.Fatal("expected error on duplicate space date")
@@ -514,7 +514,7 @@ func TestWithSpaceDates_Comprehensive(t *testing.T) {
 
 	// validateSpaceDates: invalid format
 	wsd.SpaceIDs = []coretypes.SpaceID{"s1"}
-	wsd.DatesFields.Dates = []string{"2025-01-01"}
+	wsd.Dates = []string{"2025-01-01"}
 	wsd.SpaceDates = []string{"badformat"}
 	if err := wsd.Validate(); err == nil {
 		t.Fatal("expected error on invalid format space date")
@@ -522,7 +522,7 @@ func TestWithSpaceDates_Comprehensive(t *testing.T) {
 
 	// validateSpaceDates: spaceID not in SpaceIDs
 	wsd.SpaceIDs = []coretypes.SpaceID{"s1"}
-	wsd.DatesFields.Dates = []string{"2025-01-01"}
+	wsd.Dates = []string{"2025-01-01"}
 	wsd.SpaceDates = []string{"s2:2025-01-01"}
 	if err := wsd.Validate(); err == nil {
 		t.Fatal("expected error on spaceID not in SpaceIDs")
@@ -530,7 +530,7 @@ func TestWithSpaceDates_Comprehensive(t *testing.T) {
 
 	// validateSpaceDates: date in SpaceDate not in Dates
 	wsd.SpaceIDs = []coretypes.SpaceID{"s1"}
-	wsd.DatesFields.Dates = []string{"2025-01-01"}
+	wsd.Dates = []string{"2025-01-01"}
 	wsd.SpaceDates = []string{"s1:2025-01-02"}
 	if err := wsd.Validate(); err == nil {
 		t.Fatal("expected error on date in SpaceDate not in Dates")
