@@ -14,6 +14,8 @@ type Expected struct {
 	DelayersCount int
 }
 
+var dummyDelayWorker = func() {}
+
 func AssertExtension(t *testing.T, m Config, expected Expected) {
 	if m == nil {
 		t.Fatalf("Config() must not return nil")
@@ -35,7 +37,11 @@ func AssertExtension(t *testing.T, m Config, expected Expected) {
 		enqueueWorkMulti := func(c context.Context, params delaying.Params, args ...[]interface{}) error {
 			return nil
 		}
-		return delaying.NewDelayer(key, func() {}, enqueueWork, enqueueWorkMulti)
+		impl := i
+		if impl == nil {
+			impl = dummyDelayWorker
+		}
+		return delaying.NewDelayer(key, impl, enqueueWork, enqueueWorkMulti)
 	}
 	delaying.Init(mustRegisterDelayFunc)
 	args := NewModuleRegistrationArgs(handle, mustRegisterDelayFunc)

@@ -162,3 +162,10 @@ func TestIsPermanentException(t *testing.T) {
 		})
 	}
 }
+
+func TestNewClient(t *testing.T) {
+	client := NewClient(Credentials{AccountSID: "sid", AuthToken: "token"}, nil)
+	if client == nil {
+		t.Fatal("expected non-nil Client")
+	}
+}

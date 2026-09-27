@@ -24,6 +24,73 @@ func TestAvatar_Validate(t *testing.T) {
 			},
 			wantErr: "",
 		},
+		{
+			name: "url_with_spaces",
+			avatar: &Avatar{
+				Provider: "provider1",
+				URL:      " https://example.com/avatar.jpg",
+			},
+			wantErr: "leading or trailing spaces",
+		},
+		{
+			name: "fileID_with_spaces",
+			avatar: &Avatar{
+				Provider: "provider1",
+				FileID:   " file123 ",
+			},
+			wantErr: "leading or trailing spaces",
+		},
+		{
+			name: "fileUniqueID_with_spaces",
+			avatar: &Avatar{
+				Provider:     "provider1",
+				FileID:       "file123",
+				FileUniqueID: " unique123 ",
+			},
+			wantErr: "leading or trailing spaces",
+		},
+		{
+			name: "missing_provider",
+			avatar: &Avatar{
+				URL: "https://example.com/avatar.jpg",
+			},
+			wantErr: "provider",
+		},
+		{
+			name: "provider_with_spaces",
+			avatar: &Avatar{
+				Provider: "provider 1",
+				URL:      "https://example.com/avatar.jpg",
+			},
+			wantErr: "must not contain spaces",
+		},
+		{
+			name: "negative_width",
+			avatar: &Avatar{
+				Provider: "provider1",
+				URL:      "https://example.com/avatar.jpg",
+				Width:    -1,
+			},
+			wantErr: "width",
+		},
+		{
+			name: "negative_height",
+			avatar: &Avatar{
+				Provider: "provider1",
+				URL:      "https://example.com/avatar.jpg",
+				Height:   -1,
+			},
+			wantErr: "height",
+		},
+		{
+			name: "negative_size",
+			avatar: &Avatar{
+				Provider: "provider1",
+				URL:      "https://example.com/avatar.jpg",
+				Size:     -1,
+			},
+			wantErr: "size",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

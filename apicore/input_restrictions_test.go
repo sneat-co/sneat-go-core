@@ -18,6 +18,13 @@ func TestIsAllowedContentLength(t *testing.T) {
 	if err := validateContentLength(req, 0, 0); err != nil {
 		t.Errorf("Content-Length=0, min=0, max=0, expected nil, got: %v", err)
 	}
+	if err := validateContentLength(req, 10, 0); err == nil {
+		t.Error("expected error for content length < min")
+	}
+	req.ContentLength = 100
+	if err := validateContentLength(req, 0, 50); err == nil {
+		t.Error("expected error for content length > max")
+	}
 }
 
 func TestVerifyRequest(t *testing.T) {

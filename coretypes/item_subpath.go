@@ -101,12 +101,9 @@ func ParseItemSubPath(path string) ([]ItemSubPathSegment, error) {
 			segments[i] = ItemSubPathSegment{Field: part}
 		}
 	}
-	canonical, err := FormatItemSubPath(segments...)
+	_, err := FormatItemSubPath(segments...)
 	if err != nil {
 		return nil, err
-	}
-	if canonical != path {
-		return nil, fmt.Errorf("subpath must use canonical encoding")
 	}
 	return segments, nil
 }

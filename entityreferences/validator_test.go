@@ -21,6 +21,9 @@ func TestValidationRequestAndMissingError(t *testing.T) {
 		t.Fatalf("reserved Spot Space ID rejected: %v", err)
 	}
 	err := MissingError{IDs: []string{"a"}}
+	if !strings.Contains(err.Error(), "reference not found") {
+		t.Fatalf("unexpected error string: %s", err.Error())
+	}
 	if !errors.Is(err, ErrReferenceNotFound) {
 		t.Fatalf("err=%v", err)
 	}

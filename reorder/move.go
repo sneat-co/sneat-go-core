@@ -34,7 +34,7 @@ func RemoveStr(arr []string, s string) []string {
 
 // InsertStr insert a string into an array
 func InsertStr(arr []string, index int, v string) []string {
-	a := make([]string, len(arr)+1)
+	a := make([]string, 0, len(arr)+1)
 	a = append(a, arr[:index]...)
 	a = append(a, v)
 	return append(a, arr[index:]...)

@@ -56,6 +56,20 @@ func TestTo_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "invalid ACL",
+			to: To{
+				ACL: dbo4acl.ACL{
+					Users: map[string]dbo4acl.Permissions{
+						"": {const4acl.PermittedToView: with.CreatedFields{
+							CreatedAtField: with.CreatedAtField{CreatedAt: now},
+							CreatedByField: with.CreatedByField{CreatedBy: "user1"},
+						}},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "valid users",
 			to: To{
 				ACL: dbo4acl.ACL{
@@ -139,6 +153,19 @@ func TestShared_Validate(t *testing.T) {
 			shared: Shared{
 				ID:          "item1",
 				Permissions: nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid permissions",
+			shared: Shared{
+				ID: "item1",
+				Permissions: dbo4acl.Permissions{
+					"": with.CreatedFields{
+						CreatedAtField: with.CreatedAtField{CreatedAt: now},
+						CreatedByField: with.CreatedByField{CreatedBy: "user1"},
+					},
+				},
 			},
 			wantErr: true,
 		},

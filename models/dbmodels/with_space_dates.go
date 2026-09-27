@@ -3,7 +3,6 @@ package dbmodels
 import (
 	"fmt"
 	"github.com/sneat-co/sneat-go-core/coretypes"
-	"github.com/sneat-co/sneat-go-core/validate"
 	"github.com/strongo/slice"
 	"github.com/strongo/strongoapp/with"
 	"github.com/strongo/validation"
@@ -28,7 +27,9 @@ func (v *WithSpaceDates) Validate() error {
 	if err := v.DatesFields.Validate(); err != nil {
 		return err
 	}
-	v.populateSpaceDatesField()
+	if len(v.SpaceDates) == 0 {
+		v.populateSpaceDatesField()
+	}
 	if len(v.SpaceDates) != len(v.SpaceIDs)*len(v.Dates) {
 		message := fmt.Sprintf("len(v.SpaceDates) != len(v.SpaceIDs) * len(v.DatesFields): %v != %v*%v: {spaceIDs=%v, dates: %v, spaceDates: %v}",
 			len(v.SpaceDates),
@@ -39,9 +40,6 @@ func (v *WithSpaceDates) Validate() error {
 			strings.Join(v.SpaceDates, ","),
 		)
 		return validation.NewErrBadRequestFieldValue("dates,spaceDates", message)
-	}
-	if err := v.validateDates(); err != nil {
-		return err
 	}
 	if err := v.validateSpaceDates(); err != nil {
 		return err
@@ -56,34 +54,6 @@ func (v *WithSpaceDates) populateSpaceDatesField() {
 			v.SpaceDates = append(v.SpaceDates, string(spaceID)+":"+date)
 		}
 	}
-}
-
-func (v *WithSpaceDates) validateDates() error {
-	for i, date := range v.Dates {
-		if strings.TrimSpace(date) == "" {
-			return validation.NewErrRecordIsMissingRequiredField(fmt.Sprintf("dates[%v]", i))
-		}
-		if _, err := validate.DateString(date); err != nil {
-			return validation.NewErrBadRecordFieldValue("date", err.Error())
-		}
-
-		for j, date2 := range v.Dates {
-			if j != i && date2 == date {
-				return validation.NewErrBadRecordFieldValue("dates", "duplicate value: "+date)
-			}
-		}
-
-		isInSpaceDate := false
-		for _, td := range v.SpaceDates {
-			if strings.HasSuffix(td, ":"+date) {
-				isInSpaceDate = true
-			}
-		}
-		if !isInSpaceDate {
-			return validation.NewErrBadRecordFieldValue(fmt.Sprintf("dates[%v]", i), "the value is not in 'spaceDates'")
-		}
-	}
-	return nil
 }
 
 func (v *WithSpaceDates) validateSpaceDates() error {

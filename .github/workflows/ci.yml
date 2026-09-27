@@ -62,6 +62,25 @@ jobs:
           go mod tidy
           git diff --exit-code -- go.mod go.sum
 
+  root_module:
+    name: root module (100% coverage)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: Build, vet and test with 100% coverage
+        run: |
+          go build ./...
+          go vet ./...
+          go test -race -coverprofile=cover.out ./...
+          awk 'NR>1 && $NF==0 {print; bad=1} END{exit bad}' cover.out
+      - name: Verify module files are tidy
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+
   strongo_workflow:
     uses: strongo/cicd/.github/workflows/workflow.yml@main
     permissions:

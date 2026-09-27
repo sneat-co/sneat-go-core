@@ -52,6 +52,7 @@ func TestACL_Validate(t *testing.T) {
 		{"empty", ACL{}, false},
 		{"valid", ACL{Users: map[string]Permissions{"user1": {const4acl.PermittedToEdit: grant("user1")}}}, false},
 		{"empty userID", ACL{Users: map[string]Permissions{"": {const4acl.PermittedToEdit: grant("user1")}}}, true},
+		{"invalid user permissions", ACL{Users: map[string]Permissions{"user1": {"": grant("user1")}}}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

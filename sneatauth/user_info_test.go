@@ -11,3 +11,11 @@ func TestGetUserInfo(t *testing.T) {
 		_, _ = GetUserInfo(context.Background(), "u1")
 	})
 }
+
+func TestUserInfo_String(t *testing.T) {
+	providerInfo := AuthProviderUserInfo{ProviderID: "p1", UID: "u1", DisplayName: "User 1"}
+	assert.NotEmpty(t, providerInfo.String())
+
+	authInfo := AuthUserInfo{AuthProviderUserInfo: &providerInfo}
+	assert.NotEmpty(t, authInfo.String())
+}

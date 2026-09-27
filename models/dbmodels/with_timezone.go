@@ -24,10 +24,7 @@ func (v *WithTimezone) SetTimezone(loc *time.Location) (updates []update.Update,
 	if loc == nil {
 		panic("required argument is nil: WithTimezone.SetTimezone(loc==nil)")
 	}
-	var offsetMinutes int
-	if offsetMinutes, err = getOffsetMinutes(loc, time.Now()); err != nil {
-		return
-	}
+	offsetMinutes := getOffsetMinutes(loc, time.Now())
 	tzName := loc.String()
 	if v.Timezone == nil || v.Timezone.Iana != tzName || v.Timezone.OffsetMinutes != offsetMinutes {
 		v.Timezone = &Timezone{
@@ -39,9 +36,9 @@ func (v *WithTimezone) SetTimezone(loc *time.Location) (updates []update.Update,
 	return
 }
 
-func getOffsetMinutes(loc *time.Location, t time.Time) (int, error) {
+func getOffsetMinutes(loc *time.Location, t time.Time) int {
 	_, offsetSeconds := t.In(loc).Zone()
-	return offsetSeconds / 60, nil // Convert to minutes
+	return offsetSeconds / 60 // Convert to minutes
 }
 
 // Timezone record

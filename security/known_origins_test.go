@@ -57,6 +57,7 @@ func TestVerifyOrigin(t *testing.T) {
 		"https://listus-app.localhost:0",
 		"https://listus-app.localhost:65536",
 		"https://listus-app.localhost:",
+		"https://-leading-hyphen.datatug.app",
 	} {
 		t.Run("rejects "+origin, func(t *testing.T) {
 			assert.ErrorIs(t, VerifyOrigin(origin), ErrBadOrigin)
@@ -94,6 +95,7 @@ func TestIsLocalhostHost(t *testing.T) {
 		"listus-app.localhost:0",
 		"listus-app.localhost:65536",
 		"listus-app.localhost:not-a-port",
+		"localhost:bad:port",
 	} {
 		t.Run("rejects "+host, func(t *testing.T) {
 			assert.False(t, IsLocalhostHost(host))

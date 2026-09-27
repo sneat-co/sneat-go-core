@@ -181,8 +181,7 @@ func TestWithTimezone_SetTimezone(t *testing.T) {
 		assert.NoError(t, err, "Should be able to load location")
 
 		// First get the current offset minutes for the timezone
-		offsetMinutes, err := getOffsetMinutes(loc, time.Now())
-		assert.NoError(t, err, "Should not return an error for valid timezone")
+		offsetMinutes := getOffsetMinutes(loc, time.Now())
 
 		// Set the timezone with the current offset
 		v.Timezone.OffsetMinutes = offsetMinutes

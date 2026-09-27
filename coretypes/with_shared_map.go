@@ -90,19 +90,19 @@ func (v *WithSharedMap) AddSharedFrom(spaceID string, entityRef EntityRefWithout
 	entities := v.SharedFrom[spaceID]
 	if entities == nil {
 		entities = make(map[string]ShareDetail, 1)
-		v.SharedTo[string(entityRef)] = entities
+		v.SharedFrom[spaceID] = entities
 	}
 	if existing, ok := entities[string(entityRef)]; ok && existing.ByUserID == shareDetail.ByUserID && slices.Equal(existing.Permissions, shareDetail.Permissions) {
 		return nil, nil
 	}
-	entities[spaceID] = shareDetail
+	entities[string(entityRef)] = shareDetail
 	return update.ByFieldPath([]string{"sharedFrom", spaceID, string(entityRef)}, shareDetail), nil
 }
 
 func validateSharedFrom(fieldName string, sharedFrom SharedFromMap) (err error) {
 	for spaceID, refs := range sharedFrom {
 		if strings.TrimSpace(string(spaceID)) != string(spaceID) {
-			return validation.NewErrBadRecordFieldValue("fieldName", "spaceID key has leading or trailing spaces")
+			return validation.NewErrBadRecordFieldValue(fieldName, "spaceID key has leading or trailing spaces")
 		}
 		for entityRef, shareDetail := range refs {
 			if err = EntityRefWithoutSpaceID(entityRef).Validate(); err != nil {
@@ -119,12 +119,12 @@ func validateSharedFrom(fieldName string, sharedFrom SharedFromMap) (err error) 
 func validateSharedTo(fieldName string, sharedTo SharedToMap) (err error) {
 	for entityRef, refs := range sharedTo {
 		if strings.TrimSpace(string(entityRef)) != string(entityRef) {
-			return validation.NewErrBadRecordFieldValue("fieldName", "entityRef key has leading or trailing spaces")
-		}
-		if err = EntityRefWithoutSpaceID(entityRef).Validate(); err != nil {
-			return validation.NewErrBadRecordFieldValue(fmt.Sprintf("%s.%s", fieldName, entityRef), err.Error())
+			return validation.NewErrBadRecordFieldValue(fieldName, "entityRef key has leading or trailing spaces")
 		}
 		for spaceID, shareDetail := range refs {
+			if err = EntityRefWithoutSpaceID(entityRef).Validate(); err != nil {
+				return validation.NewErrBadRecordFieldValue(fmt.Sprintf("%s.%s", fieldName, entityRef), err.Error())
+			}
 			if err = shareDetail.Validate(); err != nil {
 				return validation.NewErrBadRecordFieldValue(fmt.Sprintf("%s.%s.%s", fieldName, entityRef, spaceID), err.Error())
 			}

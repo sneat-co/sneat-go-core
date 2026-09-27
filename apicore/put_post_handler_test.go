@@ -21,7 +21,10 @@ func TestHandleAuthenticatedRequestWithBody(t *testing.T) {
 
 	getAuthTokenFromHttpRequest := GetAuthTokenFromHttpRequest
 	GetAuthTokenFromHttpRequest = func(r *http.Request, authRequired bool) (token *sneatauth.Token, err error) {
-		return nil, nil
+		if authRequired {
+			return nil, nil
+		}
+		return &sneatauth.Token{UID: "u1"}, nil
 	}
 
 	tests := []struct {
@@ -29,12 +32,35 @@ func TestHandleAuthenticatedRequestWithBody(t *testing.T) {
 		args args
 	}{
 		{
+			name: "success",
+			args: args{
+				r:                 httptest.NewRequest(http.MethodPost, "/", nil),
+				options:           verify.Request(),
+				successStatusCode: http.StatusNoContent,
+				facadeHandler: func(ctx facade.ContextWithUser) (response any, err error) {
+					return nil, nil
+				},
+			},
+		},
+		{
 			name: "TestHandleAuthenticatedRequestWithBody",
 			args: args{
 				r:                 httptest.NewRequest(http.MethodGet, "/", nil),
 				options:           verify.Request(),
 				successStatusCode: http.StatusMethodNotAllowed, // TODO: make it working using http.StatusNoContent
 				facadeHandler: func(ctx facade.ContextWithUser) (response any, err error) {
+					return nil, nil
+				},
+			},
+		},
+		{
+			name: "verification_fails",
+			args: args{
+				r: httptest.NewRequest(http.MethodGet, "/", nil),
+				options:           verify.Request(verify.AuthenticationRequired(true)),
+				successStatusCode: http.StatusUnauthorized,
+				facadeHandler: func(ctx facade.ContextWithUser) (response any, err error) {
+					t.Fatal("handler should not be called when verification fails")
 					return nil, nil
 				},
 			},

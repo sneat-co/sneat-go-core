@@ -42,6 +42,67 @@ func TestEmail_Validate(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:    "empty_to",
+			wantErr: true,
+			fields: fields{
+				From:    "sender@example.com",
+				Subject: "Test email",
+				Type:    "test",
+				Created: time.Now(),
+			},
+		},
+		{
+			name:    "empty_from",
+			wantErr: true,
+			fields: fields{
+				To:      "receiver@example.com",
+				Subject: "Test email",
+				Type:    "test",
+				Created: time.Now(),
+			},
+		},
+		{
+			name:    "empty_subject",
+			wantErr: true,
+			fields: fields{
+				From:    "sender@example.com",
+				To:      "receiver@example.com",
+				Type:    "test",
+				Created: time.Now(),
+			},
+		},
+		{
+			name:    "empty_type",
+			wantErr: true,
+			fields: fields{
+				From:    "sender@example.com",
+				To:      "receiver@example.com",
+				Subject: "Test email",
+				Created: time.Now(),
+			},
+		},
+		{
+			name:    "zero_created",
+			wantErr: true,
+			fields: fields{
+				From:    "sender@example.com",
+				To:      "receiver@example.com",
+				Subject: "Test email",
+				Type:    "test",
+			},
+		},
+		{
+			name:    "empty_body",
+			wantErr: true,
+			fields: fields{
+				From:    "sender@example.com",
+				To:      "receiver@example.com",
+				Subject: "Test email",
+				Type:    "test",
+				Created: time.Now(),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

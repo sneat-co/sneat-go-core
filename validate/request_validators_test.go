@@ -25,6 +25,11 @@ func TestRequestID(t *testing.T) {
 			isValid: false,
 		},
 		{
+			name:    "leading space",
+			args:    args{" abc", "id"},
+			isValid: false,
+		},
+		{
 			name:    "number",
 			args:    args{"123", "id"},
 			isValid: true,
@@ -72,6 +77,16 @@ func TestRecordID(t *testing.T) {
 		{
 			name:    "spaces",
 			args:    args{" "},
+			isValid: false,
+		},
+		{
+			name:    "leading space",
+			args:    args{" abc"},
+			isValid: false,
+		},
+		{
+			name:    "middle space",
+			args:    args{"a b"},
 			isValid: false,
 		},
 		{

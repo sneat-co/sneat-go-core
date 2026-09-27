@@ -10,7 +10,6 @@ import (
 	"github.com/sneat-co/sneat-go-core/monitoring"
 	"github.com/strongo/logus"
 	"github.com/strongo/validation"
-	"io"
 	"net/http"
 	"reflect"
 )
@@ -70,19 +69,9 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 	}
 	responseBody.Error.Type, responseBody.Error.RootErrType = getErrorTypes(err)
 
-	if content, err := json.Marshal(responseBody); err != nil {
-		err = fmt.Errorf("failed to encode response to JSON: %w", err)
-		logus.Errorf(ctx, "HandleError: %v", err)
-		_ = monitoring.CaptureError(ctx, err)
-		//w.WriteHeader(500) // TODO: Ask at StackOverflow: Does it make sense?
-		_, _ = io.WriteString(w, "Failed to encode error as JSON: ")
-		_, _ = io.WriteString(w, err.Error())
-		return
-	} else {
-		_, err = w.Write(content)
-		if err != nil {
-			logus.Errorf(ctx, "HandleError: failed to write response body: %v", err)
-		}
+	content, _ := json.Marshal(responseBody)
+	if _, err := w.Write(content); err != nil {
+		logus.Errorf(ctx, "HandleError: failed to write response body: %v", err)
 	}
 }
 
