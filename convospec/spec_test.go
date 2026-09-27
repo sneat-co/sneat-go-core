@@ -188,3 +188,109 @@ func TestMultiWordTrigger(t *testing.T) {
 		t.Error("multi-word trigger must match contiguous words only")
 	}
 }
+
+func TestValidateArgs_edgeCases(t *testing.T) {
+	actionDef := ActionDef{
+		ID: "test.all",
+		Args: []ArgDef{
+			{Name: "str", Type: ArgTypeString, Required: true},
+			{Name: "numInt", Type: ArgTypeInt},
+			{Name: "numFloat", Type: ArgTypeFloat},
+			{Name: "boolVal", Type: ArgTypeBool},
+			{Name: "sliceVal", Type: ArgTypeStringSlice},
+			{Name: "unknownType", Type: ArgType("unknown")},
+		},
+	}
+
+	reqIntDef := ActionDef{
+		ID:   "test.reqInt",
+		Args: []ArgDef{{Name: "count", Type: ArgTypeInt, Required: true}},
+	}
+	if _, err := reqIntDef.ValidateArgs(map[string]any{"count": 5}); err != nil {
+		t.Errorf("expected valid count to pass: %v", err)
+	}
+	if _, err := reqIntDef.ValidateArgs(map[string]any{}); err == nil {
+		t.Error("expected error for missing required count")
+	}
+
+	// ArgTypeString with non-string
+	_, err := actionDef.ValidateArgs(map[string]any{"str": 123})
+	if err == nil {
+		t.Error("expected error for non-string on ArgTypeString")
+	}
+
+	// ArgTypeInt with int, int64, float64 integer, float64 non-integer, non-number
+	validIntArgs := map[string]any{"str": "ok", "numInt": int(5)}
+	if _, err := actionDef.ValidateArgs(validIntArgs); err != nil {
+		t.Errorf("expected int to pass: %v", err)
+	}
+	validInt64Args := map[string]any{"str": "ok", "numInt": int64(5)}
+	if _, err := actionDef.ValidateArgs(validInt64Args); err != nil {
+		t.Errorf("expected int64 to pass: %v", err)
+	}
+	nonIntArgs := map[string]any{"str": "ok", "numInt": "not-an-int"}
+	if _, err := actionDef.ValidateArgs(nonIntArgs); err == nil {
+		t.Error("expected error for string on ArgTypeInt")
+	}
+
+	// ArgTypeFloat with float32, int, int64, invalid
+	validFloat32 := map[string]any{"str": "ok", "numFloat": float32(1.5)}
+	if _, err := actionDef.ValidateArgs(validFloat32); err != nil {
+		t.Errorf("expected float32 to pass: %v", err)
+	}
+	validFloatInt := map[string]any{"str": "ok", "numFloat": int(10)}
+	if _, err := actionDef.ValidateArgs(validFloatInt); err != nil {
+		t.Errorf("expected int as float to pass: %v", err)
+	}
+	validFloatInt64 := map[string]any{"str": "ok", "numFloat": int64(10)}
+	if _, err := actionDef.ValidateArgs(validFloatInt64); err != nil {
+		t.Errorf("expected int64 as float to pass: %v", err)
+	}
+	invalidFloat := map[string]any{"str": "ok", "numFloat": "not-a-number"}
+	if _, err := actionDef.ValidateArgs(invalidFloat); err == nil {
+		t.Error("expected error for string on ArgTypeFloat")
+	}
+
+	// ArgTypeBool with non-bool
+	invalidBool := map[string]any{"str": "ok", "boolVal": "true"}
+	if _, err := actionDef.ValidateArgs(invalidBool); err == nil {
+		t.Error("expected error for string on ArgTypeBool")
+	}
+
+	// ArgTypeStringSlice with []string, []any with non-string, non-slice
+	validSlice := map[string]any{"str": "ok", "sliceVal": []string{"a", "b"}}
+	if _, err := actionDef.ValidateArgs(validSlice); err != nil {
+		t.Errorf("expected []string to pass: %v", err)
+	}
+	invalidSliceElem := map[string]any{"str": "ok", "sliceVal": []any{123}}
+	if _, err := actionDef.ValidateArgs(invalidSliceElem); err == nil {
+		t.Error("expected error for []any containing int")
+	}
+	invalidSliceType := map[string]any{"str": "ok", "sliceVal": 123}
+	if _, err := actionDef.ValidateArgs(invalidSliceType); err == nil {
+		t.Error("expected error for non-slice on ArgTypeStringSlice")
+	}
+
+	// Unknown arg type
+	unknownArgType := map[string]any{"str": "ok", "unknownType": "val"}
+	if _, err := actionDef.ValidateArgs(unknownArgType); err == nil {
+		t.Error("expected error for unknown argument type")
+	}
+
+	// Required string slice that is empty
+	reqSliceDef := ActionDef{
+		ID: "test.req",
+		Args: []ArgDef{{Name: "items", Type: ArgTypeStringSlice, Required: true}},
+	}
+	if _, err := reqSliceDef.ValidateArgs(map[string]any{"items": []string{}}); err == nil {
+		t.Error("expected error for empty required slice")
+	}
+}
+
+func TestNextRune_atEnd(t *testing.T) {
+	runes := []rune("a")
+	if nextRune(runes, 0) != 0 {
+		t.Errorf("expected 0 for nextRune at end of slice")
+	}
+}
+

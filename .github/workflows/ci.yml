@@ -51,11 +51,12 @@ jobs:
             echo "$deps" >&2
             exit 1
           fi
-      - name: Build, vet and test
+      - name: Build, vet and test with 100% coverage
         run: |
           go build ./...
           go vet ./...
-          go test -race ./...
+          go test -race -coverprofile=cover.out ./...
+          awk 'NR>1 && $NF==0 {print; bad=1} END{exit bad}' cover.out
       - name: Verify module files are tidy
         run: |
           go mod tidy

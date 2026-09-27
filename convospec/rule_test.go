@@ -167,3 +167,113 @@ func TestValidateRules(t *testing.T) {
 		}
 	}
 }
+
+func TestOnlyCatalogInScope(t *testing.T) {
+	if !OnlyCatalogInScope([]string{"trackus.add", "clarify"}, "trackus.") {
+		t.Error("expected true when only own catalog and clarify are in scope")
+	}
+	if OnlyCatalogInScope([]string{"trackus.add", "other.action"}, "trackus.") {
+		t.Error("expected false when other catalog in scope")
+	}
+	if OnlyCatalogInScope([]string{"clarify"}, "trackus.") {
+		t.Error("expected false when no own actions in scope")
+	}
+}
+
+func TestRuleMatch_edgeCases(t *testing.T) {
+	// nil pattern
+	if _, matched := (Rule{}).Match("test", addEntryDef); matched {
+		t.Error("expected no match with nil pattern")
+	}
+	// regex no match
+	rNoMatch := Rule{Pattern: regexp.MustCompile(`^nomatch$`)}
+	if _, matched := rNoMatch.Match("test", addEntryDef); matched {
+		t.Error("expected no match when regex fails")
+	}
+
+	intAndBoolDef := ActionDef{
+		ID: "test.action",
+		Args: []ArgDef{
+			{Name: "intVal", Type: ArgTypeInt},
+			{Name: "boolVal", Type: ArgTypeBool},
+			{Name: "unknownVal", Type: ArgType("mystery")},
+		},
+	}
+
+	// Non-string constant template
+	rNonString := Rule{
+		Pattern:  regexp.MustCompile(`^const$`),
+		ActionID: "test.action",
+		Args:     map[string]any{"intVal": 999},
+	}
+	args, matched := rNonString.Match("const", intAndBoolDef)
+	if !matched || args["intVal"] != 999 {
+		t.Errorf("expected intVal 999, got %v, %v", matched, args)
+	}
+
+	// Invalid int parse
+	rInvalidInt := Rule{
+		Pattern:  regexp.MustCompile(`^val (.*)$`),
+		ActionID: "test.action",
+		Args:     map[string]any{"intVal": "$1"},
+	}
+	if _, matched := rInvalidInt.Match("val not-an-int", intAndBoolDef); matched {
+		t.Error("expected no match when int fails to parse")
+	}
+
+	// Valid int & bool
+	rValidIntBool := Rule{
+		Pattern:  regexp.MustCompile(`^(\d+) (true|false)$`),
+		ActionID: "test.action",
+		Args:     map[string]any{"intVal": "$1", "boolVal": "$2"},
+	}
+	args, matched = rValidIntBool.Match("42 true", intAndBoolDef)
+	if !matched || args["intVal"] != 42 || args["boolVal"] != true {
+		t.Errorf("unexpected match result: %v, %v", matched, args)
+	}
+
+	// Invalid bool parse
+	rInvalidBool := Rule{
+		Pattern:  regexp.MustCompile(`^bool (.*)$`),
+		ActionID: "test.action",
+		Args:     map[string]any{"boolVal": "$1"},
+	}
+	if _, matched := rInvalidBool.Match("bool not-a-bool", intAndBoolDef); matched {
+		t.Error("expected no match when bool fails to parse")
+	}
+
+	// Unknown arg type
+	rUnknown := Rule{
+		Pattern:  regexp.MustCompile(`^u (.*)$`),
+		ActionID: "test.action",
+		Args:     map[string]any{"unknownVal": "$1"},
+	}
+	if _, matched := rUnknown.Match("u val", intAndBoolDef); matched {
+		t.Error("expected no match with unknown arg type")
+	}
+
+	// Template with $ at end and $ with non-digit
+	strDef := ActionDef{
+		ID:   "test.str",
+		Args: []ArgDef{{Name: "text", Type: ArgTypeString}},
+	}
+	rDollar := Rule{
+		Pattern:  regexp.MustCompile(`^(.*)$`),
+		ActionID: "test.str",
+		Args:     map[string]any{"text": "$end $abc"},
+	}
+	args, matched = rDollar.Match("hello", strDef)
+	if !matched || args["text"] != "$end $abc" {
+		t.Errorf("expected '$end $abc', got %v", args["text"])
+	}
+	rTrailingDollar := Rule{
+		Pattern:  regexp.MustCompile(`^(.*)$`),
+		ActionID: "test.str",
+		Args:     map[string]any{"text": "trail$"},
+	}
+	args, matched = rTrailingDollar.Match("hello", strDef)
+	if !matched || args["text"] != "trail$" {
+		t.Errorf("expected 'trail$', got %v", args["text"])
+	}
+}
+
