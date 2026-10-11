@@ -4,22 +4,22 @@ module github.com/sneat-co/sneat-go-core
 
 go 1.26.0
 
-toolchain go1.27.1
+toolchain go1.27.2
 
 require (
 	github.com/crediterra/money v0.4.2
-	github.com/dal-go/dalgo v0.88.1
+	github.com/dal-go/dalgo v0.93.5
 	github.com/dal-go/record v0.1.4
 	github.com/stretchr/testify v1.12.1
 	github.com/strongo/analytics v0.2.10
-	github.com/strongo/delaying v0.2.8
+	github.com/strongo/delaying v0.2.9
 	github.com/strongo/gotwilio v0.0.0-20160123000810-f024bbefe80f
-	github.com/strongo/logus v0.4.6
-	github.com/strongo/slice v0.3.12
-	github.com/strongo/strongoapp v0.31.65
+	github.com/strongo/logus v0.4.7
+	github.com/strongo/slice v0.3.13
+	github.com/strongo/strongoapp v0.31.68
 	github.com/strongo/validation v0.0.15
 	go.uber.org/mock v0.6.0
-	golang.org/x/text v0.42.0
+	golang.org/x/text v0.43.0
 )
 
 require (
