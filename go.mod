@@ -8,7 +8,7 @@ toolchain go1.27.2
 
 require (
 	github.com/crediterra/money v0.4.2
-	github.com/dal-go/dalgo v0.94.0
+	github.com/dal-go/dalgo v0.94.1
 	github.com/dal-go/record v0.1.5
 	github.com/stretchr/testify v1.12.1
 	github.com/strongo/analytics v0.2.10
@@ -17,7 +17,7 @@ require (
 	github.com/strongo/logus v0.4.7
 	github.com/strongo/slice v0.3.13
 	github.com/strongo/strongoapp v0.31.69
-	github.com/strongo/validation v0.0.15
+	github.com/strongo/validation v0.0.16
 	go.uber.org/mock v0.6.0
 	golang.org/x/text v0.43.0
 )
