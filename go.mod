@@ -8,7 +8,7 @@ toolchain go1.27.2
 
 require (
 	github.com/crediterra/money v0.4.2
-	github.com/dal-go/dalgo v0.94.2
+	github.com/dal-go/dalgo v0.95.1
 	github.com/dal-go/record v0.1.5
 	github.com/stretchr/testify v1.12.1
 	github.com/strongo/analytics v0.2.10
