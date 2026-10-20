@@ -9,7 +9,6 @@ import (
 	"github.com/sneat-co/sneat-go-core/capturer"
 	"github.com/sneat-co/sneat-go-core/monitoring"
 	"github.com/strongo/logus"
-	"github.com/strongo/validation"
 	"net/http"
 	"reflect"
 )
@@ -46,7 +45,7 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 
 	var statusCode int
 	switch {
-	case validation.IsBadRequestError(err):
+	case IsBadRequestError(err):
 		statusCode = http.StatusBadRequest
 	case IsUnauthorizedError(err):
 		statusCode = http.StatusUnauthorized
@@ -75,7 +74,20 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 	}
 }
 
+// originalError is implemented by transparent error wrappers that only add a classification
+// (e.g. apicore's bad request marker) and must not change the reported error types.
+type originalError interface {
+	Original() error
+}
+
 func getErrorTypes(err error) (errorType, rootErrorType string) {
+	for {
+		o, ok := err.(originalError)
+		if !ok {
+			break
+		}
+		err = o.Original()
+	}
 	errorType = reflect.TypeOf(err).String()
 
 	const wrapErrorType = "*fmt.wrapError"

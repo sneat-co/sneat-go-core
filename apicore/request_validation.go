@@ -162,7 +162,9 @@ func DecodeRequestBody(w http.ResponseWriter, r *http.Request, request facade.Re
 			return err
 		}
 		if err = request.Validate(); err != nil {
-			err = fmt.Errorf("request struct decoded from HTTP request body failed initial validation %T: %w", request, err)
+			// Any failure of the request's own Validate() is the caller's fault, whichever flavour of
+			// validation error it is (e.g. a "bad record" field error is still a bad request here).
+			err = badRequestError{fmt.Errorf("request struct decoded from HTTP request body failed initial validation %T: %w", request, err)}
 			httpserver.HandleError(r.Context(), err, "DecodeRequestBody", w, r)
 			return err
 		}
