@@ -9,7 +9,6 @@ import (
 	"github.com/sneat-co/sneat-go-core/capturer"
 	"github.com/sneat-co/sneat-go-core/monitoring"
 	"github.com/strongo/logus"
-	"github.com/strongo/validation"
 	"net/http"
 	"reflect"
 )
@@ -46,7 +45,7 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 
 	var statusCode int
 	switch {
-	case validation.IsBadRequestError(err):
+	case IsBadRequestError(err):
 		statusCode = http.StatusBadRequest
 	case IsUnauthorizedError(err):
 		statusCode = http.StatusUnauthorized

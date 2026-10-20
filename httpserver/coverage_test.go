@@ -172,6 +172,55 @@ func TestHandleError(t *testing.T) {
 	})
 }
 
+func TestHandleError_StatusMapping(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/test", nil)
+
+	// The exact chain from the init_user_record report: a "bad record" field error wrapped by
+	// DecodeRequestBody's %w.
+	badRecordChain := fmt.Errorf("request struct decoded from HTTP request body failed initial validation %T: %w",
+		struct{}{}, validation.NewErrBadRecordFieldValue("authProvider", "unknown auth provider"))
+
+	tests := []struct {
+		name string
+		err  error
+		want int
+	}{
+		{"bad_request_field_value", validation.NewErrBadRequestFieldValue("f", "bad"), http.StatusBadRequest},
+		{"bad_request_field_value_wrapped", fmt.Errorf("w2: %w", fmt.Errorf("w1: %w", validation.NewErrBadRequestFieldValue("f", "bad"))), http.StatusBadRequest},
+		{"validation_bad_request_error", validation.NewBadRequestError(errors.New("x")), http.StatusBadRequest},
+		{"missing_request_field", validation.NewErrRequestIsMissingRequiredField("f"), http.StatusBadRequest},
+		{"facade_ErrBadRequest", facade.ErrBadRequest, http.StatusBadRequest},
+		{"facade_ErrBadRequest_wrapped", fmt.Errorf("ctx: %w", fmt.Errorf("%w: Content-Length", facade.ErrBadRequest)), http.StatusBadRequest},
+		{"joined_ErrBadRequest", errors.Join(errors.New("a"), facade.ErrBadRequest), http.StatusBadRequest},
+		{"unauthorized", facade.ErrUnauthorized, http.StatusUnauthorized},
+		{"unauthorized_wrapped", fmt.Errorf("w: %w", ErrNotABearerToken), http.StatusUnauthorized},
+		{"forbidden", facade.ErrForbidden, http.StatusForbidden},
+		{"forbidden_wrapped", fmt.Errorf("w: %w", facade.ErrForbidden), http.StatusForbidden},
+		{"plain_server_error", errors.New("boom"), http.StatusInternalServerError},
+		{"bad_record_alone_is_server_error", validation.NewErrBadRecordFieldValue("f", "bad"), http.StatusInternalServerError},
+		{"bad_record_chain_without_marker_is_500", badRecordChain, http.StatusInternalServerError},
+		{"generic_validation_error_is_500", validation.NewValidationError("x"), http.StatusInternalServerError},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			HandleError(context.Background(), tt.err, "test", w, req)
+			if w.Code != tt.want {
+				t.Errorf("status = %d, want %d", w.Code, tt.want)
+			}
+		})
+	}
+}
+
+func TestIsBadRequestError(t *testing.T) {
+	if IsBadRequestError(nil) {
+		t.Error("nil is not a bad request")
+	}
+	if !IsBadRequestError(fmt.Errorf("w: %w", facade.ErrBadRequest)) {
+		t.Error("wrapped facade.ErrBadRequest must be a bad request")
+	}
+}
+
 func TestGetErrorTypes_EdgeCases(t *testing.T) {
 	// fmt.wrapError wrapping nil
 	errWrapNil := fmt.Errorf("wrap nil: %w", nil)
