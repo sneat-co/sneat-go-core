@@ -2,6 +2,7 @@ package apicore
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -73,7 +74,27 @@ func TestDecodeRequestBody_KeepsValidationChain(t *testing.T) {
 	if !errors.As(err, &fieldErr) || fieldErr.Field != "authProvider" {
 		t.Errorf("expected ErrBadFieldValue for authProvider via errors.As, got: %v", err)
 	}
-	if !strings.Contains(w.Body.String(), "bad value for field [authProvider]") {
-		t.Errorf("response body: %s", w.Body.String())
+	var resp struct {
+		Error struct {
+			Message     string `json:"message"`
+			From        string `json:"from"`
+			Type        string `json:"type"`
+			RootErrType string `json:"rootErrType"`
+		} `json:"error"`
+	}
+	if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("response is not JSON: %v: %s", err, w.Body.String())
+	}
+	if resp.Error.From != "DecodeRequestBody" {
+		t.Errorf("from = %q", resp.Error.From)
+	}
+	if resp.Error.Type != "validation.ErrBadFieldValue" {
+		t.Errorf("type = %q, want validation.ErrBadFieldValue (unchanged from before the 400 fix)", resp.Error.Type)
+	}
+	if resp.Error.RootErrType != "" {
+		t.Errorf("rootErrType = %q, want empty (unchanged)", resp.Error.RootErrType)
+	}
+	if !strings.HasPrefix(resp.Error.Message, "request struct decoded from HTTP request body failed initial validation *apicore.invalidAuthProviderRequest: bad value for field [authProvider]: ") {
+		t.Errorf("message = %q", resp.Error.Message)
 	}
 }

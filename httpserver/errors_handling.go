@@ -74,7 +74,20 @@ var HandleError = func(ctx context.Context, err error, from string, w http.Respo
 	}
 }
 
+// originalError is implemented by transparent error wrappers that only add a classification
+// (e.g. apicore's bad request marker) and must not change the reported error types.
+type originalError interface {
+	Original() error
+}
+
 func getErrorTypes(err error) (errorType, rootErrorType string) {
+	for {
+		o, ok := err.(originalError)
+		if !ok {
+			break
+		}
+		err = o.Original()
+	}
 	errorType = reflect.TypeOf(err).String()
 
 	const wrapErrorType = "*fmt.wrapError"

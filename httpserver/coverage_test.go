@@ -237,3 +237,20 @@ func TestGetErrorTypes_EdgeCases(t *testing.T) {
 		t.Fatal("expected non-empty root error type for custom wrapped error")
 	}
 }
+
+type transparentWrapper struct{ err error }
+
+func (v transparentWrapper) Error() string   { return v.err.Error() }
+func (v transparentWrapper) Original() error { return v.err }
+
+func TestGetErrorTypes_TransparentWrapper(t *testing.T) {
+	inner := fmt.Errorf("outer: %w", validation.NewErrBadRecordFieldValue("f", "bad"))
+	wantType, wantRoot := getErrorTypes(inner)
+	if wantType != "validation.ErrBadFieldValue" {
+		t.Fatalf("unexpected baseline type %s", wantType)
+	}
+	gotType, gotRoot := getErrorTypes(transparentWrapper{transparentWrapper{inner}})
+	if gotType != wantType || gotRoot != wantRoot {
+		t.Errorf("got (%s, %s), want (%s, %s)", gotType, gotRoot, wantType, wantRoot)
+	}
+}

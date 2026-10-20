@@ -16,6 +16,11 @@ func (v badRequestError) Error() string {
 	return v.err.Error()
 }
 
+// Original returns the wrapped error so that error type reporting sees through this marker.
+func (v badRequestError) Original() error {
+	return v.err
+}
+
 func (v badRequestError) Unwrap() []error {
 	return []error{v.err, facade.ErrBadRequest}
 }
