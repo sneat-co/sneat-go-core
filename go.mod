@@ -4,7 +4,7 @@ module github.com/sneat-co/sneat-go-core
 
 go 1.26.0
 
-toolchain go1.27.2
+toolchain go1.27.3
 
 require (
 	github.com/crediterra/money v0.4.2
@@ -15,8 +15,8 @@ require (
 	github.com/strongo/delaying v0.2.9
 	github.com/strongo/gotwilio v0.0.0-20160123000810-f024bbefe80f
 	github.com/strongo/logus v0.4.7
-	github.com/strongo/slice v0.3.13
-	github.com/strongo/strongoapp v0.31.70
+	github.com/strongo/slice v0.3.14
+	github.com/strongo/strongoapp v0.31.71
 	github.com/strongo/validation v0.0.16
 	go.uber.org/mock v0.6.0
 	golang.org/x/text v0.43.0
