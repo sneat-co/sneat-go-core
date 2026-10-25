@@ -4,10 +4,10 @@ package facade
 import (
 	"errors"
 	"github.com/dal-go/dalgo/dal"
-	sneatfirebase "github.com/sneat-co/sneat-firebase"
+	"github.com/sneat-co/sneat-go-core/firestorepolicy"
 )
 
-var protectRootCollections = sneatfirebase.ProtectRootCollections
+var protectRootCollections = firestorepolicy.ProtectRootCollections
 
 // ProtectSneatDB enforces the reviewed collection registry on Firestore handles.
 // Non-Firestore deployments retain their own storage layout. Calling this on a
