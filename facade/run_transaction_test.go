@@ -30,6 +30,7 @@ func TestRunReadwriteTransaction(t *testing.T) {
 		// dalgo v0.64 seals dal.DB, so the generated mock is a MockBackend and
 		// the test hands it to dal.NewDB to get the DB the facade expects.
 		mockDB := mock_dal.NewMockBackend(ctrl)
+		mockDB.EXPECT().Adapter().Return(dal.NewAdapter("mock", "test")).AnyTimes()
 		mockDB.EXPECT().RunReadwriteTransaction(gomock.Any(), gomock.Any()).DoAndReturn(func(ctx context.Context, f dal.RWTxWorker, options ...dal.TransactionOption) error {
 			err := f(ctx, mock_dal.NewMockReadwriteTransaction(ctrl))
 			if deadline, ok := ctx.Deadline(); ok && time.Until(deadline) <= 0 {

@@ -10,6 +10,7 @@ require (
 	github.com/crediterra/money v0.4.2
 	github.com/dal-go/dalgo v0.95.1
 	github.com/dal-go/record v0.1.5
+	github.com/sneat-co/sneat-firebase v0.0.2-0.20261025213650-b2434c0b989e
 	github.com/stretchr/testify v1.12.1
 	github.com/strongo/analytics v0.2.10
 	github.com/strongo/delaying v0.2.10
@@ -31,4 +32,5 @@ require (
 	github.com/strongo/random v0.0.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/sys v0.30.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
