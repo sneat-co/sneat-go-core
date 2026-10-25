@@ -165,11 +165,11 @@ type directPolicyDB struct {
 
 func (d *directPolicyDB) SetMulti(ctx context.Context, rows []record.Record) error {
 	d.calls++
-	return d.DB.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error { return tx.SetMulti(ctx, rows) })
+	return d.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error { return tx.SetMulti(ctx, rows) })
 }
 func (d *directPolicyDB) InsertMulti(ctx context.Context, rows []record.Record, options ...dal.InsertOption) error {
 	d.calls++
-	return d.DB.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+	return d.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
 		return tx.InsertMulti(ctx, rows, options...)
 	})
 }
