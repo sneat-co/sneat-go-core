@@ -14,7 +14,7 @@ var protectRootCollections = firestorepolicy.ProtectRootCollections
 // separately constructed production handle is required before handing it out.
 func ProtectSneatDB(db dal.DB) (dal.DB, error) {
 	if db == nil {
-		return nil, errors.New("Sneat database provider returned nil database")
+		return nil, errors.New("sneat database provider returned nil database")
 	}
 	if db.Adapter().Name() != "firestore" {
 		return db, nil
