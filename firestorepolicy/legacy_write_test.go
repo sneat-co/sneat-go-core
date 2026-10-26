@@ -33,7 +33,7 @@ func TestLegacyWritableRootsRequiredAndObservationPreserved(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := r.CompareRoots(r.LegacyRoots); len(got.Legacy) != 48 || len(got.Unexpected) != 0 {
+	if got := r.CompareRoots(r.LegacyRoots); len(got.Legacy) != 47 || len(got.Unexpected) != 0 {
 		t.Fatal(got)
 	}
 	r.LegacyWritableRoots = []string{}
@@ -67,7 +67,7 @@ func TestEveryLegacyRootWriteEligibility(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	pending := []string{"referrers"}
+	pending := []string{}
 	if !reflect.DeepEqual(registry.LegacyWritableRoots, pending) {
 		t.Fatal(registry.LegacyWritableRoots)
 	}
@@ -226,5 +226,49 @@ func TestApprovedCoordinationNamespaceCutovers(t *testing.T) {
 				t.Fatalf("legacy root writable: %v", err)
 			}
 		})
+	}
+}
+
+// Root approval changes placement only. Caller authorization remains mandatory.
+func TestReferrersApprovedRootPreservesCallerPolicy(t *testing.T) {
+	registry, _, err := DefaultRootRegistry()
+	if err != nil {
+		t.Fatal(err)
+	}
+	comparison := registry.CompareRoots([]string{"referrers"})
+	if len(comparison.Legacy) != 0 || len(comparison.Unexpected) != 0 {
+		t.Fatal(comparison)
+	}
+	raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+	db, err := ProtectRootCollections(&directPolicyDB{DB: raw})
+	if err != nil {
+		t.Fatal(err)
+	}
+	writer := db.(dal.WriteSession)
+	ctx := access.WithPolicy(context.Background(), access.MustPolicy("referrer-server", access.Root(access.Allow(access.ReadWrite))))
+	row := func(id string) record.Record {
+		return record.NewRecordWithData(record.NewKeyWithID("referrers", id), map[string]any{"n": 1})
+	}
+	if err := writer.Insert(ctx, row("direct")); err != nil {
+		t.Fatal(err)
+	}
+	if err := writer.SetMulti(ctx, []record.Record{row("batch-a"), row("batch-b")}); err != nil {
+		t.Fatal(err)
+	}
+	generated := record.NewRecordWithData(record.NewIncompleteKey("referrers", reflect.String, nil), map[string]any{"n": 1})
+	if err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+		return tx.Insert(ctx, generated, dal.WithAdapterGeneratedID())
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if generated.Key().ID == nil || generated.Key().ID == "" {
+		t.Fatal("missing generated referrer ID")
+	}
+	denied := access.WithPolicy(context.Background(), access.MustPolicy("client-denied", access.Root(access.Deny(access.ReadWrite))))
+	if err := writer.Set(denied, row("denied")); !errors.Is(err, access.ErrAccessDenied) {
+		t.Fatalf("placement expanded caller permission: %v", err)
+	}
+	if exists, _ := raw.Exists(ctx, row("denied").Key()); exists {
+		t.Fatal("denied write reached adapter")
 	}
 }
