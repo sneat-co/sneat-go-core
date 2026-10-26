@@ -61,10 +61,6 @@
     "transfers"
   ],
   "legacyWritableRoots": [
-    "botPlatforms",
-    "moneyEvents",
-    "oauthDeviceAuthorizations",
-    "oauthDeviceUserCodes",
     "referrers"
   ],
   "extensions": [

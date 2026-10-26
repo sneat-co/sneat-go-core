@@ -67,7 +67,7 @@ func TestEveryLegacyRootWriteEligibility(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	pending := []string{"botPlatforms", "moneyEvents", "oauthDeviceAuthorizations", "oauthDeviceUserCodes", "referrers"}
+	pending := []string{"referrers"}
 	if !reflect.DeepEqual(registry.LegacyWritableRoots, pending) {
 		t.Fatal(registry.LegacyWritableRoots)
 	}
@@ -195,5 +195,36 @@ func TestBiddingTicTacToeNamespaceCutover(t *testing.T) {
 	got := registry.CompareRoots([]string{"bttt-matches"})
 	if !reflect.DeepEqual(got.Legacy, []string{"bttt-matches"}) || len(got.Unexpected) != 0 {
 		t.Fatal(got)
+	}
+}
+
+func TestApprovedCoordinationNamespaceCutovers(t *testing.T) {
+	raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+	db, err := ProtectRootCollections(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx := access.WithPolicy(context.Background(), access.MustPolicy("coordination-caller", access.Root(access.Allow(access.ReadWrite))))
+	for _, tc := range []struct{ legacy, owner, leaf string }{
+		{"botPlatforms", "bots", "platforms"},
+		{"moneyEvents", "paymentus", "moneyEvents"},
+		{"oauthDeviceAuthorizations", "auth", "deviceAuthorizations"},
+		{"oauthDeviceUserCodes", "auth", "deviceUserCodes"},
+	} {
+		t.Run(tc.legacy, func(t *testing.T) {
+			key := record.NewKeyWithParentAndID(record.NewKeyWithID("ext", tc.owner), tc.leaf, "fresh")
+			if err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+				return tx.Insert(ctx, record.NewRecordWithData(key, map[string]any{"v": 1}))
+			}); err != nil {
+				t.Fatal(err)
+			}
+			if exists, err := raw.Exists(ctx, key); err != nil || !exists {
+				t.Fatalf("approved namespace unavailable: %v %v", exists, err)
+			}
+			old := record.NewRecordWithData(record.NewKeyWithID(tc.legacy, "old"), map[string]any{"v": 1})
+			if err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error { return tx.Set(ctx, old) }); !errors.Is(err, access.ErrAccessDenied) {
+				t.Fatalf("legacy root writable: %v", err)
+			}
+		})
 	}
 }

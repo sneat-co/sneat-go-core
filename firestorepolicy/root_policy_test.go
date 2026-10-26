@@ -18,7 +18,7 @@ import (
 
 func TestRegistrySnapshotAndComparison(t *testing.T) {
 	r, digest, err := DefaultRootRegistry()
-	if err != nil || len(digest) != 64 || len(r.ApprovedRoots) != 6 || len(r.LegacyRoots) != 48 || len(r.LegacyWritableRoots) != 5 {
+	if err != nil || len(digest) != 64 || len(r.ApprovedRoots) != 6 || len(r.LegacyRoots) != 48 || len(r.LegacyWritableRoots) != 1 {
 		t.Fatalf("registry %v %s %v", r, digest, err)
 	}
 	got := r.CompareRoots([]string{"users", "invites", "checkoutCustomers", "newRoot", "newRoot", "datatugNeverApproved", "ext"})
