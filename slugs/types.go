@@ -3,7 +3,9 @@ package slugs
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/dal-go/record"
 	"github.com/sneat-co/sneat-go-core/coretypes"
@@ -138,8 +140,9 @@ func ValidateNamespace(namespace Namespace) error {
 		return fmt.Errorf("slugs: invalid namespace kind %q", namespace.Kind)
 	}
 	if namespace.SpaceID != "" {
-		if err := coretypes.ValidateSpaceID(namespace.SpaceID); err != nil {
-			return fmt.Errorf("slugs: %w", err)
+		id := string(namespace.SpaceID)
+		if len(id) > 1500 || !utf8.ValidString(id) || id != strings.TrimSpace(id) || strings.ContainsAny(id, "/%") || id == "." || id == ".." || (strings.HasPrefix(id, "__") && strings.HasSuffix(id, "__")) {
+			return fmt.Errorf("slugs: invalid spaceID %q", id)
 		}
 	}
 	return nil
@@ -147,7 +150,12 @@ func ValidateNamespace(namespace Namespace) error {
 
 // namespaceKey builds an extension-owned namespace, optionally inside a space.
 func namespaceKey(namespace Namespace) *record.Key {
-	parent := coretypes.NewSpaceModuleKey(namespace.SpaceID, namespace.ExtensionID)
+	parent := record.NewKeyWithID("ext", namespace.ExtensionID)
+	if namespace.SpaceID != "" {
+		// Namespace ownership accepts existing opaque space IDs; it does not change
+		// the platform's separate new-space ID contract.
+		parent = record.NewKeyWithParentAndID(record.NewKeyWithID("spaces", string(namespace.SpaceID)), "ext", namespace.ExtensionID)
+	}
 	return record.NewKeyWithParentAndID(parent, namespacesCollection, namespace.Kind)
 }
 

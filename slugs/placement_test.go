@@ -16,7 +16,7 @@ func TestNamespacePlacementAndIsolation(t *testing.T) {
 	}{
 		{Namespace{ExtensionID: "schoolus", Kind: "space"}, "ext/schoolus/slugNamespaces/space/claims/hall"},
 		{Namespace{ExtensionID: "communitycentrum", Kind: "space"}, "ext/communitycentrum/slugNamespaces/space/claims/hall"},
-		{Namespace{ExtensionID: "bookius", Kind: "bookingType", SpaceID: "space1"}, "spaces/space1/ext/bookius/slugNamespaces/bookingType/claims/hall"},
+		{Namespace{ExtensionID: "bookius", Kind: "bookingType", SpaceID: "space-1"}, "spaces/space-1/ext/bookius/slugNamespaces/bookingType/claims/hall"},
 		{Namespace{ExtensionID: "bookius", Kind: "bookingType", SpaceID: "space2"}, "spaces/space2/ext/bookius/slugNamespaces/bookingType/claims/hall"},
 		{Namespace{ExtensionID: "bookius", Kind: "bookingType"}, "ext/bookius/slugNamespaces/bookingType/claims/hall"},
 	}

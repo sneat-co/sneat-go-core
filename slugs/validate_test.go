@@ -11,7 +11,7 @@ import (
 
 // TestValidateNamespace rejects malformed explicit path segments before any key is built.
 func TestValidateNamespace(t *testing.T) {
-	for _, ns := range []slugs.Namespace{{ExtensionID: "communitycentrum", Kind: "space"}, {ExtensionID: "bookius", Kind: "bookingType", SpaceID: "space1"}} {
+	for _, ns := range []slugs.Namespace{{ExtensionID: "communitycentrum", Kind: "space"}, {ExtensionID: "bookius", Kind: "bookingType", SpaceID: "space-1"}} {
 		if err := slugs.ValidateNamespace(ns); err != nil {
 			t.Errorf("ValidateNamespace(%q) = %v, want nil", ns, err)
 		}
