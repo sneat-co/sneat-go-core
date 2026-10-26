@@ -20,14 +20,15 @@ import (
 //go:embed root-collections.json
 var rootRegistryJSON []byte
 
-// RootRegistry is deployment-owned placement metadata. LegacyRoots are exact,
-// temporary operational allowances; they never become approved placement.
+// RootRegistry separates frozen legacy observation names from the exact legacy
+// roots still eligible for writes. Neither list approves new root placement.
 type RootRegistry struct {
 	SchemaVersion        int      `json:"schemaVersion"`
 	Project              string   `json:"project"`
 	Database             string   `json:"database"`
 	ApprovedRoots        []string `json:"approvedRoots"`
 	LegacyRoots          []string `json:"legacyRoots"`
+	LegacyWritableRoots  []string `json:"legacyWritableRoots"`
 	Extensions           []string `json:"extensions"`
 	LegacySourceSnapshot string   `json:"legacySourceSnapshot"`
 	LegacyRemovalGate    string   `json:"legacyRemovalGate"`
@@ -50,7 +51,7 @@ func LoadRootRegistry(data []byte) (RootRegistry, error) {
 	if decoder.Decode(&trailing) != io.EOF {
 		return r, fmt.Errorf("root registry: trailing JSON")
 	}
-	if r.SchemaVersion != 1 || r.Project == "" || r.Database != "(default)" || len(r.ApprovedRoots) == 0 || len(r.Extensions) == 0 || r.LegacySourceSnapshot == "" || r.LegacyRemovalGate == "" {
+	if r.SchemaVersion != 2 || r.Project == "" || r.Database != "(default)" || len(r.ApprovedRoots) == 0 || len(r.Extensions) == 0 || r.LegacySourceSnapshot == "" || r.LegacyRemovalGate == "" {
 		return r, fmt.Errorf("root registry: incomplete deployment identity")
 	}
 	seen := map[string]bool{}
@@ -61,6 +62,16 @@ func LoadRootRegistry(data []byte) (RootRegistry, error) {
 			}
 			seen[name] = true
 		}
+	}
+	if r.LegacyWritableRoots == nil {
+		return r, fmt.Errorf("root registry: legacyWritableRoots is required")
+	}
+	writable := map[string]bool{}
+	for _, name := range r.LegacyWritableRoots {
+		if !segmentName.MatchString(name) || writable[name] || !containsRoot(r.LegacyRoots, name) {
+			return r, fmt.Errorf("root registry: invalid, duplicate or non-legacy writable root %q", name)
+		}
+		writable[name] = true
 	}
 	if !containsRoot(r.ApprovedRoots, "ext") {
 		return r, fmt.Errorf("root registry: ext namespace must be approved")
@@ -93,7 +104,7 @@ func (r RootRegistry) RootPolicy() (access.Policy, error) {
 	}
 	mutations := access.Insert | access.Set | access.Update | access.Delete
 	rules := []access.Rule{}
-	for _, root := range append(append([]string{}, r.ApprovedRoots...), r.LegacyRoots...) {
+	for _, root := range append(append([]string{}, r.ApprovedRoots...), r.LegacyWritableRoots...) {
 		if root != "ext" {
 			rules = append(rules, access.Collection(root, access.Allow(mutations)))
 		}

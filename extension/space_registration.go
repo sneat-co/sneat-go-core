@@ -2,6 +2,7 @@ package extension
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 	"sync"
@@ -35,11 +36,11 @@ type SpaceRegistrationProfile struct {
 	// Space types.
 	SpaceType coretypes.SpaceType
 
-	// SlugNamespace is the slugs namespace this extension claims public slugs
-	// in (e.g. "communitycentrum:space"). Empty means the extension has no
+	// SlugKind names the public-space claim kind under this extension
+	// (e.g. "space"). Empty means the extension has no
 	// public URL scheme for its Spaces, and RegisterSpace never claims a slug
 	// for it.
-	SlugNamespace string
+	SlugKind string
 
 	// CreatorRoles are roles the registering user needs in addition to the ones
 	// CreateSpace always grants a creator (member, creator, owner,
@@ -47,6 +48,8 @@ type SpaceRegistrationProfile struct {
 	// registering their own Space.
 	CreatorRoles []string
 }
+
+var slugKindSegment = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_-]*$`)
 
 // Validate reports whether the profile can be registered.
 func (p SpaceRegistrationProfile) Validate() error {
@@ -57,8 +60,8 @@ func (p SpaceRegistrationProfile) Validate() error {
 	case coretypes.SpaceTypeSystem, coretypes.SpaceTypeSpot, coretypes.SpaceTypePersonal:
 		return fmt.Errorf("space type %q cannot be registered by an extension: it is provisioned by the platform or has no ordinary membership", p.SpaceType)
 	}
-	if p.SlugNamespace != strings.TrimSpace(p.SlugNamespace) {
-		return fmt.Errorf("space registration slug namespace must not have leading or trailing whitespace: %q", p.SlugNamespace)
+	if p.SlugKind != "" && !slugKindSegment.MatchString(p.SlugKind) {
+		return fmt.Errorf("space registration slug kind must be a safe path segment: %q", p.SlugKind)
 	}
 	for _, role := range p.CreatorRoles {
 		if strings.TrimSpace(role) == "" {
@@ -104,7 +107,7 @@ func RegisterSpaceProfile(profile SpaceRegistrationProfile) Option {
 }
 
 func (p SpaceRegistrationProfile) equal(other SpaceRegistrationProfile) bool {
-	if p.SpaceType != other.SpaceType || p.SlugNamespace != other.SlugNamespace {
+	if p.SpaceType != other.SpaceType || p.SlugKind != other.SlugKind {
 		return false
 	}
 	if len(p.CreatorRoles) != len(other.CreatorRoles) {

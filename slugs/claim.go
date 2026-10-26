@@ -19,7 +19,7 @@ import (
 // exists to make impossible. A typical call looks like:
 //
 //	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-//	    slug, err := slugs.Claim(ctx, tx, "communitycentrum:space", rawSlug, spaceID, "space")
+//	    slug, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "communitycentrum", Kind: "space"}, rawSlug, spaceID, "space")
 //	    if err != nil {
 //	        return err // rolls back the transaction; no claim and no record are left behind
 //	    }

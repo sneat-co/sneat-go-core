@@ -12,7 +12,7 @@
 //
 // # The document ID is the lock
 //
-// A claim lives at /slugs/<namespace>/claims/<slug>, and the slug IS the
+// A claim lives at /ext/{extension}/slugNamespaces/{kind}/claims/{slug}, and the slug IS the
 // document's ID. That is what makes Claim atomic without a preceding read:
 // two callers racing to claim the same slug are really racing to insert the
 // same document, and a storage backend that rejects a duplicate insert
@@ -21,15 +21,13 @@
 // backend that itself detects the conflict, and the whole point of this
 // package is to be correct without assuming that.
 //
-// # Namespaces are opaque
+// # Namespaces name their owners
 //
-// A namespace is any caller-supplied string. It is not a fixed concept like
-// "space" or "extension" because the fleet needs three different uniqueness
-// scopes from one mechanism: global (a community centre's public slug),
-// per-parent (a booking type's slug, unique within its space), and per-parent
-// again but one level down (a room's slug, unique within its venue). All
-// three are just "some string" to this package; the scoping rule lives
-// entirely in what string the caller passes as the namespace.
+// Namespace carries ExtensionID, Kind and optional SpaceID explicitly. Global
+// claims live at ext/{extension}/slugNamespaces/{kind}/claims/{slug}; space-local
+// claims live at spaces/{space}/ext/{extension}/slugNamespaces/{kind}/claims/{slug}.
+// No legacy namespace string is interpreted. Callers retain authorization over
+// their extension, space and target; placement does not grant access.
 //
 // # Claim joins the caller's transaction
 //
