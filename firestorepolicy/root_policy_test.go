@@ -18,7 +18,7 @@ import (
 
 func TestRegistrySnapshotAndComparison(t *testing.T) {
 	r, digest, err := DefaultRootRegistry()
-	if err != nil || len(digest) != 64 || len(r.ApprovedRoots) != 6 || len(r.LegacyRoots) != 48 {
+	if err != nil || len(digest) != 64 || len(r.ApprovedRoots) != 6 || len(r.LegacyRoots) != 48 || len(r.LegacyWritableRoots) != 6 {
 		t.Fatalf("registry %v %s %v", r, digest, err)
 	}
 	got := r.CompareRoots([]string{"users", "invites", "checkoutCustomers", "newRoot", "newRoot", "datatugNeverApproved", "ext"})
@@ -32,7 +32,7 @@ func TestRegistrySnapshotAndComparison(t *testing.T) {
 	}
 }
 func TestRegistryRejectsInvalidArtifacts(t *testing.T) {
-	for _, data := range []string{"", `{}`, string(rootRegistryJSON) + `{}`, strings.Replace(string(rootRegistryJSON), `"schemaVersion": 1`, `"schemaVersion": 2`, 1), strings.Replace(string(rootRegistryJSON), `"database": "(default)"`, `"database": "other"`, 1), strings.Replace(string(rootRegistryJSON), `"schemaVersion": 1`, `"unrecognized": true, "schemaVersion": 1`, 1)} {
+	for _, data := range []string{"", `{}`, string(rootRegistryJSON) + `{}`, strings.Replace(string(rootRegistryJSON), `"schemaVersion": 2`, `"schemaVersion": 1`, 1), strings.Replace(string(rootRegistryJSON), `"database": "(default)"`, `"database": "other"`, 1), strings.Replace(string(rootRegistryJSON), `"schemaVersion": 2`, `"unrecognized": true, "schemaVersion": 2`, 1)} {
 		if _, err := LoadRootRegistry([]byte(data)); err == nil {
 			t.Fatal("accepted invalid registry", data)
 		}
@@ -45,6 +45,11 @@ func TestRegistryRejectsInvalidArtifacts(t *testing.T) {
 		func(r *RootRegistry) { r.Extensions = append(r.Extensions, r.Extensions[0]) },
 		func(r *RootRegistry) { r.Extensions = append(r.Extensions, "bad/name") },
 		func(r *RootRegistry) { r.Extensions = nil },
+		func(r *RootRegistry) { r.LegacyWritableRoots = nil },
+		func(r *RootRegistry) { r.LegacyWritableRoots = []string{"users"} },
+		func(r *RootRegistry) { r.LegacyWritableRoots = []string{"unrecognized"} },
+		func(r *RootRegistry) { r.LegacyWritableRoots = []string{"bad/name"} },
+		func(r *RootRegistry) { r.LegacyWritableRoots = append(r.LegacyWritableRoots, r.LegacyWritableRoots[0]) },
 		func(r *RootRegistry) { r.ApprovedRoots = []string{"users"} },
 	} {
 		raw, _ := json.Marshal(r)
@@ -66,7 +71,7 @@ func TestPolicyPlacementMatrixAndReadPassThrough(t *testing.T) {
 		k     *record.Key
 		allow bool
 	}{
-		{record.NewKeyWithID("users", "u"), true}, {record.NewKeyWithID("invites", "i"), true}, {record.NewKeyWithID("checkoutCustomers", "c"), true},
+		{record.NewKeyWithID("users", "u"), true}, {record.NewKeyWithID("invites", "i"), true}, {record.NewKeyWithID("checkoutCustomers", "c"), false},
 		{record.NewKeyWithID("checkoutCustomerTypo", "c"), false}, {record.NewKeyWithID("newRoot", "id"), false},
 		{record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "checkout"), "customers", "c"), true},
 		{record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "unknown-extension"), "rows", "x"), false},

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "project": "sneat-eur3-1",
   "database": "(default)",
   "approvedRoots": [
@@ -59,6 +59,14 @@
     "referrers",
     "slugs",
     "transfers"
+  ],
+  "legacyWritableRoots": [
+    "botPlatforms",
+    "bttt-matches",
+    "moneyEvents",
+    "oauthDeviceAuthorizations",
+    "oauthDeviceUserCodes",
+    "referrers"
   ],
   "extensions": [
     "aicloud",
