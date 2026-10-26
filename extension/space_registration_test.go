@@ -9,8 +9,8 @@ import (
 
 func venueProfile() SpaceRegistrationProfile {
 	return SpaceRegistrationProfile{
-		SpaceType:     coretypes.SpaceTypeCompany,
-		SlugNamespace: "gametable:space",
+		SpaceType: coretypes.SpaceTypeCompany,
+		SlugKind:  "space",
 	}
 }
 
@@ -26,7 +26,7 @@ func TestSpaceRegistrationProfile_Validate(t *testing.T) {
 		},
 		{
 			name:    "club is registerable",
-			profile: SpaceRegistrationProfile{SpaceType: coretypes.SpaceTypeClub, SlugNamespace: "sneatclub:space"},
+			profile: SpaceRegistrationProfile{SpaceType: coretypes.SpaceTypeClub, SlugKind: "space"},
 		},
 		{
 			name:    "creator roles are allowed",
@@ -61,7 +61,7 @@ func TestSpaceRegistrationProfile_Validate(t *testing.T) {
 		},
 		{
 			name:    "padded slug namespace is rejected",
-			profile: SpaceRegistrationProfile{SpaceType: coretypes.SpaceTypeCompany, SlugNamespace: " gametable:space "},
+			profile: SpaceRegistrationProfile{SpaceType: coretypes.SpaceTypeCompany, SlugKind: " space "},
 			wantErr: "leading or trailing whitespace",
 		},
 		{
@@ -106,8 +106,8 @@ func TestRegisterSpaceProfile(t *testing.T) {
 		if !ok {
 			t.Fatal("LookupSpaceProfile() found nothing for a declared extension")
 		}
-		if fromRegistry.SlugNamespace != "gametable:space" {
-			t.Errorf("SlugNamespace = %q, want %q", fromRegistry.SlugNamespace, "gametable:space")
+		if fromRegistry.SlugKind != "space" {
+			t.Errorf("SlugKind = %q, want %q", fromRegistry.SlugKind, "space")
 		}
 	})
 

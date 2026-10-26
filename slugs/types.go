@@ -2,31 +2,30 @@ package slugs
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/dal-go/record"
+	"github.com/sneat-co/sneat-go-core/coretypes"
 )
 
-// namespacesCollection and claimsCollection together spell out the storage
-// path fixed by Decision 0001: /slugs/<namespace>/claims/<slug>. The nested
-// shape — namespace as a parent document, claims as its subcollection — is
-// what makes Enumerate an ordinary subcollection listing instead of needing a
-// secondary index. A flat "/slugs/<namespace>:<slug>" collection was
-// considered and declined for exactly this reason; see the Decision's
-// "Declined Alternatives".
 const (
-	namespacesCollection = "slugs"
+	namespacesCollection = "slugNamespaces"
 	claimsCollection     = "claims"
 )
 
-// Namespace scopes slug uniqueness. It is an arbitrary caller-supplied
-// string, not a fixed concept — see the package doc's "Namespaces are
-// opaque". Two claims of the same slug in different namespaces never
-// collide: "communitycentrum:space" is a global scope, "bookius:bookingType:
-// <spaceID>" is scoped to one space, "communitycentrum:room:<spaceID>" is
-// scoped to one venue, and this package cannot tell the difference between
-// them — that is the point.
-type Namespace string
+// Namespace explicitly names the extension and optional space owning a slug
+// namespace. Empty SpaceID selects global extension state. Callers authorize
+// the owner separately; a namespace never grants access to its target.
+type Namespace struct {
+	ExtensionID coretypes.ExtID   `json:"extensionID" firestore:"extensionID"`
+	Kind        string            `json:"kind" firestore:"kind"`
+	SpaceID     coretypes.SpaceID `json:"spaceID,omitempty" firestore:"spaceID,omitempty"`
+}
+
+func (n Namespace) String() string {
+	return fmt.Sprintf("extension=%s kind=%s space=%s", n.ExtensionID, n.Kind, n.SpaceID)
+}
 
 // Slug is a normalised slug: lowercased, Unicode-normalised, with runs of
 // separators collapsed to a single hyphen and none leading or trailing. Every
@@ -90,7 +89,7 @@ type ClaimInfo struct {
 }
 
 // claimData is the JSON/Firestore wire shape stored at
-// /slugs/<namespace>/claims/<slug>. It intentionally mirrors the minimal
+// /ext/{extension}/slugNamespaces/{kind}/claims/{slug}. It intentionally mirrors the minimal
 // shape from Decision 0001 ({targetID, targetKind, claimedAt, claimedBy}) plus
 // the two fields a tombstone needs (releasedAt, successorSlug), which stay
 // absent on a live claim rather than being pre-declared with zero values —
@@ -127,29 +126,33 @@ func (d *claimData) toInfo(namespace Namespace, slug Slug) *ClaimInfo {
 	return info
 }
 
-// ValidateNamespace checks that namespace satisfies REQ:namespace-is-opaque's
-// storage requirement: non-empty and safe as a document ID. It does not, and
-// cannot, validate that the namespace means what the caller thinks it means —
-// namespaces are opaque strings by design, so "safe to store" is the only
-// universal check available.
+var namespaceSegment = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_-]*$`)
+
+// ValidateNamespace checks every explicit path segment before key construction.
+// Placement policy separately enforces the deployment's approved extension IDs.
 func ValidateNamespace(namespace Namespace) error {
-	if namespace == "" {
-		return fmt.Errorf("slugs: namespace is empty")
+	if !namespaceSegment.MatchString(string(namespace.ExtensionID)) {
+		return fmt.Errorf("slugs: invalid extensionID %q", namespace.ExtensionID)
 	}
-	if err := record.ValidateStringID(string(namespace)); err != nil {
-		return fmt.Errorf("slugs: namespace %q is not safe as a document ID: %w", namespace, err)
+	if !namespaceSegment.MatchString(namespace.Kind) {
+		return fmt.Errorf("slugs: invalid namespace kind %q", namespace.Kind)
+	}
+	if namespace.SpaceID != "" {
+		if err := coretypes.ValidateSpaceID(namespace.SpaceID); err != nil {
+			return fmt.Errorf("slugs: %w", err)
+		}
 	}
 	return nil
 }
 
-// namespaceKey builds the parent key for a namespace's claims subcollection:
-// /slugs/<namespace>.
+// namespaceKey builds an extension-owned namespace, optionally inside a space.
 func namespaceKey(namespace Namespace) *record.Key {
-	return record.NewKeyWithID(namespacesCollection, string(namespace))
+	parent := coretypes.NewSpaceModuleKey(namespace.SpaceID, namespace.ExtensionID)
+	return record.NewKeyWithParentAndID(parent, namespacesCollection, namespace.Kind)
 }
 
 // claimKey builds the key of one claim document:
-// /slugs/<namespace>/claims/<slug>. slug must already be normalised — every
+// /ext/{extension}/slugNamespaces/{kind}/claims/{slug}. slug must already be normalised — every
 // caller of claimKey in this package normalises first, so that a claim's key
 // and the slug reported back to the caller are always the same string.
 func claimKey(namespace Namespace, slug Slug) *record.Key {

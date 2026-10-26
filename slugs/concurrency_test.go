@@ -52,7 +52,7 @@ func TestClaim_ConcurrentClaimsYieldOneWinner(t *testing.T) {
 		targetID := targetIDs[i]
 		go func() {
 			err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-				if _, err := slugs.Claim(ctx, tx, "test:space", "contested-hall", targetID, "space"); err != nil {
+				if _, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "contested-hall", targetID, "space"); err != nil {
 					return err
 				}
 				// Both sides' Insert has now succeeded against this
@@ -98,7 +98,7 @@ func TestClaim_ConcurrentClaimsYieldOneWinner(t *testing.T) {
 	// Assert the actual end state, not merely that an error was returned: the
 	// slug must resolve to whichever target actually won, and to nothing
 	// else.
-	info, err := slugs.Resolve(ctx, db, "test:space", "contested-hall")
+	info, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "contested-hall")
 	if err != nil {
 		t.Fatalf("resolving the contested slug: %v", err)
 	}

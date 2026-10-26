@@ -9,16 +9,14 @@ import (
 	"github.com/sneat-co/sneat-go-core/sneatcoretesting"
 )
 
-// TestValidateNamespace pins REQ:namespace-is-opaque's storage-level
-// validation: non-empty, and safe as a document ID (no reserved '%' escape
-// marker — see record.ValidateStringID).
+// TestValidateNamespace rejects malformed explicit path segments before any key is built.
 func TestValidateNamespace(t *testing.T) {
-	for _, ns := range []slugs.Namespace{"communitycentrum:space", "bookius:bookingType:space-1", "a"} {
+	for _, ns := range []slugs.Namespace{{ExtensionID: "communitycentrum", Kind: "space"}, {ExtensionID: "bookius", Kind: "bookingType", SpaceID: "space1"}} {
 		if err := slugs.ValidateNamespace(ns); err != nil {
 			t.Errorf("ValidateNamespace(%q) = %v, want nil", ns, err)
 		}
 	}
-	for _, ns := range []slugs.Namespace{"", "has%percent"} {
+	for _, ns := range []slugs.Namespace{{}, {ExtensionID: "bad/owner", Kind: "space"}, {ExtensionID: "test", Kind: "bad/kind"}, {ExtensionID: "test", Kind: "space", SpaceID: "bad/space"}} {
 		if err := slugs.ValidateNamespace(ns); err == nil {
 			t.Errorf("ValidateNamespace(%q) = nil, want an error", ns)
 		}
@@ -34,7 +32,7 @@ func TestClaim_RejectsEmptyNamespaceAndSlug(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "", "main-hall", "space-1", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{}, "main-hall", "space-1", "space")
 		return err
 	})
 	if err == nil {
@@ -42,7 +40,7 @@ func TestClaim_RejectsEmptyNamespaceAndSlug(t *testing.T) {
 	}
 
 	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:space", "!!!", "space-1", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "!!!", "space-1", "space")
 		return err
 	})
 	if err == nil {
@@ -59,38 +57,38 @@ func TestRejectsEmptyNamespaceAndSlug_AllEntryPoints(t *testing.T) {
 	db := sneatcoretesting.NewMemoryDB()
 	ctx := context.Background()
 
-	if _, err := slugs.Resolve(ctx, db, "", "main-hall"); err == nil {
+	if _, err := slugs.Resolve(ctx, db, slugs.Namespace{}, "main-hall"); err == nil {
 		t.Error("Resolve with an empty namespace should fail")
 	}
-	if _, err := slugs.Resolve(ctx, db, "test:space", "!!!"); !slugs.IsSlugNotFound(err) {
+	if _, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "!!!"); !slugs.IsSlugNotFound(err) {
 		t.Errorf("Resolve with a slug that normalises to empty: IsSlugNotFound(%v) = false, want true", err)
 	}
-	if _, err := slugs.Enumerate(ctx, db, ""); err == nil {
+	if _, err := slugs.Enumerate(ctx, db, slugs.Namespace{}); err == nil {
 		t.Error("Enumerate with an empty namespace should fail")
 	}
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		return slugs.Release(ctx, tx, "", "main-hall")
+		return slugs.Release(ctx, tx, slugs.Namespace{}, "main-hall")
 	})
 	if err == nil {
 		t.Error("Release with an empty namespace should fail")
 	}
 	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		return slugs.Release(ctx, tx, "test:space", "!!!")
+		return slugs.Release(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "!!!")
 	})
 	if err == nil {
 		t.Error("Release with a slug that normalises to empty should fail")
 	}
 
 	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Rename(ctx, tx, "", "old-hall", "new-hall", "space-1", "space")
+		_, err := slugs.Rename(ctx, tx, slugs.Namespace{}, "old-hall", "new-hall", "space-1", "space")
 		return err
 	})
 	if err == nil {
 		t.Error("Rename with an empty namespace should fail")
 	}
 	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Rename(ctx, tx, "test:space", "!!!", "new-hall", "space-1", "space")
+		_, err := slugs.Rename(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "!!!", "new-hall", "space-1", "space")
 		return err
 	})
 	if err == nil {
@@ -109,7 +107,7 @@ func TestRelease_NeverClaimedReportsNotFound(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		return slugs.Release(ctx, tx, "test:space", "never-claimed")
+		return slugs.Release(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "never-claimed")
 	})
 	if !slugs.IsSlugNotFound(err) {
 		t.Errorf("releasing a never-claimed slug: IsSlugNotFound(%v) = false, want true", err)
