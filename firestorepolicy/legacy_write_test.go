@@ -67,7 +67,7 @@ func TestEveryLegacyRootWriteEligibility(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	pending := []string{"botPlatforms", "bttt-matches", "moneyEvents", "oauthDeviceAuthorizations", "oauthDeviceUserCodes", "referrers"}
+	pending := []string{"botPlatforms", "moneyEvents", "oauthDeviceAuthorizations", "oauthDeviceUserCodes", "referrers"}
 	if !reflect.DeepEqual(registry.LegacyWritableRoots, pending) {
 		t.Fatal(registry.LegacyWritableRoots)
 	}
@@ -150,5 +150,50 @@ func TestEveryLegacyRootWriteEligibility(t *testing.T) {
 				})
 			}
 		})
+	}
+}
+
+// The approved game identity permits its new namespace while retaining old
+// match records for observation with no write authority.
+func TestBiddingTicTacToeNamespaceCutover(t *testing.T) {
+	raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+	db, err := ProtectRootCollections(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx := access.WithPolicy(context.Background(), access.MustPolicy("game-caller", access.Root(access.Allow(access.ReadWrite))))
+	owner := record.NewKeyWithID("ext", "bidding-tictactoe")
+	key := record.NewKeyWithParentAndID(owner, "matches", "fresh")
+	if got := key.String(); got != "ext/bidding-tictactoe/matches/fresh" {
+		t.Fatal(got)
+	}
+	if err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+		return tx.Insert(ctx, record.NewRecordWithData(key, map[string]any{"move": 1}))
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if exists, err := raw.Exists(ctx, key); err != nil || !exists {
+		t.Fatalf("new namespace unavailable: %v %v", exists, err)
+	}
+	generated := record.NewRecordWithData(record.NewIncompleteKey("matches", reflect.String, owner), map[string]any{"move": 1})
+	if err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+		return tx.Insert(ctx, generated, dal.WithAdapterGeneratedID())
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if generated.Key().ID == nil || generated.Key().ID == "" {
+		t.Fatal("generated match ID missing")
+	}
+	old := record.NewRecordWithData(record.NewKeyWithID("bttt-matches", "old"), map[string]any{"move": 1})
+	if err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error { return tx.Set(ctx, old) }); !errors.Is(err, access.ErrAccessDenied) {
+		t.Fatalf("old root recreated: %v", err)
+	}
+	registry, _, err := DefaultRootRegistry()
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := registry.CompareRoots([]string{"bttt-matches"})
+	if !reflect.DeepEqual(got.Legacy, []string{"bttt-matches"}) || len(got.Unexpected) != 0 {
+		t.Fatal(got)
 	}
 }

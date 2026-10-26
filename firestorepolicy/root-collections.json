@@ -62,7 +62,6 @@
   ],
   "legacyWritableRoots": [
     "botPlatforms",
-    "bttt-matches",
     "moneyEvents",
     "oauthDeviceAuthorizations",
     "oauthDeviceUserCodes",
@@ -73,6 +72,7 @@
     "aigateway",
     "assetus",
     "auth",
+    "bidding-tictactoe",
     "bookius",
     "bots",
     "budgetus",
