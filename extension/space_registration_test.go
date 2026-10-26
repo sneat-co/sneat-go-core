@@ -62,7 +62,7 @@ func TestSpaceRegistrationProfile_Validate(t *testing.T) {
 		{
 			name:    "padded slug namespace is rejected",
 			profile: SpaceRegistrationProfile{SpaceType: coretypes.SpaceTypeCompany, SlugKind: " space "},
-			wantErr: "leading or trailing whitespace",
+			wantErr: "safe path segment",
 		},
 		{
 			name:    "blank creator role is rejected",
