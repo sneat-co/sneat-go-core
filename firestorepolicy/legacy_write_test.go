@@ -45,21 +45,21 @@ func TestLegacyWritableRootsRequiredAndObservationPreserved(t *testing.T) {
 
 func (d *directPolicyDB) Insert(ctx context.Context, row record.Record, options ...dal.InsertOption) error {
 	d.calls++
-	return d.DB.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error { return tx.Insert(ctx, row, options...) })
+	return d.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error { return tx.Insert(ctx, row, options...) })
 }
 func (d *directPolicyDB) Set(ctx context.Context, row record.Record) error {
 	d.calls++
-	return d.DB.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error { return tx.Set(ctx, row) })
+	return d.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error { return tx.Set(ctx, row) })
 }
 func (d *directPolicyDB) Update(ctx context.Context, key *record.Key, changes []update.Update, options ...dal.Precondition) error {
 	d.calls++
-	return d.DB.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+	return d.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
 		return tx.Update(ctx, key, changes, options...)
 	})
 }
 func (d *directPolicyDB) Delete(ctx context.Context, key *record.Key) error {
 	d.calls++
-	return d.DB.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error { return tx.Delete(ctx, key) })
+	return d.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error { return tx.Delete(ctx, key) })
 }
 
 func TestEveryLegacyRootWriteEligibility(t *testing.T) {
