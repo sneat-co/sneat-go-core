@@ -31,13 +31,13 @@ var (
 // a DB through the context instead, via WithSneatDB or WithSneatDBProvider.
 func GetSneatDB(ctx context.Context) (dal.DB, error) {
 	if provider, ok := ctx.Value(contextDBKey).(SneatDBProvider); ok {
-		return provider(ctx)
+		return resolveProtectedSneatDB(ctx, provider)
 	}
 
 	defaultSneatDBProviderMu.RLock()
 	provider := defaultSneatDBProvider
 	defaultSneatDBProviderMu.RUnlock()
-	return provider(ctx)
+	return resolveProtectedSneatDB(ctx, provider)
 }
 
 // WithSneatDB returns a child context that resolves db through GetSneatDB.
@@ -99,4 +99,14 @@ func UpdateDefaultSneatDBProvider(update func(SneatDBProvider) SneatDBProvider) 
 func uninitializedSneatDBProvider(context.Context) (dal.DB, error) {
 	err := fmt.Errorf("%w: facade.GetSneatDB(context.Context) (dal.DB, error)", ErrNotInitialized)
 	panic(err)
+}
+
+// resolveProtectedSneatDB applies placement after resolving both default and
+// request-scoped providers, so a context override cannot remove the guard.
+func resolveProtectedSneatDB(ctx context.Context, provider SneatDBProvider) (dal.DB, error) {
+	db, err := provider(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return ProtectSneatDB(db)
 }

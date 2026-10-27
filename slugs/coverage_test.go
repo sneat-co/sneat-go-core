@@ -23,7 +23,7 @@ func (g errorGetter) Get(_ context.Context, _ record.Record) error {
 
 func TestResolve_StorageError(t *testing.T) {
 	expectedErr := errors.New("storage get failed")
-	_, err := slugs.Resolve(context.Background(), errorGetter{err: expectedErr}, "ns", "valid-slug")
+	_, err := slugs.Resolve(context.Background(), errorGetter{err: expectedErr}, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "valid-slug")
 	if !errors.Is(err, expectedErr) {
 		t.Fatalf("expected %v, got %v", expectedErr, err)
 	}
@@ -40,7 +40,7 @@ func (u errorUpdater) Update(_ context.Context, _ *record.Key, _ []update.Update
 
 func TestRelease_StorageError(t *testing.T) {
 	expectedErr := errors.New("storage update failed")
-	err := slugs.Release(context.Background(), errorUpdater{err: expectedErr}, "ns", "valid-slug")
+	err := slugs.Release(context.Background(), errorUpdater{err: expectedErr}, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "valid-slug")
 	if !errors.Is(err, expectedErr) {
 		t.Fatalf("expected %v, got %v", expectedErr, err)
 	}
@@ -64,7 +64,7 @@ func TestRename_TombstoneError(t *testing.T) {
 
 	_ = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
 		txWrapper := &renameErrorTx{ReadwriteTransaction: tx, failOnUpdate: true}
-		_, err := slugs.Rename(ctx, txWrapper, "ns", "old-slug", "new-slug", "target1", "kind")
+		_, err := slugs.Rename(ctx, txWrapper, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "old-slug", "new-slug", "target1", "kind")
 		if err == nil {
 			t.Fatal("expected error on tombstone failure, got nil")
 		}
@@ -105,14 +105,14 @@ func TestEnumerate_Errors(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("query_error", func(t *testing.T) {
-		_, err := slugs.Enumerate(ctx, errorExecutor{err: errors.New("query failed")}, "ns")
+		_, err := slugs.Enumerate(ctx, errorExecutor{err: errors.New("query failed")}, slugs.Namespace{ExtensionID: "test", Kind: "space"})
 		if err == nil {
 			t.Fatal("expected query error, got nil")
 		}
 	})
 
 	t.Run("reader_error", func(t *testing.T) {
-		_, err := slugs.Enumerate(ctx, errorReaderExecutor{}, "ns")
+		_, err := slugs.Enumerate(ctx, errorReaderExecutor{}, slugs.Namespace{ExtensionID: "test", Kind: "space"})
 		if err == nil {
 			t.Fatal("expected reader error, got nil")
 		}

@@ -20,7 +20,7 @@ func TestClaim_SecondClaimIsRefused(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:space", "Main Hall", "space-1", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "Main Hall", "space-1", "space")
 		return err
 	})
 	if err != nil {
@@ -28,7 +28,7 @@ func TestClaim_SecondClaimIsRefused(t *testing.T) {
 	}
 
 	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:space", "Main Hall", "space-2", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "Main Hall", "space-2", "space")
 		return err
 	})
 	if err == nil {
@@ -61,7 +61,7 @@ func TestClaim_RollbackLeavesNoOrphanClaim(t *testing.T) {
 
 	simulatedErr := errors.New("simulated failure writing the caller's own record")
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		if _, err := slugs.Claim(ctx, tx, "test:space", "orphan-check", "space-1", "space"); err != nil {
+		if _, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "orphan-check", "space-1", "space"); err != nil {
 			return err
 		}
 		return simulatedErr
@@ -70,7 +70,7 @@ func TestClaim_RollbackLeavesNoOrphanClaim(t *testing.T) {
 		t.Fatalf("expected the simulated failure to propagate out of RunReadwriteTransaction, got %v", err)
 	}
 
-	if _, err := slugs.Resolve(ctx, db, "test:space", "orphan-check"); !slugs.IsSlugNotFound(err) {
+	if _, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "orphan-check"); !slugs.IsSlugNotFound(err) {
 		t.Errorf("resolving after a rolled-back claim: IsSlugNotFound(%v) = false, want true", err)
 	}
 }
@@ -83,17 +83,17 @@ func TestClaim_NamespacesAreIndependent(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		if _, err := slugs.Claim(ctx, tx, "a:space", "main-hall", "space-a", "space"); err != nil {
+		if _, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "a", Kind: "space"}, "main-hall", "space-a", "space"); err != nil {
 			return err
 		}
-		_, err := slugs.Claim(ctx, tx, "b:space", "main-hall", "space-b", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "b", Kind: "space"}, "main-hall", "space-b", "space")
 		return err
 	})
 	if err != nil {
 		t.Fatalf("claiming the same slug in two namespaces: %v", err)
 	}
 
-	infoA, err := slugs.Resolve(ctx, db, "a:space", "main-hall")
+	infoA, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "a", Kind: "space"}, "main-hall")
 	if err != nil {
 		t.Fatalf("resolve a:space: %v", err)
 	}
@@ -101,7 +101,7 @@ func TestClaim_NamespacesAreIndependent(t *testing.T) {
 		t.Errorf("a:space resolved to %q, want space-a", infoA.TargetID)
 	}
 
-	infoB, err := slugs.Resolve(ctx, db, "b:space", "main-hall")
+	infoB, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "b", Kind: "space"}, "main-hall")
 	if err != nil {
 		t.Fatalf("resolve b:space: %v", err)
 	}
@@ -119,7 +119,7 @@ func TestClaim_EquivalentInputsNormaliseTogether(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:space", "St--Marys Village Hall ", "space-1", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "St--Marys Village Hall ", "space-1", "space")
 		return err
 	})
 	if err != nil {
@@ -127,18 +127,18 @@ func TestClaim_EquivalentInputsNormaliseTogether(t *testing.T) {
 	}
 
 	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:space", "st-marys-village-hall", "space-2", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "st-marys-village-hall", "space-2", "space")
 		return err
 	})
 	if !slugs.IsSlugTaken(err) {
 		t.Fatalf("second claim of the equivalent slug: IsSlugTaken(%v) = false, want true", err)
 	}
 
-	infoRaw, err := slugs.Resolve(ctx, db, "test:space", "St--Marys Village Hall ")
+	infoRaw, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "St--Marys Village Hall ")
 	if err != nil {
 		t.Fatalf("resolve raw form: %v", err)
 	}
-	infoNormalised, err := slugs.Resolve(ctx, db, "test:space", "st-marys-village-hall")
+	infoNormalised, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "st-marys-village-hall")
 	if err != nil {
 		t.Fatalf("resolve normalised form: %v", err)
 	}
@@ -157,7 +157,7 @@ func TestClaim_ReservedSlugIsRefusedDistinctly(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:space", "new", "space-1", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "new", "space-1", "space")
 		return err
 	})
 	if !slugs.IsSlugReserved(err) {
@@ -166,12 +166,12 @@ func TestClaim_ReservedSlugIsRefusedDistinctly(t *testing.T) {
 	if slugs.IsSlugTaken(err) {
 		t.Errorf("a reserved-word rejection must not also read as IsSlugTaken(%v)", err)
 	}
-	if _, err := slugs.Resolve(ctx, db, "test:space", "new"); !slugs.IsSlugNotFound(err) {
+	if _, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "new"); !slugs.IsSlugNotFound(err) {
 		t.Errorf("a rejected reserved-word claim must not have written anything: %v", err)
 	}
 
 	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:bookingType", "default", "bt-1", "bookingType", slugs.WithReservedWords("default"))
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "bookingType"}, "default", "bt-1", "bookingType", slugs.WithReservedWords("default"))
 		return err
 	})
 	if !slugs.IsSlugReserved(err) {
@@ -181,7 +181,7 @@ func TestClaim_ReservedSlugIsRefusedDistinctly(t *testing.T) {
 	// A namespace that did not extend the list with "default" is unaffected:
 	// the extension is per-call, not global.
 	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:other", "default", "o-1", "other")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "other"}, "default", "o-1", "other")
 		return err
 	})
 	if err != nil {
@@ -209,7 +209,7 @@ func TestClaim_NonDuplicateFailureIsNotReportedAsTaken(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:space", "Main Hall", "space-1", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "Main Hall", "space-1", "space")
 		return err
 	})
 	if err == nil {

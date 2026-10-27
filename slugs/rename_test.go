@@ -19,7 +19,7 @@ func TestRename_RenamedSlugIsNotReusable(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:space", "st-marys-village-hall", "space-1", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "st-marys-village-hall", "space-1", "space")
 		return err
 	})
 	if err != nil {
@@ -27,7 +27,7 @@ func TestRename_RenamedSlugIsNotReusable(t *testing.T) {
 	}
 
 	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Rename(ctx, tx, "test:space", "st-marys-village-hall", "st-marys-hall", "space-1", "space")
+		_, err := slugs.Rename(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "st-marys-village-hall", "st-marys-hall", "space-1", "space")
 		return err
 	})
 	if err != nil {
@@ -36,14 +36,14 @@ func TestRename_RenamedSlugIsNotReusable(t *testing.T) {
 
 	// A different target tries to claim the old, now-tombstoned slug.
 	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:space", "st-marys-village-hall", "space-2", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "st-marys-village-hall", "space-2", "space")
 		return err
 	})
 	if !slugs.IsSlugTaken(err) {
 		t.Fatalf("re-claiming a tombstoned slug: IsSlugTaken(%v) = false, want true", err)
 	}
 
-	info, err := slugs.Resolve(ctx, db, "test:space", "st-marys-village-hall")
+	info, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "st-marys-village-hall")
 	if err != nil {
 		t.Fatalf("resolving the tombstoned old slug must not error: %v", err)
 	}
@@ -54,7 +54,7 @@ func TestRename_RenamedSlugIsNotReusable(t *testing.T) {
 		t.Errorf("tombstone successor = %q, want st-marys-hall", info.SuccessorSlug)
 	}
 
-	newInfo, err := slugs.Resolve(ctx, db, "test:space", "st-marys-hall")
+	newInfo, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "st-marys-hall")
 	if err != nil {
 		t.Fatalf("resolving the new slug: %v", err)
 	}
@@ -74,10 +74,10 @@ func TestRename_NewSlugTakenLeavesOldUntouched(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		if _, err := slugs.Claim(ctx, tx, "test:space", "old-hall", "space-1", "space"); err != nil {
+		if _, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "old-hall", "space-1", "space"); err != nil {
 			return err
 		}
-		_, err := slugs.Claim(ctx, tx, "test:space", "new-hall", "space-2", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "new-hall", "space-2", "space")
 		return err
 	})
 	if err != nil {
@@ -85,14 +85,14 @@ func TestRename_NewSlugTakenLeavesOldUntouched(t *testing.T) {
 	}
 
 	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Rename(ctx, tx, "test:space", "old-hall", "new-hall", "space-1", "space")
+		_, err := slugs.Rename(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "old-hall", "new-hall", "space-1", "space")
 		return err
 	})
 	if !slugs.IsSlugTaken(err) {
 		t.Fatalf("renaming onto an already-claimed slug: IsSlugTaken(%v) = false, want true", err)
 	}
 
-	info, err := slugs.Resolve(ctx, db, "test:space", "old-hall")
+	info, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "old-hall")
 	if err != nil {
 		t.Fatalf("old slug should still resolve: %v", err)
 	}
@@ -118,7 +118,7 @@ func TestRename_IsAtomic(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:space", "st-marys-village-hall", "space-1", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "st-marys-village-hall", "space-1", "space")
 		return err
 	})
 	if err != nil {
@@ -127,7 +127,7 @@ func TestRename_IsAtomic(t *testing.T) {
 
 	simulatedErr := errors.New("simulated failure after both writes")
 	err = db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		if _, err := slugs.Rename(ctx, tx, "test:space", "st-marys-village-hall", "st-marys-hall", "space-1", "space"); err != nil {
+		if _, err := slugs.Rename(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "st-marys-village-hall", "st-marys-hall", "space-1", "space"); err != nil {
 			return err
 		}
 		return simulatedErr
@@ -136,11 +136,11 @@ func TestRename_IsAtomic(t *testing.T) {
 		t.Fatalf("expected the simulated failure to propagate out of RunReadwriteTransaction, got %v", err)
 	}
 
-	oldInfo, err := slugs.Resolve(ctx, db, "test:space", "st-marys-village-hall")
+	oldInfo, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "st-marys-village-hall")
 	if err != nil || oldInfo.Tombstoned {
 		t.Errorf("after rollback the old slug should still resolve live: info=%+v err=%v", oldInfo, err)
 	}
-	if _, err := slugs.Resolve(ctx, db, "test:space", "st-marys-hall"); !slugs.IsSlugNotFound(err) {
+	if _, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "st-marys-hall"); !slugs.IsSlugNotFound(err) {
 		t.Errorf("after rollback the new slug should be unclaimed: %v", err)
 	}
 }

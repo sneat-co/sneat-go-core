@@ -37,7 +37,7 @@ func TestResolve_ReturnsTargetInOneRead(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		_, err := slugs.Claim(ctx, tx, "test:space", "Main Hall", "space-1", "space", slugs.WithClaimedBy("alex"))
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "Main Hall", "space-1", "space", slugs.WithClaimedBy("alex"))
 		return err
 	})
 	if err != nil {
@@ -45,7 +45,7 @@ func TestResolve_ReturnsTargetInOneRead(t *testing.T) {
 	}
 
 	spy := &countingGetter{DB: db}
-	info, err := slugs.Resolve(ctx, spy, "test:space", "main hall")
+	info, err := slugs.Resolve(ctx, spy, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "main hall")
 	if err != nil {
 		t.Fatalf("resolve: %v", err)
 	}
@@ -72,20 +72,20 @@ func TestResolve_UnclaimedAndTombstonedAreDistinguishable(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		if _, err := slugs.Claim(ctx, tx, "test:space", "old-hall", "space-1", "space"); err != nil {
+		if _, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "old-hall", "space-1", "space"); err != nil {
 			return err
 		}
-		return slugs.Release(ctx, tx, "test:space", "old-hall")
+		return slugs.Release(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "old-hall")
 	})
 	if err != nil {
 		t.Fatalf("claim+release: %v", err)
 	}
 
-	if _, err := slugs.Resolve(ctx, db, "test:space", "never-claimed"); !slugs.IsSlugNotFound(err) {
+	if _, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "never-claimed"); !slugs.IsSlugNotFound(err) {
 		t.Errorf("resolving a never-claimed slug: IsSlugNotFound(%v) = false, want true", err)
 	}
 
-	info, err := slugs.Resolve(ctx, db, "test:space", "old-hall")
+	info, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "old-hall")
 	if err != nil {
 		t.Fatalf("resolving a released slug must not error: %v", err)
 	}

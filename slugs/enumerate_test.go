@@ -19,24 +19,24 @@ func TestEnumerate_NamespaceCanBeEnumerated(t *testing.T) {
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-		if _, err := slugs.Claim(ctx, tx, "test:space", "main-hall", "space-1", "space"); err != nil {
+		if _, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "main-hall", "space-1", "space"); err != nil {
 			return err
 		}
-		if _, err := slugs.Claim(ctx, tx, "test:space", "small-room", "space-2", "space"); err != nil {
+		if _, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "small-room", "space-2", "space"); err != nil {
 			return err
 		}
-		if err := slugs.Release(ctx, tx, "test:space", "small-room"); err != nil {
+		if err := slugs.Release(ctx, tx, slugs.Namespace{ExtensionID: "test", Kind: "space"}, "small-room"); err != nil {
 			return err
 		}
 		// Lives in a different namespace: must not appear in the listing below.
-		_, err := slugs.Claim(ctx, tx, "other:space", "main-hall", "space-3", "space")
+		_, err := slugs.Claim(ctx, tx, slugs.Namespace{ExtensionID: "other", Kind: "space"}, "main-hall", "space-3", "space")
 		return err
 	})
 	if err != nil {
 		t.Fatalf("setup: %v", err)
 	}
 
-	claims, err := slugs.Enumerate(ctx, db, "test:space")
+	claims, err := slugs.Enumerate(ctx, db, slugs.Namespace{ExtensionID: "test", Kind: "space"})
 	if err != nil {
 		t.Fatalf("enumerate: %v", err)
 	}
@@ -56,7 +56,7 @@ func TestEnumerate_NamespaceCanBeEnumerated(t *testing.T) {
 	// The other namespace's claim was never returned above; confirm it is
 	// still independently resolvable, so "excluded from this listing" is not
 	// hiding "never actually written".
-	if _, err := slugs.Resolve(ctx, db, "other:space", "main-hall"); err != nil {
+	if _, err := slugs.Resolve(ctx, db, slugs.Namespace{ExtensionID: "other", Kind: "space"}, "main-hall"); err != nil {
 		t.Errorf("other:space's own claim should resolve fine: %v", err)
 	}
 }

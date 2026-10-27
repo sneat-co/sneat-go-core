@@ -10,6 +10,7 @@ on:
       - '.github/workflows/**.yml'
       - '**/go.*'
       - '**/*.go'
+      - 'firestorepolicy/root-collections.json'
   pull_request:
     branches:
       - '**'
@@ -17,6 +18,7 @@ on:
       - '.github/workflows/**.yml'
       - '**/go.*'
       - '**/*.go'
+      - 'firestorepolicy/root-collections.json'
 
 jobs:
 
