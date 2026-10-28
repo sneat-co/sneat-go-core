@@ -128,6 +128,7 @@
     "wallet",
     "workbench"
   ],
+  "spaceOnlyExtensions": ["sizeus"],
   "legacySourceSnapshot": "2026-10-25T20:19:15.940404Z",
   "legacyRemovalGate": "Remove only after full consumer cutover and founder-approved deletion manifest. Legacy entries are temporary compatibility allowances, not approved root placement."
 }

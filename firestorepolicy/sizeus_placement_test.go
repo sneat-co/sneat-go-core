@@ -27,6 +27,11 @@ func TestSizeusExtensionPlacement(t *testing.T) {
 		allowed bool
 	}{
 		{"owned size", size, true},
+		{"existing global extension", record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "commitius"), "rows", "row1"), true},
+		{"existing user extension", record.NewKeyWithParentAndID(record.NewKeyWithParentAndID(record.NewKeyWithID("users", "user1"), "ext", "commitius"), "rows", "row1"), true},
+		{"existing space extension", record.NewKeyWithParentAndID(record.NewKeyWithParentAndID(space, "ext", "commitius"), "rows", "row1"), true},
+		{"global sizeus denied", record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "sizeus"), "sizes", "size1"), false},
+		{"user sizeus denied", record.NewKeyWithParentAndID(record.NewKeyWithParentAndID(record.NewKeyWithID("users", "user1"), "ext", "sizeus"), "sizes", "size1"), false},
 		{"unknown extension", record.NewKeyWithParentAndID(record.NewKeyWithParentAndID(space, "ext", "unknown-sizeus"), "sizes", "size1"), false},
 		{"unapproved sizeus root", record.NewKeyWithID("sizeus", "size1"), false},
 		{"unapproved sizes root", record.NewKeyWithID("sizes", "size1"), false},

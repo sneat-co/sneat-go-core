@@ -45,6 +45,8 @@ func TestRegistryRejectsInvalidArtifacts(t *testing.T) {
 		func(r *RootRegistry) { r.Extensions = append(r.Extensions, r.Extensions[0]) },
 		func(r *RootRegistry) { r.Extensions = append(r.Extensions, "bad/name") },
 		func(r *RootRegistry) { r.Extensions = nil },
+		func(r *RootRegistry) { r.SpaceOnlyExtensions = []string{"not-registered"} },
+		func(r *RootRegistry) { r.SpaceOnlyExtensions = []string{"sizeus", "sizeus"} },
 		func(r *RootRegistry) { r.LegacyWritableRoots = nil },
 		func(r *RootRegistry) { r.LegacyWritableRoots = []string{"users"} },
 		func(r *RootRegistry) { r.LegacyWritableRoots = []string{"unrecognized"} },
