@@ -23,13 +23,16 @@ var rootRegistryJSON []byte
 // RootRegistry separates frozen legacy observation names from the exact legacy
 // roots still eligible for writes. Neither list approves new root placement.
 type RootRegistry struct {
-	SchemaVersion        int      `json:"schemaVersion"`
-	Project              string   `json:"project"`
-	Database             string   `json:"database"`
-	ApprovedRoots        []string `json:"approvedRoots"`
-	LegacyRoots          []string `json:"legacyRoots"`
-	LegacyWritableRoots  []string `json:"legacyWritableRoots"`
-	Extensions           []string `json:"extensions"`
+	SchemaVersion       int      `json:"schemaVersion"`
+	Project             string   `json:"project"`
+	Database            string   `json:"database"`
+	ApprovedRoots       []string `json:"approvedRoots"`
+	LegacyRoots         []string `json:"legacyRoots"`
+	LegacyWritableRoots []string `json:"legacyWritableRoots"`
+	Extensions          []string `json:"extensions"`
+	// SpaceOnlyExtensions restricts registered extensions to their space-owned
+	// paths; it does not grant global or user-owned placement.
+	SpaceOnlyExtensions  []string `json:"spaceOnlyExtensions,omitempty"`
 	LegacySourceSnapshot string   `json:"legacySourceSnapshot"`
 	LegacyRemovalGate    string   `json:"legacyRemovalGate"`
 }
@@ -83,6 +86,13 @@ func LoadRootRegistry(data []byte) (RootRegistry, error) {
 		}
 		seen[name] = true
 	}
+	spaceOnly := map[string]bool{}
+	for _, name := range r.SpaceOnlyExtensions {
+		if !seen[name] || spaceOnly[name] {
+			return r, fmt.Errorf("root registry: unknown or duplicate space-only extension %q", name)
+		}
+		spaceOnly[name] = true
+	}
 	return r, nil
 }
 
@@ -112,7 +122,10 @@ func (r RootRegistry) RootPolicy() (access.Policy, error) {
 	// A literal extension has higher structural specificity than the wildcard.
 	rules = append(rules, access.Under(access.Path("spaces", access.AnyID, "ext", access.AnyID), access.Deny(mutations)), access.Under(access.Path("users", access.AnyID, "ext", access.AnyID), access.Deny(mutations)))
 	for _, extension := range r.Extensions {
-		rules = append(rules, access.Scope("ext", extension, access.Allow(mutations)), access.Under(access.Path("spaces", access.AnyID, "ext", extension), access.Allow(mutations)), access.Under(access.Path("users", access.AnyID, "ext", extension), access.Allow(mutations)))
+		rules = append(rules, access.Under(access.Path("spaces", access.AnyID, "ext", extension), access.Allow(mutations)))
+		if !containsRoot(r.SpaceOnlyExtensions, extension) {
+			rules = append(rules, access.Scope("ext", extension, access.Allow(mutations)), access.Under(access.Path("users", access.AnyID, "ext", extension), access.Allow(mutations)))
+		}
 	}
 	policy, err := newRootAccessPolicy("sneat-firestore-root-placement", rules...)
 	if err != nil {
