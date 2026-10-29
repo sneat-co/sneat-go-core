@@ -5,8 +5,6 @@
   "approvedRoots": [
     "ext",
     "health_checks",
-    "invites",
-    "referrers",
     "spaces",
     "users"
   ],
