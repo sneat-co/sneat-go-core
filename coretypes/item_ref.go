@@ -48,6 +48,9 @@ func newItemRef(extID ExtID, collection, itemID string) ItemRef {
 	if collection == "" {
 		panic("collection is required")
 	}
+	if err := ValidateCollectionName(collection); err != nil {
+		panic(err.Error())
+	}
 	if itemID == "" {
 		panic("itemID is required")
 	}
@@ -86,6 +89,9 @@ func NewItemRefFromQueryString(values url.Values) (itemRef ItemRef, err error) {
 	}
 	if itemRef.Collection = values.Get("c"); strings.TrimSpace(itemRef.Collection) == "" {
 		return itemRef, errors.New("collectionID 'c' parameter is required")
+	}
+	if err = ValidateCollectionName(itemRef.Collection); err != nil {
+		return itemRef, err
 	}
 	if itemRef.ItemID = values.Get("i"); strings.TrimSpace(itemRef.ItemID) == "" {
 		return itemRef, errors.New("itemID 'i' parameter is required")
@@ -142,6 +148,9 @@ func (v ItemRef) Validate() error {
 	}
 	if v.Collection == "" {
 		return validation.NewErrRecordIsMissingRequiredField("collection")
+	}
+	if err := ValidateCollectionName(v.Collection); err != nil {
+		return validation.NewErrBadRecordFieldValue("collection", err.Error())
 	}
 	if v.ItemID == "" {
 		return validation.NewErrRecordIsMissingRequiredField("itemID")
