@@ -56,7 +56,7 @@ func TestHandleAuthenticatedRequestWithBody(t *testing.T) {
 		{
 			name: "verification_fails",
 			args: args{
-				r: httptest.NewRequest(http.MethodGet, "/", nil),
+				r:                 httptest.NewRequest(http.MethodGet, "/", nil),
 				options:           verify.Request(verify.AuthenticationRequired(true)),
 				successStatusCode: http.StatusUnauthorized,
 				facadeHandler: func(ctx facade.ContextWithUser) (response any, err error) {
