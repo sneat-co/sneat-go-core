@@ -6,8 +6,6 @@ github.com/bits-and-blooms/bitset v1.24.6 h1:qcrftZUVBIwfs+m+nhoCBAPT+ZPZZjti8Sb
 github.com/bits-and-blooms/bitset v1.24.6/go.mod h1:7hO7Gc7Pp1vODcmWvKMRA9BNmbv6a/7QIWpPxHddWR8=
 github.com/crediterra/money v0.4.2 h1:jywtH44L+BwPV3Yy+VxAmvk18eayaUXfVxvz1dnk5wQ=
 github.com/crediterra/money v0.4.2/go.mod h1:v1LjiUrGIVmK0L070iz4ghVDhqVGiyd9vNX0XJOLGak=
-github.com/dal-go/dalgo v0.95.4 h1:AjfaI7S/dreCfmZL8ybcahBlm8l8XVuJ25ZVLorfxxs=
-github.com/dal-go/dalgo v0.95.4/go.mod h1:UCGV7G50rWbXamWXbmbBGmHiACWtNYUFNIL+qM5AAs8=
 github.com/dal-go/dalgo v0.95.5 h1:O8imXKatqxlMoTshy9rzYUBwFON8X3a6Ft+QX/UuBXg=
 github.com/dal-go/dalgo v0.95.5/go.mod h1:UCGV7G50rWbXamWXbmbBGmHiACWtNYUFNIL+qM5AAs8=
 github.com/dal-go/record v0.1.5 h1:lkPxiJA7S2oE5tA0WUayezd+lmaiEekrEcGz/HRhzLg=
