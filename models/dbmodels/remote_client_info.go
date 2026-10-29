@@ -8,6 +8,7 @@ import (
 // RemoteClientInfo a struct to store data about remote client (e.g. IP address)
 type RemoteClientInfo struct {
 	HostOrApp    string    `json:"hostOrApp" firestore:"hostOrApp"`
+	Origin       string    `json:"origin,omitempty" firestore:"origin,omitempty"`         // Website the request came from, e.g. https://datatug.app
 	RemoteAddr   string    `json:"remoteAddr,omitempty" firestore:"remoteAddr,omitempty"` // Can be enpty in case of messenger
 	ForwardedFor string    `json:"forwardedFor,omitempty" firestore:"forwardedFor,omitempty"`
 	GeoCountry   string    `json:"geoCountry,omitempty" firestore:"geoCountry,omitempty"`
