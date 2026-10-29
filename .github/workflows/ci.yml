@@ -5,12 +5,13 @@ on:
     branches:
       - main
     tags:
-      - 'v[0-9]+\.[0-9]+\.[0-9]+' # Push events to matching v*, i.e. v20.15.10
+      - 'v[0-9]+.[0-9]+.[0-9]+' # Push events to matching v*, i.e. v20.15.10
     paths:
       - '.github/workflows/**.yml'
       - '**/go.*'
       - '**/*.go'
       - 'firestorepolicy/root-collections.json'
+      - '.ci/**'
   pull_request:
     branches:
       - '**'
@@ -19,6 +20,7 @@ on:
       - '**/go.*'
       - '**/*.go'
       - 'firestorepolicy/root-collections.json'
+      - '.ci/**'
 
 jobs:
 
@@ -72,6 +74,10 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+      - name: Check reviewed native Firestore import sites
+        run: |
+          set -euo pipefail
+          GOWORK=off go run github.com/sneat-co/cicd/cmd/check-go-native-firestore-sites@40765b99ee6f9b1d2fefe8cee3e1a7a09934d67e --root "$(git rev-parse --show-toplevel)" --repository "$GITHUB_REPOSITORY" --manifest .ci/native-firestore-sites.json
       - name: Build, vet and test with 100% coverage
         run: |
           go build ./...
@@ -91,4 +97,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
     with:
+      build_command: |
+        set -euo pipefail
+        GOWORK=off go run github.com/sneat-co/cicd/cmd/check-go-native-firestore-sites@40765b99ee6f9b1d2fefe8cee3e1a7a09934d67e --root "$(git rev-parse --show-toplevel)" --repository "$GITHUB_REPOSITORY" --manifest .ci/native-firestore-sites.json
       code_coverage: true
