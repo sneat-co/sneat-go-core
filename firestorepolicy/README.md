@@ -19,3 +19,14 @@ mirror must use the same bytes and a matching Core version. Registry digests
 change when registration changes; consumers with a sealed expected digest
 (including the DataTug root monitor) must coordinate that configuration when
 they upgrade. Publishing Core does not upgrade or reconfigure deployed writers.
+
+## Retired observation names
+
+The post-cleanup registry retains six operational observation names. Retired
+names are no longer `Legacy`: if recreated, `CompareRoots` reports them as
+`Unexpected`, which the root monitor evaluates. This does not grant writes to
+the retained names; `legacyWritableRoots` remains empty. Activate this cohort
+only after separately approved cleanup and preservation verification. Historical
+count snapshots remain immutable evidence; registry retirement does not delete
+data or establish writer absence. Consumers must pair the new registry digest
+with their selected Core artifact and reviewed monitor configuration.
