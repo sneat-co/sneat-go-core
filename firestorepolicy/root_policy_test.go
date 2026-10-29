@@ -18,7 +18,7 @@ import (
 
 func TestRegistrySnapshotAndComparison(t *testing.T) {
 	r, digest, err := DefaultRootRegistry()
-	if err != nil || len(digest) != 64 || len(r.ApprovedRoots) != 7 || len(r.LegacyRoots) != 6 || len(r.LegacyWritableRoots) != 0 {
+	if err != nil || len(digest) != 64 || len(r.ApprovedRoots) != 6 || len(r.LegacyRoots) != 6 || len(r.LegacyWritableRoots) != 0 {
 		t.Fatalf("registry %v %s %v", r, digest, err)
 	}
 	got := r.CompareRoots([]string{"users", "invites", "checkoutCustomers", "newRoot", "newRoot", "datatugNeverApproved", "ext"})
@@ -73,6 +73,7 @@ func TestPolicyPlacementMatrixAndReadPassThrough(t *testing.T) {
 		k     *record.Key
 		allow bool
 	}{
+		{record.NewKeyWithID("_smoke", "latest"), false}, {record.NewKeyWithID("health_checks", "cloud-tasks"), true},
 		{record.NewKeyWithID("referrers", "r"), true}, {record.NewKeyWithID("users", "u"), true}, {record.NewKeyWithID("invites", "i"), true}, {record.NewKeyWithID("checkoutCustomers", "c"), false},
 		{record.NewKeyWithID("checkoutCustomerTypo", "c"), false}, {record.NewKeyWithID("newRoot", "id"), false},
 		{record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "checkout"), "customers", "c"), true},

@@ -3,7 +3,6 @@
   "project": "sneat-eur3-1",
   "database": "(default)",
   "approvedRoots": [
-    "_smoke",
     "ext",
     "health_checks",
     "invites",
