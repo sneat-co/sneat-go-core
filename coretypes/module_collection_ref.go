@@ -14,6 +14,8 @@ func (v *ModuleCollectionRef) Validate() error {
 	if v.Collection == "" {
 		return validation.NewErrRequestIsMissingRequiredField("collection")
 	}
+	if err := ValidateCollectionName(v.Collection); err != nil {
+		return validation.NewErrBadRequestFieldValue("collection", err.Error())
+	}
 	return nil
-
 }
