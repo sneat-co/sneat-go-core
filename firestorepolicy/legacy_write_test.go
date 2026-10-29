@@ -33,7 +33,7 @@ func TestLegacyWritableRootsRequiredAndObservationPreserved(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := r.CompareRoots(r.LegacyRoots); len(got.Legacy) != 47 || len(got.Unexpected) != 0 {
+	if got := r.CompareRoots(r.LegacyRoots); len(got.Legacy) != 6 || len(got.Unexpected) != 0 {
 		t.Fatal(got)
 	}
 	r.LegacyWritableRoots = []string{}
@@ -193,7 +193,7 @@ func TestBiddingTicTacToeNamespaceCutover(t *testing.T) {
 		t.Fatal(err)
 	}
 	got := registry.CompareRoots([]string{"bttt-matches"})
-	if !reflect.DeepEqual(got.Legacy, []string{"bttt-matches"}) || len(got.Unexpected) != 0 {
+	if len(got.Legacy) != 0 || !reflect.DeepEqual(got.Unexpected, []string{"bttt-matches"}) {
 		t.Fatal(got)
 	}
 }

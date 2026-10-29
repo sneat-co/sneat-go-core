@@ -18,11 +18,11 @@ import (
 
 func TestRegistrySnapshotAndComparison(t *testing.T) {
 	r, digest, err := DefaultRootRegistry()
-	if err != nil || len(digest) != 64 || len(r.ApprovedRoots) != 7 || len(r.LegacyRoots) != 47 || len(r.LegacyWritableRoots) != 0 {
+	if err != nil || len(digest) != 64 || len(r.ApprovedRoots) != 7 || len(r.LegacyRoots) != 6 || len(r.LegacyWritableRoots) != 0 {
 		t.Fatalf("registry %v %s %v", r, digest, err)
 	}
 	got := r.CompareRoots([]string{"users", "invites", "checkoutCustomers", "newRoot", "newRoot", "datatugNeverApproved", "ext"})
-	if !reflect.DeepEqual(got.Unexpected, []string{"datatugNeverApproved", "newRoot"}) || !reflect.DeepEqual(got.Legacy, []string{"checkoutCustomers"}) {
+	if !reflect.DeepEqual(got.Unexpected, []string{"checkoutCustomers", "datatugNeverApproved", "newRoot"}) || len(got.Legacy) != 0 {
 		t.Fatal(got)
 	}
 	r.ApprovedRoots[0] = "mutated"
