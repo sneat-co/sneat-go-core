@@ -51,7 +51,7 @@ func TestRegistryRejectsInvalidArtifacts(t *testing.T) {
 		func(r *RootRegistry) { r.LegacyWritableRoots = []string{"users"} },
 		func(r *RootRegistry) { r.LegacyWritableRoots = []string{"unrecognized"} },
 		func(r *RootRegistry) { r.LegacyWritableRoots = []string{"bad/name"} },
-		func(r *RootRegistry) { r.LegacyWritableRoots = []string{"slugs", "slugs"} },
+		func(r *RootRegistry) { r.LegacyWritableRoots = []string{r.LegacyRoots[0], r.LegacyRoots[0]} },
 		func(r *RootRegistry) { r.ApprovedRoots = []string{"users"} },
 	} {
 		raw, _ := json.Marshal(r)
