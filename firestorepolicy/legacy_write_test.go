@@ -229,14 +229,14 @@ func TestApprovedCoordinationNamespaceCutovers(t *testing.T) {
 	}
 }
 
-// Root approval changes placement only. Caller authorization remains mandatory.
-func TestReferrersApprovedRootPreservesCallerPolicy(t *testing.T) {
+// Extension placement does not replace caller authorization.
+func TestReferrersExtensionPlacementPreservesCallerPolicy(t *testing.T) {
 	registry, _, err := DefaultRootRegistry()
 	if err != nil {
 		t.Fatal(err)
 	}
 	comparison := registry.CompareRoots([]string{"referrers"})
-	if len(comparison.Legacy) != 0 || len(comparison.Unexpected) != 0 {
+	if len(comparison.Legacy) != 0 || len(comparison.Unexpected) != 1 || comparison.Unexpected[0] != "referrers" {
 		t.Fatal(comparison)
 	}
 	raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
@@ -246,8 +246,9 @@ func TestReferrersApprovedRootPreservesCallerPolicy(t *testing.T) {
 	}
 	writer := db.(dal.WriteSession)
 	ctx := access.WithPolicy(context.Background(), access.MustPolicy("referrer-server", access.Root(access.Allow(access.ReadWrite))))
+	parent := record.NewKeyWithID("ext", "bots")
 	row := func(id string) record.Record {
-		return record.NewRecordWithData(record.NewKeyWithID("referrers", id), map[string]any{"n": 1})
+		return record.NewRecordWithData(record.NewKeyWithParentAndID(parent, "referrers", id), map[string]any{"n": 1})
 	}
 	if err := writer.Insert(ctx, row("direct")); err != nil {
 		t.Fatal(err)
@@ -255,7 +256,7 @@ func TestReferrersApprovedRootPreservesCallerPolicy(t *testing.T) {
 	if err := writer.SetMulti(ctx, []record.Record{row("batch-a"), row("batch-b")}); err != nil {
 		t.Fatal(err)
 	}
-	generated := record.NewRecordWithData(record.NewIncompleteKey("referrers", reflect.String, nil), map[string]any{"n": 1})
+	generated := record.NewRecordWithData(record.NewIncompleteKey("referrers", reflect.String, parent), map[string]any{"n": 1})
 	if err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
 		return tx.Insert(ctx, generated, dal.WithAdapterGeneratedID())
 	}); err != nil {

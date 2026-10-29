@@ -18,11 +18,11 @@ import (
 
 func TestRegistrySnapshotAndComparison(t *testing.T) {
 	r, digest, err := DefaultRootRegistry()
-	if err != nil || len(digest) != 64 || len(r.ApprovedRoots) != 6 || len(r.LegacyRoots) != 6 || len(r.LegacyWritableRoots) != 0 {
+	if err != nil || len(digest) != 64 || len(r.ApprovedRoots) != 4 || len(r.LegacyRoots) != 6 || len(r.LegacyWritableRoots) != 0 {
 		t.Fatalf("registry %v %s %v", r, digest, err)
 	}
 	got := r.CompareRoots([]string{"users", "invites", "checkoutCustomers", "newRoot", "newRoot", "datatugNeverApproved", "ext"})
-	if !reflect.DeepEqual(got.Unexpected, []string{"checkoutCustomers", "datatugNeverApproved", "newRoot"}) || len(got.Legacy) != 0 {
+	if !reflect.DeepEqual(got.Unexpected, []string{"checkoutCustomers", "datatugNeverApproved", "invites", "newRoot"}) || len(got.Legacy) != 0 {
 		t.Fatal(got)
 	}
 	r.ApprovedRoots[0] = "mutated"
@@ -74,7 +74,9 @@ func TestPolicyPlacementMatrixAndReadPassThrough(t *testing.T) {
 		allow bool
 	}{
 		{record.NewKeyWithID("_smoke", "latest"), false}, {record.NewKeyWithID("health_checks", "cloud-tasks"), true},
-		{record.NewKeyWithID("referrers", "r"), true}, {record.NewKeyWithID("users", "u"), true}, {record.NewKeyWithID("invites", "i"), true}, {record.NewKeyWithID("checkoutCustomers", "c"), false},
+		{record.NewKeyWithID("referrers", "r"), false}, {record.NewKeyWithID("users", "u"), true}, {record.NewKeyWithID("invites", "i"), false}, {record.NewKeyWithID("checkoutCustomers", "c"), false},
+		{record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "invitus"), "invites", "i"), true},
+		{record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "bots"), "referrers", "r"), true},
 		{record.NewKeyWithID("checkoutCustomerTypo", "c"), false}, {record.NewKeyWithID("newRoot", "id"), false},
 		{record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "checkout"), "customers", "c"), true},
 		{record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "unknown-extension"), "rows", "x"), false},
