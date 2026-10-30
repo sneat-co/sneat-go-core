@@ -104,9 +104,28 @@ func TestProductRecordClosedValidation(t *testing.T) {
 }
 
 func TestProductRealmIsClosed(t *testing.T) {
-	for _, issuer := range []string{"%", "http://auth.sneat.co/product-delegation/v1", "https://Auth.sneat.co/product-delegation/v1", "https://user@auth.sneat.co/product-delegation/v1", "https://auth.sneat.co/product-delegation/v1?x=1", "https://auth.sneat.co/product-delegation/v1#fragment", "https://auth.sneat.co/product%2Ddelegation/v1", "https:///product-delegation/v1"} {
+	for _, issuer := range []string{"%", "http://auth.sneat.co/product-delegation/v1", "https://Auth.sneat.co/product-delegation/v1", "https://user@auth.sneat.co/product-delegation/v1", "https://auth.sneat.co/product-delegation/v1?x=1", "https://auth.sneat.co/product-delegation/v1#fragment", "https://auth.sneat.co/product%2Ddelegation/v1", "https:///product-delegation/v1", "https://:443/product-delegation/v1", "https://auth.sneat.co/product-delegation/v1?", "https://auth.sneat.co:443/product-delegation/v1", "https://auth.sneat.co:/product-delegation/v1"} {
 		if ValidateProductDelegationRealm(issuer, "project", "") == nil {
 			t.Fatal("invalid realm accepted")
 		}
+	}
+	// Pinned deviceauth canonicalizes an explicit default/empty port away.
+	// Only that resulting identity is accepted; a nondefault port is retained.
+	for _, issuer := range []string{"https://auth.sneat.co/product-delegation/v1", "https://auth.sneat.co:8443/product-delegation/v1"} {
+		if err := ValidateProductDelegationRealm(issuer, "project", ""); err != nil {
+			t.Fatal("canonical client issuer refused", err)
+		}
+	}
+}
+
+func TestOversizedProductBearerRefusedBeforeDecodeAllocation(t *testing.T) {
+	oversized := ProductDelegationPrefix + strings.Repeat("A", 4096)
+	if allocations := testing.AllocsPerRun(10, func() {
+		digest, err := ProductDelegationDigest(oversized)
+		if digest != "" || !errors.Is(err, ErrInvalidProductDelegation) {
+			t.Fatal("oversized bearer accepted")
+		}
+	}); allocations != 0 {
+		t.Fatal("oversized bearer allocated a decode buffer")
 	}
 }

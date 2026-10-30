@@ -76,6 +76,11 @@ type ProductDelegation struct {
 // ProductDelegationDigest refuses noncanonical, unknown and Firebase tokens.
 // It does not authenticate the bearer; the current server record is required.
 func ProductDelegationDigest(bearer string) (string, error) {
+	// The wire format is fixed. Bound decoding allocation before inspecting
+	// caller-controlled base64, including otherwise valid oversized input.
+	if len(bearer) != len(ProductDelegationPrefix)+43 {
+		return "", ErrInvalidProductDelegation
+	}
 	secret, ok := strings.CutPrefix(bearer, ProductDelegationPrefix)
 	if !ok {
 		return "", ErrInvalidProductDelegation
@@ -96,8 +101,9 @@ func productBearerDigest(bearer string) string {
 // tenants. A future tenant contract requires independent review.
 func ValidateProductDelegationRealm(issuer, project, tenant string) error {
 	u, err := url.Parse(issuer)
-	if err != nil || u.Scheme != "https" || u.Host == "" || u.Host != strings.ToLower(u.Host) ||
-		u.User != nil || u.RawQuery != "" || u.Fragment != "" || u.RawPath != "" ||
+	if err != nil || u.Scheme != "https" || u.Hostname() == "" || u.Host != strings.ToLower(u.Host) ||
+		u.User != nil || u.RawQuery != "" || u.ForceQuery || u.Fragment != "" || u.RawPath != "" ||
+		u.Port() == "443" || strings.HasSuffix(u.Host, ":") ||
 		u.Path != ProductDelegationPath || u.String() != issuer || tenant != "" || !validCredentialLabel(project) {
 		return ErrInvalidProductDelegation
 	}
