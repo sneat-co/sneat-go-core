@@ -91,6 +91,12 @@ The local round-trip harness captures the actual registered function and queued 
 
 Storage companion PR85 in sneat-firebase adds Core scheduledWork privacy and due/lease index definitions. Its independently reviewed narrow rules candidate preserves unrelated live policy; the Core privacy matrix plus scope tests passed in the emulator (378tests). Fresh live rules at2026-11-02T16:12:37Z still had hash10ff5789a9af2d4dc3b78a27fdaab12d9a3a8591bb829763ffe59843ec6d6c87 and no scheduler exclusion. Production deployment/read-back, deployed index readiness, malformed-row recovery and actual consumer qualification remain required before job enablement.
 
+### Production storage checkpoint and adapter qualification gate
+
+Storage companion PR85 is merged at sneat-firebase3b3dcc54f6a9884a9601d8505f46210bcd7f6f8f. Exact-head and post-merge CI passed. The scheduler-only production rules workflow41483207616 succeeded; fresh read-back at2026-11-02T16:40:13Z is byte-identical to the independently reviewed narrow candidate, SHA2565a2e7ac77c1f7e856ef7378866a7d9df50e0d8a3889b8a790529999b84df8b98. Removing that one exclusion reproduces every byte of the prior live policy, preserving unrelated un-deployed changes. The additive index deployment workflow41482444330 succeeded, and a direct Admin metadata read at16:38:20Z confirmed both exact scheduledWork index resources READY. The Firebase companion was retired through scoped WB cleanup; active producer/provider work remains separate.
+
+Read-only real-adapter qualification then found a release blocker missed by memory tests: dalgo2firestorev0.10.41 renders an ordinary nested order field through FieldRef.String(), turning `claim.until` into `[claim.until]`, which the Firestore SDK rejects. The shared query is correct; equality predicates already use FieldRef.Name(). Cached adapterv0.10.42 has the same implementation. Correct the owning adapter to use the raw Name for ordinary FieldRef ordering while preserving typed DocumentID, publish it normally, then repeat both discovery paths through the actual adapter. Do not change Core to SQL-display field names or claim scheduler production readiness from READY indexes alone. No production job or product record was written by this qualification.
+
 ## Acceptance Criteria
 
 - **AC: scope** — Given missing/invalid Space or path-like identity, key creation fails without a global fallback; distinct valid producer/subject/action/Space identities do not alias.
