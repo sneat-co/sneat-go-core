@@ -327,9 +327,6 @@ func TestDispatcherConfigurationIsBoundedAndReportsSafeErrors(t *testing.T) {
 	if _, err := nilDispatcher.Tick(context.Background()); !errors.Is(err, ErrInvalid) {
 		t.Fatal(err)
 	}
-	if _, err := f.d.Tick(nil); !errors.Is(err, ErrInvalid) {
-		t.Fatal(err)
-	}
 	failure := errors.New("private-cursor")
 	f.db.query = func(context.Context, dal.StructuredQuery) (dal.RecordsReader, error) { return nil, failure }
 	_, err := f.d.Tick(context.Background())

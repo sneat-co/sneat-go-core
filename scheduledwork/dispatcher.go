@@ -50,13 +50,14 @@ type DispatchError struct{ cause error }
 func (e *DispatchError) Error() string { return "scheduled work dispatch incomplete" }
 func (e *DispatchError) Unwrap() error { return e.cause }
 
-// Tick bounds both pages AND elapsed time. Pending work and expired leases get
+// Tick requires a non-nil context, like the standard context APIs.
+// It bounds both pages AND elapsed time. Pending work and expired leases get
 // separate time allowances; a slow pending query cannot consume lease recovery's
 // allowance. Adapters/delayers must honor context deadlines. No goroutine is
 // detached to forcefully interrupt an adapter that violates that contract.
 func (d *Dispatcher) Tick(ctx context.Context) (DispatchReport, error) {
 	var report DispatchReport
-	if d == nil || ctx == nil {
+	if d == nil {
 		return report, ErrInvalid
 	}
 	if err := ctx.Err(); err != nil {
