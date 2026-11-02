@@ -134,7 +134,7 @@ func PrepareSchedule(ctx context.Context, tx dal.ReadwriteTransaction, spec Spec
 		return nil, err
 	}
 	spec.RunAt = spec.RunAt.UTC()
-	rec, existing, err := readWork(ctx, tx, spec.Ref)
+	_, existing, err := readWork(ctx, tx, spec.Ref)
 	insert := record.IsNotFound(err)
 	if err != nil && !insert {
 		return nil, err
@@ -159,7 +159,7 @@ func PrepareSchedule(ctx context.Context, tx dal.ReadwriteTransaction, spec Spec
 		return nil, err
 	}
 	key, _ := spec.Ref.Key() // Spec validation already proved the key inputs.
-	rec = record.NewRecordWithData(key, w)
+	rec := record.NewRecordWithData(key, w)
 	return &Change{tx: tx, rec: rec, generation: w.Generation, insert: insert}, nil
 }
 
