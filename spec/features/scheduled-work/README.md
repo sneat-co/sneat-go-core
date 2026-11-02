@@ -53,6 +53,16 @@ Original field whitelists reject unknown or case-aliased work/spec/reference/cla
 
 Store review r1 found that JSON null on `effectKey` became an empty string during typed conversion, incorrectly treating malformed intent metadata as proven absence. Decoding now rejects explicit null for non-nullable scalar/object fields before conversion; omitted optional fields and deliberately nullable claim/completion pointers remain supported. Raw-row regressions require `Read`, replacement and cancellation to fail with no writable participant or persisted changes for null external-intent/attempt/failure metadata.
 
+### Claim and transaction-bound execution slice
+
+`PrepareClaim` admits only the requested current generation of due pending work or an expired lease, increments attempts and creates a cryptographically random opaque token. Takeover retains any owning external-effect identity. It is a read-phase participant; the caller supplies a callback-fresh server instant and applies the claim in that transaction's write phase.
+
+`PrepareExecution` reads the exact current claim in the owning business transaction. Its captured transaction participant rechecks the trusted server clock immediately before committing an intent or completion, and rejects expired, replaced, cancelled or mismatched claims. The producer completes its business reads and writes, then returns the participant's write error so both business and job changes roll back together. CommitIntent records the stable owning effect identity in the same transaction as the external outbox/intent; actual provider calls occur only after successful commit. Complete requires the producer's actual business success or persisted provider acknowledgment, not enqueue acknowledgment.
+
+Tests pause a worker after its claim read, commit cancellation in another real in-memory transaction, then resume the worker: contention retry rejects the obsolete claim and its business write never persists. The opposite ordering commits intent first and requires cancellation to return explicit reconciliation-needed rather than claim recall. Additional tests cover lease takeover/old-token rejection, intent preservation, fresh expiry during business writes, invalid claims and storage/validation failures. Local package tests/vet retain100% statement coverage. This does not qualify actual Firestore contention, authenticated executor dispatch or provider effects.
+
+The saved live-rules snapshot used for PR67 qualification (`10ff5789a9af2d4dc3b78a27fdaab12d9a3a8591bb829763ffe59843ec6d6c87`) grants Space-member reads broadly under extension collections and does not specifically exclude Core scheduledWork. It cannot establish the required private-read policy. Before production job writes, obtain fresh active rules, add and independently verify the explicit private-collection exclusion, and qualify owner/member/anonymous/injected-membership denial. This task has written no production scheduler records. Indexed discovery, retry/quarantine operations, private rules, executor/consumer wiring and complete cutover remain required.
+
 ## Acceptance Criteria
 
 - **AC: scope** — Given missing/invalid Space or path-like identity, key creation fails without a global fallback; distinct valid producer/subject/action/Space identities do not alias.
