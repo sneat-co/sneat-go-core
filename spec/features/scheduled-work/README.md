@@ -81,6 +81,16 @@ Local tests use the real in-memory adapter with120 future and120 terminal record
 
 Poison-prefix recovery remains a deployment gate: rejected rows require a separately fenced repair/quarantine or a qualified continuation mechanism so malformed records cannot starve later work. This read API deliberately grants no authority to overwrite foreign/malformed records or erase uncertain effect identity. No production tick is enabled by this slice. Private Firestore rules, deployed composite indexes, corrupted-row recovery and owning ibetican executor/producer integration remain pending.
 
+### Existing delayed-runtime adapter slice
+
+`RegisterExecutor` registers a primitive-argument worker through the already-used `strongo/delaying` factory. Producer, handler and queue are backend configuration; the task body carries only Space, subject, action, generation and opaque lease token. Payload validation rejects invalid/cross-producer input before invoking the owning callback. `Enqueue` uses the existing queue at zero delay only after the claim transaction commits; durable registry timing and expired-lease recovery supply correctness rather than an arbitrary long-future provider horizon.
+
+This adapter does not claim work, authorize business rules, open transactions, acknowledge completion or perform provider IO. Its owning callback must reload its current handler/revision/business authority and use transaction-bound `PrepareExecution`. The callback decides which obsolete deliveries are harmless no-ops; other errors propagate unchanged to the existing authenticated task host. An enqueue error or unknown response does not clear the durable lease or report business completion.
+
+The local round-trip harness captures the actual registered function and queued primitive arguments, then invokes that function against the real in-memory business transaction. Duplicate delivery applies the business transition once; cancellation between enqueue and delivery prevents the business write. Additional tests preserve the lease on enqueue uncertainty, retain expired-lease discovery, propagate owning errors, and reject invalid startup/payload values. Package tests/vet pass with100% statement coverage. This is provider-level local evidence, not actual Cloud Tasks serialization/authentication, ibetican handler integration or a published runtime.
+
+Storage companion PR85 in sneat-firebase adds Core scheduledWork privacy and due/lease index definitions. Its independently reviewed narrow rules candidate preserves unrelated live policy; the Core privacy matrix plus scope tests passed in the emulator (378tests). Fresh live rules at2026-11-02T16:12:37Z still had hash10ff5789a9af2d4dc3b78a27fdaab12d9a3a8591bb829763ffe59843ec6d6c87 and no scheduler exclusion. Production deployment/read-back, deployed index readiness, malformed-row recovery and actual consumer qualification remain required before job enablement.
+
 ## Acceptance Criteria
 
 - **AC: scope** — Given missing/invalid Space or path-like identity, key creation fails without a global fallback; distinct valid producer/subject/action/Space identities do not alias.
