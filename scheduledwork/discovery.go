@@ -45,7 +45,15 @@ type Batch struct {
 	Full bool
 }
 
-func (d Discovery) query() (dal.StructuredQuery, error) {
+// Page keeps continuation separate from execution hints. Persist Next only
+// after handling this batch; reuse exactly the same Discovery, including Now
+// and Limit, until EOF. Pending and expired-lease cycles are independent.
+type Page struct {
+	Batch
+	Next string
+}
+
+func (d Discovery) query(after string) (dal.StructuredQuery, error) {
 	if !identifier(string(d.Producer)) || !identifier(d.Handler) || !instant(d.Now) || d.Limit < 1 || d.Limit > 100 {
 		return nil, ErrInvalid
 	}
@@ -57,13 +65,17 @@ func (d Discovery) query() (dal.StructuredQuery, error) {
 	default:
 		return nil, ErrInvalid
 	}
-	return dal.From(dal.NewCollectionGroupRef(Collection, "")).NewQuery().
+	builder := dal.From(dal.NewCollectionGroupRef(Collection, "")).NewQuery().
 		WhereField("spec.ref.producer", dal.Equal, string(d.Producer)).
 		WhereField("spec.handler", dal.Equal, d.Handler).
 		WhereField("state", dal.Equal, string(d.State)).
 		WhereField(field, dal.LessOrEqual, d.Now.UTC()).
 		OrderBy(dal.AscendingField(field), dal.Ascending(dal.DocumentID())).
-		Limit(d.Limit).SelectIntoRecord(func() record.Record {
+		Limit(d.Limit)
+	if after != "" {
+		builder = builder.StartAfter(dal.Cursor(after))
+	}
+	return builder.SelectIntoRecord(func() record.Record {
 		fields := make(map[string]any)
 		return record.NewRecordWithIncompleteKey(Collection, reflect.String, &fields)
 	}), nil
@@ -122,33 +134,51 @@ func sameStringKey(expected, actual *record.Key) bool {
 // dispatched; handling poison-prefix recovery is required before enabling a
 // tick in production. This function alone is not that recovery policy.
 func Discover(ctx context.Context, executor dal.QueryExecutor, d Discovery) (batch Batch, err error) {
-	query, err := d.query()
+	page, err := discover(ctx, executor, d, "", false)
+	return page.Batch, err
+}
+
+// DiscoverPage uses an adapter-qualified opaque cursor, including the last
+// rejected row, to continue past a poison prefix without OFFSET or rewriting
+// foreign metadata. Cursor failures discard all hints. This is a live traversal,
+// not a database snapshot: restart from the beginning with a fresh Now after EOF
+// so changed/newly due work behind the boundary is reconsidered. Callers must
+// bound pages per tick and save cycle progress; this API never scans in a loop.
+func DiscoverPage(ctx context.Context, executor dal.QueryExecutor, d Discovery, after string) (Page, error) {
+	if len(after) > 64<<10 {
+		return Page{}, ErrInvalid
+	}
+	return discover(ctx, executor, d, after, true)
+}
+
+func discover(ctx context.Context, executor dal.QueryExecutor, d Discovery, after string, paged bool) (page Page, err error) {
+	query, err := d.query(after)
 	if err != nil {
-		return Batch{}, err
+		return Page{}, err
 	}
 	if executor == nil {
-		return Batch{}, ErrInvalid
+		return Page{}, ErrInvalid
 	}
 	reader, err := executor.ExecuteQueryToRecordsReader(ctx, query)
 	if err != nil {
-		return Batch{}, fmt.Errorf("discover scheduled work: %w", err)
+		return Page{}, fmt.Errorf("discover scheduled work: %w", err)
 	}
 	if reader == nil {
-		return Batch{}, ErrInvalid
+		return Page{}, ErrInvalid
 	}
 	defer func() {
 		if closeErr := reader.Close(); closeErr != nil && err == nil {
-			batch = Batch{}
+			page = Page{}
 			err = fmt.Errorf("close scheduled work discovery: %w", closeErr)
 		}
 	}()
 	for i := 0; i < d.Limit; i++ {
 		rec, readErr := reader.Next()
 		if errors.Is(readErr, dal.ErrNoMoreRecords) {
-			return batch, nil
+			return page, nil
 		}
 		if readErr != nil {
-			return Batch{}, fmt.Errorf("read scheduled work discovery: %w", readErr)
+			return Page{}, fmt.Errorf("read scheduled work discovery: %w", readErr)
 		}
 		candidate, code := d.candidate(rec)
 		if code != "" {
@@ -156,11 +186,20 @@ func Discover(ctx context.Context, executor dal.QueryExecutor, d Discovery) (bat
 			if rec != nil {
 				key = rec.Key()
 			}
-			batch.Rejected = append(batch.Rejected, Rejection{Key: key, Code: code})
+			page.Rejected = append(page.Rejected, Rejection{Key: key, Code: code})
 		} else {
-			batch.Ready = append(batch.Ready, candidate)
+			page.Ready = append(page.Ready, candidate)
 		}
 	}
-	batch.Full = true
-	return batch, nil
+	page.Full = true
+	if paged {
+		page.Next, err = reader.Cursor()
+		if err != nil {
+			return Page{}, fmt.Errorf("scheduled work continuation: %w", err)
+		}
+		if page.Next == "" || page.Next == after || len(page.Next) > 64<<10 {
+			return Page{}, ErrInvalid
+		}
+	}
+	return page, nil
 }
