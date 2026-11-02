@@ -1,0 +1,131 @@
+---
+format: https://specscore.md/feature-specification
+status: Draft
+---
+
+# Feature: Shared scheduled work
+
+> [SpecScore.**Studio**](https://specscore.studio): | [Explore](https://specscore.studio/app/github.com/sneat-co/sneat-go-core/spec/features/scheduled-work?op=explore) | [Edit](https://specscore.studio/app/github.com/sneat-co/sneat-go-core/spec/features/scheduled-work?op=edit) | [Ask question](https://specscore.studio/app/github.com/sneat-co/sneat-go-core/spec/features/scheduled-work?op=ask) | [Request change](https://specscore.studio/app/github.com/sneat-co/sneat-go-core/spec/features/scheduled-work?op=request-change) |
+**Status:** Draft
+**Source Ideas:** —
+
+## Summary
+
+Space-bounded durable background work using shared delayed execution, initially consumed by ibetican.
+
+## Problem
+
+Products need durable scheduled execution without periodically reading all business entities. The existing `strongo/delaying` and `sneat-go-host/taskshost` runtime already supplies typed, authenticated delayed execution; retain it. Add the missing shared durable identity, due-time discovery and transactional claim protocol rather than another executor.
+
+The governing reviewed consumer design is [ibetican shared scheduled work](https://github.com/sneat-co/commitius/blob/integration/ibetican-typed-goals/spec/features/ibetican-product-experience/shared-scheduled-work/README.md). Its first consumer is ibetican. Calendarius and Debtus are future compatibility cases only and remain unchanged.
+
+## Behavior
+
+### Connected lifecycle
+
+A producer creates or changes its business record and scheduled action atomically → the application can close → a bounded indexed query finds eligible work → the existing delayed executor calls its registered handler → the handler asserts the current generation/claim and business authority in the transaction committing its transition or durable external intent → acknowledgment records actual execution outcome. Replacement/cancellation invalidates old deliveries. Crash recovery claims expired leases rather than losing them.
+
+### Shared ownership and contract
+
+`scheduledwork.Ref` binds owning Space, producer, subject and logical action. Its deterministic length-framed key lives at `spaces/{space}/ext/core/scheduledWork/{id}`. Reject missing/invalid Spaces before calling the shared module factory, which otherwise has a global fallback. Producer/action/handler names are bounded; subject identities cannot supply a path. A new business reminder can use a new subject identity without erasing its predecessor's domain history.
+
+The model stores only routing and execution metadata: a supported handler key, opaque subject revision, UTC-comparable microsecond execution time, positive safe generation, next eligible attempt, attempt count, claim token/lease, optional external intent identity and explicit completion or quarantine state. It neither contains private message content nor makes a product's verification, payment or recipient decisions. Syntax validation is not handler registration or authorization.
+
+Pending and expired-lease discovery require separate bounded database-filtered collection-group queries and deployed indexes. Future/terminal rows cannot consume a due batch. Validate the returned Core/Space key chain and stable identity before acting; collection name equality is insufficient. Retry backoff and quarantine must prevent one bad early item from starving later due work.
+
+Schedule/cancel preparation reads during the producer transaction's read phase and writes in that same transaction. External enqueue/provider calls are outside retried callbacks. A transaction-bound claim assertion must fence the owning business mutation or external intent, not merely its later acknowledgment. Rescheduling/cancellation before that commit wins; after external intent commits, cancellation may be too late and must return an honest reconciliation disposition. Stable effect identity survives uncertainty and lease takeover. Generic exhaustion never erases an obligation: only owning policy authorizes a final stop; unresolved work remains recoverable.
+
+Calendarius compatibility includes occurrence identity, explicit timezone/DST normalization and edits/cancellation. Debtus compatibility includes `DtNext` due semantics, reminder replacement/discard, clearing delivery history on replacement and stable provider acknowledgment/uncertainty. Do not import their implementation packages, duplicate their business state or migrate either consumer now.
+
+### Initial model-only checkpoint
+
+The first source slice contains the model, validation and deterministic key factory only. Focused capped Go tests/vet pass with100% statement coverage for this new package. A test found that the shared record ID validator alone accepted a path-like subject; the owning reference now rejects path separators and control characters explicitly. This is not a working scheduler, a published provider or production acceptance.
+
+Next implement the DAL transaction participant, indexed due/expired-lease reads, claim/intent/retry/completion operations and existing-executor adapter. Qualify the paused-worker cancellation/lease races, actual Firestore indexes/rules and an ibetican handler journey before provider publication and consumer enablement. Existing ibetican records require a reviewed reconciliation/cutover inventory; do not keep a hidden full-collection scan as a fallback.
+
+### Transaction participant slice
+
+`PrepareSchedule` and `PrepareCancel` read and validate the original stored metadata during the owning transaction's read phase. Their opaque `Change` captures that same transaction for later `Apply`; callers finish all business/scheduler reads before applying writes. No transaction is started and no external task/provider is called by these helpers. The producer still authorizes its own business mutation; this is not a public user API or worker claim implementation.
+
+Creation uses expected generation0. A replacement compares the expected current generation, advances it and creates pending work; exact prior-generation/spec replay acknowledges existing execution without resetting its result, attempts, lease or intent. Equal execution instants in different UTC offsets have the same request meaning. Cancellation advances the generation and clears a pending lease, while exact cancellation retries remain unchanged. An unresolved external-effect identity blocks replacement/cancellation; completed work reports explicit too-late cancellation rather than pretending to undo its effect.
+
+Original field whitelists reject unknown or case-aliased work/spec/reference/claim metadata before shared typed conversion, and the decoded reference must match the requested Space-owned key. Tests cover stable retries, cancelled-work resurrection attempts, malformed stored fields and mismatched Space identity. A real strict in-memory transaction first writes a business entity, then encounters an injected schedule-write failure; neither record survives rollback. Storage and candidate-validation failures expose no writable participant or partial state. Package tests/vet retain100% statement coverage. These are local source checks, not Firestore index, claim-race, authenticated execution or provider release evidence.
+
+Store review r1 found that JSON null on `effectKey` became an empty string during typed conversion, incorrectly treating malformed intent metadata as proven absence. Decoding now rejects explicit null for non-nullable scalar/object fields before conversion; omitted optional fields and deliberately nullable claim/completion pointers remain supported. Raw-row regressions require `Read`, replacement and cancellation to fail with no writable participant or persisted changes for null external-intent/attempt/failure metadata.
+
+### Claim and transaction-bound execution slice
+
+`PrepareClaim` admits only the requested current generation of due pending work or an expired lease, increments attempts and creates a cryptographically random opaque token. Takeover retains any owning external-effect identity. It is a read-phase participant; the caller supplies a callback-fresh server instant and applies the claim in that transaction's write phase.
+
+`PrepareExecution` reads the exact current claim in the owning business transaction. Its captured transaction participant rechecks the trusted server clock immediately before committing an intent or completion, and rejects expired, replaced, cancelled or mismatched claims. The producer completes its business reads and writes, then returns the participant's write error so both business and job changes roll back together. CommitIntent records the stable owning effect identity in the same transaction as the external outbox/intent; actual provider calls occur only after successful commit. Complete requires the producer's actual business success or persisted provider acknowledgment, not enqueue acknowledgment.
+
+Tests pause a worker after its claim read, commit cancellation in another real in-memory transaction, then resume the worker: contention retry rejects the obsolete claim and its business write never persists. The opposite ordering commits intent first and requires cancellation to return explicit reconciliation-needed rather than claim recall. Additional tests cover lease takeover/old-token rejection, intent preservation, fresh expiry during business writes, invalid claims and storage/validation failures. Local package tests/vet retain100% statement coverage. This does not qualify actual Firestore contention, authenticated executor dispatch or provider effects.
+
+The saved live-rules snapshot used for PR67 qualification (`10ff5789a9af2d4dc3b78a27fdaab12d9a3a8591bb829763ffe59843ec6d6c87`) grants Space-member reads broadly under extension collections and does not specifically exclude Core scheduledWork. It cannot establish the required private-read policy. Before production job writes, obtain fresh active rules, add and independently verify the explicit private-collection exclusion, and qualify owner/member/anonymous/injected-membership denial. This task has written no production scheduler records. Indexed discovery, retry/quarantine operations, private rules, executor/consumer wiring and complete cutover remain required.
+
+### Retry and explicit recovery slice
+
+The transaction-bound execution participant now records retry only at a strictly later eligible instant with a bounded classification code. Retry clears its lease but preserves generation, subject revision, attempts and any committed effect identity. Old execution tokens cannot complete that pending job; a due retry must obtain a fresh claim. The generic library chooses no business retry budget or financial failure policy.
+
+Quarantine keeps unresolved work, intent identity and failure classification, without completion metadata. The internal producer-authorized `PrepareResume` can make that same quarantined action eligible again. It preserves its original generation/meaning, attempts and effect identity; it does not authorize a replacement external effect or create a user-facing recovery endpoint. Recovery binds to the observed attempt count as well as generation. Exact eligible-time replay can acknowledge a pending result without resetting execution; after a new claim increases attempts it conflicts and requires a fresh read. An old lost-reply recovery cannot reopen a later quarantine of the same generation. Stale generations, non-quarantined changes, pre-execution recovery times and exhausted safe counters reject rather than erase evidence.
+
+Tests run intent → retry/backoff → new claim → quarantine → explicit resume → new claim → completion using the real in-memory transaction profile, checking unchanged intent identity and increasing attempts throughout. Invalid classifications, hot-loop retry times, nil/stale operations, storage errors and candidate-validation failures remain inert. Local tests/vet retain100% statement coverage. Review r1 found an ABA recovery flaw: a lost-reply resume could reopen a later quarantine of the same generation. Expected observed attempts now fence that recovery episode; the regression runs quarantine → resume → new claim → new quarantine → old resume replay, which must leave the later failure unchanged. Indexed discovery, corrupted-record quarantine, authenticated dispatch, private rules and actual ibetican integration remain unqualified.
+
+### Bounded discovery slice
+
+`Discover` builds one database-filtered collection-group query per registered producer/handler and execution state. Pending work filters `nextAttemptAt <= now`; expired leases separately filter `claim.until <= now`. Both order by their eligible instant and typed document identity, with a mandatory1–100 database limit and a matching local reader cap. Future/terminal/other-handler rows cannot consume an eligible batch. Returned candidates are hints only: a new transaction must claim the current generation before execution.
+
+Each returned row is decoded from its original map and checked against the complete Space-owned deterministic key. Invalid shape, malformed metadata, foreign key ownership, wrong registration/state and future eligibility never become actionable candidates. Query/stream/close failures discard partial batches. Rejected rows are internal diagnostic references, not mutation authority or public content. A full batch does not imply the due queue is drained.
+
+Local tests use the real in-memory adapter with120 future and120 terminal records ahead of due work, plus due/live/expired-lease and other-producer records. They verify due filtering before limit, stable tie ordering, independent expired-lease selection, and cancellation after discovery defeating a stale claim. Fault readers verify bounded reads and fail-closed partial streams. These tests do not prove Firestore index availability or production read cost. Review r1 caught an adapter-type mismatch missed by memory tests: Firestore reconstructs ancestor IDs as plain strings while the owning factory uses named SpaceID/ExtID types, so Go interface-based key equality rejected valid jobs. Discovery now compares every collection and string-kind ID segment at exact depth. A Firestore-shaped plain-string ancestor test admits valid work while wrong Space/module/root/collection/depth/leaf paths reject. Existing dalgo2firestore v0.10.41 already preserves full collection-group key ancestry; the older cached v0.10.27 reader must not be used as current consumer evidence.
+
+Poison-prefix recovery remains a deployment gate: rejected rows require a separately fenced repair/quarantine or a qualified continuation mechanism so malformed records cannot starve later work. This read API deliberately grants no authority to overwrite foreign/malformed records or erase uncertain effect identity. No production tick is enabled by this slice. Private Firestore rules, deployed composite indexes, corrupted-row recovery and owning ibetican executor/producer integration remain pending.
+
+### Existing delayed-runtime adapter slice
+
+`RegisterExecutor` registers a primitive-argument worker through the already-used `strongo/delaying` factory. Producer, handler and queue are backend configuration; the task body carries only Space, subject, action, generation and opaque lease token. Payload validation rejects invalid/cross-producer input before invoking the owning callback. `Enqueue` uses the existing queue at zero delay only after the claim transaction commits; durable registry timing and expired-lease recovery supply correctness rather than an arbitrary long-future provider horizon.
+
+This adapter does not claim work, authorize business rules, open transactions, acknowledge completion or perform provider IO. Its owning callback must reload its current handler/revision/business authority and use transaction-bound `PrepareExecution`. The callback decides which obsolete deliveries are harmless no-ops; other errors propagate unchanged to the existing authenticated task host. An enqueue error or unknown response does not clear the durable lease or report business completion.
+
+The local round-trip harness captures the actual registered function and queued primitive arguments, then invokes that function against the real in-memory business transaction. Duplicate delivery applies the business transition once; cancellation between enqueue and delivery prevents the business write. Additional tests preserve the lease on enqueue uncertainty, retain expired-lease discovery, propagate owning errors, and reject invalid startup/payload values. Package tests/vet pass with100% statement coverage. This is provider-level local evidence, not actual Cloud Tasks serialization/authentication, ibetican handler integration or a published runtime.
+
+Storage companion PR85 in sneat-firebase adds Core scheduledWork privacy and due/lease index definitions. Its independently reviewed narrow rules candidate preserves unrelated live policy; the Core privacy matrix plus scope tests passed in the emulator (378tests). Fresh live rules at2026-11-02T16:12:37Z still had hash10ff5789a9af2d4dc3b78a27fdaab12d9a3a8591bb829763ffe59843ec6d6c87 and no scheduler exclusion. Production deployment/read-back, deployed index readiness, malformed-row recovery and actual consumer qualification remain required before job enablement.
+
+### Production storage checkpoint and adapter qualification gate
+
+Storage companion PR85 is merged at sneat-firebase3b3dcc54f6a9884a9601d8505f46210bcd7f6f8f. Exact-head and post-merge CI passed. The scheduler-only production rules workflow41483207616 succeeded; fresh read-back at2026-11-02T16:40:13Z is byte-identical to the independently reviewed narrow candidate, SHA2565a2e7ac77c1f7e856ef7378866a7d9df50e0d8a3889b8a790529999b84df8b98. Removing that one exclusion reproduces every byte of the prior live policy, preserving unrelated un-deployed changes. The additive index deployment workflow41482444330 succeeded, and a direct Admin metadata read at16:38:20Z confirmed both exact scheduledWork index resources READY. The Firebase companion was retired through scoped WB cleanup; active producer/provider work remains separate.
+
+Read-only real-adapter qualification then found a release blocker missed by memory tests: dalgo2firestorev0.10.41 renders an ordinary nested order field through FieldRef.String(), turning `claim.until` into `[claim.until]`, which the Firestore SDK rejects. The shared query is correct; equality predicates already use FieldRef.Name(). Cached adapterv0.10.42 has the same implementation. Correct the owning adapter to use the raw Name for ordinary FieldRef ordering while preserving typed DocumentID, publish it normally, then repeat both discovery paths through the actual adapter. Do not change Core to SQL-display field names or claim scheduler production readiness from READY indexes alone. No production job or product record was written by this qualification.
+
+### Bounded continuation checkpoint
+
+`DiscoverPage` now uses DALgo's existing opaque reader cursor to continue after the last consumed row, including a rejected row. A full all-rejected page can therefore yield a continuation rather than repeatedly hide later valid work. Each call retains its database/local limit; no OFFSET, scan loop, raw repair or foreign-record write is introduced. Missing, unchanged, oversized or failed cursor results discard every candidate and continuation. Closing/stream failure remains fail-closed. Existing `Discover` callers keep their first-batch behavior.
+
+The dispatcher must persist independent pending/expired-lease cycle positions, preserve producer/handler/state/cutoff/limit throughout each cycle, cap pages per tick, and restart with a fresh cutoff after EOF. This is live keyset traversal, not snapshot membership or a claimed deadline guarantee under sustained churn. Cursor persistence and owning-consumer dispatch remain implementation gates. An adapter that cannot provide a qualified composite cursor cannot enable this page API in production.
+
+The separate dalgo2firestore source slice at5fd1779ee3af39057297c561f042ec2f1ed642cb implements the existing Reader.Cursor contract without a new DALgo ABI. It binds an exclusive full-order position to the exact immutable native query, supports scalar ordered values and a final DocumentID, and rejects offset/implicit or legacy windows, oversized tokens, query changes and foreign references. Populated native-SDK/gRPC tests cover tied timestamps across Spaces, deleted boundaries, caller-query mutation and conversion failures. Independent review caught mutable-query binding and unusable generated values; both were corrected, and the adapter package tests/vet pass with100% statement coverage. At this checkpoint it was reviewed local source, not published registry bytes or production pagination evidence; the nested-field-ordering PR300 was awaiting its explicit WB merge exception.
+
+### Published adapter and owning-consumer qualification
+
+PR300 is now merged at d99c68c83e798c59d57e1bd9c60fa36b1485407e. Its post-merge workflow41503647033 passed and published dalgo2firestorev0.10.43 at that exact commit. A fresh Go-registry download has module sum `h1:oBcPH8FsMKbY+30yb13POwZOCm9sQrpiK6SAZDsqoRE=`; its query.go SHA25652caae3865d0c7fe509002fc8e1b358970b77bdfb84fee226883482663a18d54 matches the reviewed runtime source. The qualification executable asserts that its actual build dependency is v0.10.43 with no replacement. Both limited production discovery reads passed at2026-11-02T18:53:15Z with zero matching rows and no writes: pending by nextAttemptAt and expired leases by claim.until. This closes the ordinary nested-field ordering/publication gate; it does not prove populated pagination or execution against production data.
+
+The actual owning self-report consumer is implemented and independently reviewed in commitius118530f29bd404044ce01ef7a37ad04286530a55, reconciled with deployed main in99851c386d94b6fbeec9fee738a147124953f3a9. Its creation atomically inserts parent, immutable terms and deadline job; owner outcomes atomically cancel the scheduled generation. The internal worker checks the current claim, owner/Space/mode/snapshot/deadline and empty external-effect identity before one not-reported transition and completion in the same transaction. Real owning-facade tests cover orphan rejection, rollback of every creation write, terminal replay, corrupted intent/revision/Space, lease loss after a parent write, takeover, both cancellation/due-claim orderings and lost replies. The shared registered executor callback delivers the actual consumer twice and preserves one result. Scoped backend tests/vet and targeted races pass. This is local composition of exact staged source, not a released backend, a full-backend CI result or production runtime enablement.
+
+Cursor PR301 at adapterb5291626edcbe98c3b5f14a1b48400754a78b738 has exactly the approved5fd1779 source tree. Its release and registry-byte qualification are still required for the bounded paged dispatcher; v0.10.43 supplies the ordering fix and does not claim that cursor capability. Normal provider CI and review remain required. Before enabling any consumer, qualify durable independent scan-position/cutoff recovery, task-host serialization/authentication and actual host wiring. Owner amendments must replace expiry atomically before being exposed; legacy financial scheduling still requires its separately reviewed inventory/cutover. Neither Calendarius nor Debtus is changed by this provider.
+
+## Acceptance Criteria
+
+- **AC: scope** — Given missing/invalid Space or path-like identity, key creation fails without a global fallback; distinct valid producer/subject/action/Space identities do not alias.
+- **AC: durable-schedule** — Given create/edit/cancel and an uncertain response, business state and generation-bound scheduling commit atomically or neither commits. Duplicate and obsolete deliveries cannot restore old meaning.
+- **AC: due-index** — Given future/terminal prefixes and due/expired-lease work, bounded indexed database queries select the eligible batch without scanning business collections or the complete registry. Real storage/index qualification is required.
+- **AC: claim-fence** — Given a paused worker racing cancellation, replacement or lease takeover, the same transaction fences both claim and owning business effect/intent; stale acknowledgments also fail. Prove both race orderings.
+- **AC: honest-delivery** — Enqueue acknowledgment is not completion. External uncertainty retains the same effect identity and recovery; exhausted work is not a fulfilled obligation or a fabricated payment result.
+- **AC: reusable-consumers** — The public boundary supports ibetican now and Calendarius/Debtus compatibility later without importing product implementations. This change does not migrate either existing product or change financial rules.
+- **AC: connected-proof** — Provider release requires an actual owning consumer handler journey with the shared executor and current storage/rules/index evidence. A model-only test or unused API is insufficient.
+
+## Open Questions
+
+Transaction API ergonomics, concrete index definitions and first-consumer existing-record reconciliation remain implementation gates. The model slice does not resolve them or claim release readiness.
+
+---
+*This document follows the https://specscore.md/feature-specification*
