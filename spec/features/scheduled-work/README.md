@@ -43,6 +43,16 @@ The first source slice contains the model, validation and deterministic key fact
 
 Next implement the DAL transaction participant, indexed due/expired-lease reads, claim/intent/retry/completion operations and existing-executor adapter. Qualify the paused-worker cancellation/lease races, actual Firestore indexes/rules and an ibetican handler journey before provider publication and consumer enablement. Existing ibetican records require a reviewed reconciliation/cutover inventory; do not keep a hidden full-collection scan as a fallback.
 
+### Transaction participant slice
+
+`PrepareSchedule` and `PrepareCancel` read and validate the original stored metadata during the owning transaction's read phase. Their opaque `Change` captures that same transaction for later `Apply`; callers finish all business/scheduler reads before applying writes. No transaction is started and no external task/provider is called by these helpers. The producer still authorizes its own business mutation; this is not a public user API or worker claim implementation.
+
+Creation uses expected generation0. A replacement compares the expected current generation, advances it and creates pending work; exact prior-generation/spec replay acknowledges existing execution without resetting its result, attempts, lease or intent. Equal execution instants in different UTC offsets have the same request meaning. Cancellation advances the generation and clears a pending lease, while exact cancellation retries remain unchanged. An unresolved external-effect identity blocks replacement/cancellation; completed work reports explicit too-late cancellation rather than pretending to undo its effect.
+
+Original field whitelists reject unknown or case-aliased work/spec/reference/claim metadata before shared typed conversion, and the decoded reference must match the requested Space-owned key. Tests cover stable retries, cancelled-work resurrection attempts, malformed stored fields and mismatched Space identity. A real strict in-memory transaction first writes a business entity, then encounters an injected schedule-write failure; neither record survives rollback. Storage and candidate-validation failures expose no writable participant or partial state. Package tests/vet retain100% statement coverage. These are local source checks, not Firestore index, claim-race, authenticated execution or provider release evidence.
+
+Store review r1 found that JSON null on `effectKey` became an empty string during typed conversion, incorrectly treating malformed intent metadata as proven absence. Decoding now rejects explicit null for non-nullable scalar/object fields before conversion; omitted optional fields and deliberately nullable claim/completion pointers remain supported. Raw-row regressions require `Read`, replacement and cancellation to fail with no writable participant or persisted changes for null external-intent/attempt/failure metadata.
+
 ## Acceptance Criteria
 
 - **AC: scope** — Given missing/invalid Space or path-like identity, key creation fails without a global fallback; distinct valid producer/subject/action/Space identities do not alias.
