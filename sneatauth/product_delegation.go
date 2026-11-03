@@ -51,6 +51,10 @@ type FirebaseIdentity struct {
 	IssuedAt        time.Time
 	ExpiresAt       time.Time
 	SignInProvider  string
+	// ConsentValidUntil is the original independently verified consent deadline.
+	// It is separate from the actual native token expiry in ExpiresAt. Zero
+	// supplies no bounded consent proof; consumers must not invent a deadline.
+	ConsentValidUntil time.Time
 }
 
 // ProductDelegation is the authoritative product credential record and the
