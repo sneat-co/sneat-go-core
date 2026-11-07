@@ -141,6 +141,22 @@ func TestCycleStrictDecodeRejectsCorruptOrMismatchedCheckpoints(t *testing.T) {
 	}
 }
 
+func TestScanCycleValidateRejectsNonInstantCutoff(t *testing.T) {
+	f := newDispatchFixture(t)
+	cycle := &scanCycle{
+		SchemaVersion: 1,
+		Producer:      f.d.executor.producer,
+		Handler:       f.d.executor.handler,
+		State:         Pending,
+		PageSize:      f.d.options.PageSize,
+		Epoch:         1,
+		Cutoff:        time.Unix(1, 1).UTC(),
+	}
+	if err := cycle.validate(f.d, Pending); !errors.Is(err, ErrInvalid) {
+		t.Fatal(err)
+	}
+}
+
 type cycleFaultTx struct {
 	dal.ReadwriteTransaction
 	get    func(record.Record) error
