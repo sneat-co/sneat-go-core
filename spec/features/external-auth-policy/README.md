@@ -67,7 +67,7 @@ The package exposes three stable sentinel errors classified using `errors.Is`:
 - `VerifyRequest`:
   - On denial, returns an error classified as `facade.ErrUnauthorized` (via `%w: %v` wrapping).
   - Does not itself write the authentication-error response; existing origin/content validation behavior remains unchanged.
-  - Leaves the returned context without an authenticated `sneatauth.Token`.
+  - Does not add the rejected token to the returned context; callers must honor the returned error. Existing parent-context behavior remains unchanged.
 - `VerifyRequestAndCreateUserContext`:
   - On denial, returns a `nil` `ContextWithUser`, returns an error classified as `facade.ErrUnauthorized`, and writes an HTTP 401 response with JSON error details via `httpserver.HandleError`.
   - Rejects blank/whitespace UIDs before attempting to call `facade.NewUserContext`, preventing panics.
