@@ -12,6 +12,7 @@ Feature specifications for this project.
 |---------|--------|-------------|
 | [Slug claims](slug-claims/README.md) | Draft | A shared package for claiming human-readable slugs uniquely, whatever they name. A claim is a document whose **ID is the slug**, under an opaque **namespace**: |
 | [Shared scheduled work](scheduled-work/README.md) | Draft | Space-bounded durable background work using shared delayed execution, initially consumed by ibetican. |
+| [External auth policy](external-auth-policy/README.md) | Draft | Immutable reserved-UID policy and verifier wrapper for trusted external authentication composition. |
 
 ## Open Questions
 
