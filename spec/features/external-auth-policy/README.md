@@ -76,7 +76,7 @@ The package exposes three stable sentinel errors classified using `errors.Is`:
 
 ### 5. DAL Bypass Non-Interference
 
-`facade.SpaceAccessAuthorizedByCaller` is a Data Access Layer (DAL) contract opt-out that permits trusted internal space operations to bypass membership checks by returning an empty User ID. It does not contain an authenticated `sneatauth.Token`, cannot be minted or configured by HTTP headers/DTO bodies, and cannot bypass external token verification.
+`facade.SpaceAccessAuthorizedByCaller` is a Data Access Layer (DAL) contract opt-out that permits trusted internal space operations to bypass membership checks by returning an empty User ID. It creates no authenticated token and preserves existing parent-context values; it is not an authentication-clearing operation. It cannot be minted or configured by HTTP headers/DTO bodies, and cannot bypass external token verification.
 
 ## Downstream Activation Gate
 

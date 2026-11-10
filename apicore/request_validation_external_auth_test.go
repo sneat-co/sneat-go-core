@@ -35,52 +35,78 @@ func setupTestExternalVerifier(t *testing.T, returnedToken *sneatauth.Token, ret
 	GetAuthTokenFromHttpRequest = wrapped
 }
 
-func TestVerifyRequest_DeniedCases(t *testing.T) {
-	deniedCases := []struct {
-		name          string
-		returnedToken *sneatauth.Token
-		returnedErr   error
-		authRequired  bool
-	}{
-		{
-			name:          "reserved UID denied regardless of claims",
-			returnedToken: &sneatauth.Token{UID: testReservedUID, IsAdmin: true, Issuer: "https://auth.provider"},
-			returnedErr:   nil,
-			authRequired:  true,
-		},
-		{
-			name:          "reserved UID denied on optional auth",
-			returnedToken: &sneatauth.Token{UID: testReservedUID},
-			returnedErr:   nil,
-			authRequired:  false,
-		},
-		{
-			name:          "blank token UID rejected",
-			returnedToken: &sneatauth.Token{UID: ""},
-			returnedErr:   nil,
-			authRequired:  true,
-		},
-		{
-			name:          "whitespace-only token UID rejected",
-			returnedToken: &sneatauth.Token{UID: "   "},
-			returnedErr:   nil,
-			authRequired:  true,
-		},
-		{
-			name:          "required auth with nil token",
-			returnedToken: nil,
-			returnedErr:   nil,
-			authRequired:  true,
-		},
-		{
-			name:          "underlying provider error",
-			returnedToken: nil,
-			returnedErr:   errors.New("upstream provider unavailable"),
-			authRequired:  true,
-		},
-	}
+type httpEntryDenialCase struct {
+	name          string
+	returnedToken *sneatauth.Token
+	returnedErr   error
+	authRequired  bool
+}
 
-	for _, tc := range deniedCases {
+var httpEntryDenialCases = []httpEntryDenialCase{
+	{
+		name:          "reserved UID denied regardless of claims (required auth)",
+		returnedToken: &sneatauth.Token{UID: testReservedUID, IsAdmin: true, Issuer: "https://auth.provider"},
+		returnedErr:   nil,
+		authRequired:  true,
+	},
+	{
+		name:          "reserved UID denied on optional auth",
+		returnedToken: &sneatauth.Token{UID: testReservedUID},
+		returnedErr:   nil,
+		authRequired:  false,
+	},
+	{
+		name:          "blank token UID rejected (required auth)",
+		returnedToken: &sneatauth.Token{UID: ""},
+		returnedErr:   nil,
+		authRequired:  true,
+	},
+	{
+		name:          "blank token UID rejected on optional auth",
+		returnedToken: &sneatauth.Token{UID: ""},
+		returnedErr:   nil,
+		authRequired:  false,
+	},
+	{
+		name:          "whitespace-only token UID rejected (required auth)",
+		returnedToken: &sneatauth.Token{UID: "   "},
+		returnedErr:   nil,
+		authRequired:  true,
+	},
+	{
+		name:          "whitespace-only token UID rejected on optional auth",
+		returnedToken: &sneatauth.Token{UID: "   "},
+		returnedErr:   nil,
+		authRequired:  false,
+	},
+	{
+		name:          "required auth with nil token",
+		returnedToken: nil,
+		returnedErr:   nil,
+		authRequired:  true,
+	},
+	{
+		name:          "underlying provider error",
+		returnedToken: nil,
+		returnedErr:   errors.New("upstream provider unavailable"),
+		authRequired:  true,
+	},
+	{
+		name:          "token accompanied by provider error preserves provider error precedence (required auth)",
+		returnedToken: &sneatauth.Token{UID: "ordinary-user-token"},
+		returnedErr:   errors.New("upstream provider error takes precedence"),
+		authRequired:  true,
+	},
+	{
+		name:          "token accompanied by provider error on optional auth preserves provider error precedence",
+		returnedToken: &sneatauth.Token{UID: "ordinary-user-token"},
+		returnedErr:   errors.New("upstream provider error takes precedence optional"),
+		authRequired:  false,
+	},
+}
+
+func TestVerifyRequest_DeniedCases(t *testing.T) {
+	for _, tc := range httpEntryDenialCases {
 		t.Run(tc.name, func(t *testing.T) {
 			setupTestExternalVerifier(t, tc.returnedToken, tc.returnedErr)
 
@@ -142,45 +168,7 @@ func TestVerifyRequest_SuccessCases(t *testing.T) {
 }
 
 func TestVerifyRequestAndCreateUserContext_DeniedCases(t *testing.T) {
-	deniedCases := []struct {
-		name          string
-		returnedToken *sneatauth.Token
-		returnedErr   error
-		authRequired  bool
-	}{
-		{
-			name:          "reserved UID denied",
-			returnedToken: &sneatauth.Token{UID: testReservedUID, IsAdmin: true},
-			returnedErr:   nil,
-			authRequired:  true,
-		},
-		{
-			name:          "blank UID rejected before user context creation",
-			returnedToken: &sneatauth.Token{UID: ""},
-			returnedErr:   nil,
-			authRequired:  true,
-		},
-		{
-			name:          "whitespace-only UID rejected before user context creation",
-			returnedToken: &sneatauth.Token{UID: "   "},
-			returnedErr:   nil,
-			authRequired:  true,
-		},
-		{
-			name:          "required auth with nil token",
-			returnedToken: nil,
-			returnedErr:   nil,
-			authRequired:  true,
-		},
-		{
-			name:          "provider error",
-			returnedToken: nil,
-			returnedErr:   errors.New("db network error"),
-			authRequired:  true,
-		},
-	}
-
-	for _, tc := range deniedCases {
+	for _, tc := range httpEntryDenialCases {
 		t.Run(tc.name, func(t *testing.T) {
 			setupTestExternalVerifier(t, tc.returnedToken, tc.returnedErr)
 
@@ -319,13 +307,27 @@ func TestExternalAuth_DTOHeadersAndDALBypassCannotMintAuthority(t *testing.T) {
 	assert.Nil(t, ctxWithUser)
 	assert.Equal(t, http.StatusUnauthorized, w2.Code)
 
-	// SpaceAccessAuthorizedByCaller is a DAL contract opt-out, not authentication
+	// SpaceAccessAuthorizedByCaller is a DAL contract opt-out, not authentication.
+	// 1. An empty parent gains no authenticated token.
 	baseCtx := req.Context()
-	dalBypassCtx := facade.SpaceAccessAuthorizedByCaller(baseCtx)
-	require.NotNil(t, dalBypassCtx)
-	require.NotNil(t, dalBypassCtx.User())
-	// Its user ID is deliberately empty to bypass DAL space membership checks
-	assert.Equal(t, "", dalBypassCtx.User().GetUserID())
-	// It does NOT establish a sneatauth.Token
-	assert.Nil(t, sneatauth.AuthTokenFromContext(dalBypassCtx))
+	dalBypassEmpty := facade.SpaceAccessAuthorizedByCaller(baseCtx)
+	require.NotNil(t, dalBypassEmpty)
+	require.NotNil(t, dalBypassEmpty.User())
+	assert.Equal(t, "", dalBypassEmpty.User().GetUserID(), "DAL bypass user ID is deliberately empty")
+	assert.Nil(t, sneatauth.AuthTokenFromContext(dalBypassEmpty), "empty parent context still gains no token")
+
+	// 2. A parent with an existing authenticated token preserves that exact token alongside the empty DAL userID.
+	ordinaryToken := &sneatauth.Token{
+		UID:    "ordinary-user-789",
+		Issuer: "https://auth.provider",
+	}
+	parentWithToken := sneatauth.NewContextWithAuthToken(baseCtx, ordinaryToken)
+	dalBypassWithToken := facade.SpaceAccessAuthorizedByCaller(parentWithToken)
+	require.NotNil(t, dalBypassWithToken)
+	require.NotNil(t, dalBypassWithToken.User())
+	assert.Equal(t, "", dalBypassWithToken.User().GetUserID(), "DAL bypass user ID remains empty")
+	survivingToken := sneatauth.AuthTokenFromContext(dalBypassWithToken)
+	require.NotNil(t, survivingToken)
+	assert.Same(t, ordinaryToken, survivingToken, "SpaceAccessAuthorizedByCaller preserves existing parent context authToken pointer")
+	assert.Equal(t, "ordinary-user-789", survivingToken.UID)
 }

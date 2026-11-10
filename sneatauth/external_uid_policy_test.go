@@ -334,28 +334,36 @@ func TestWrapExternalTokenVerifier_RequestAndFlagForwarding(t *testing.T) {
 	policy, err := NewReservedExternalUIDPolicy([]string{"sys-admin-uid"})
 	require.NoError(t, err)
 
-	var capturedReq *http.Request
-	var capturedAuthRequired bool
-	callCount := 0
+	for _, expectedFlag := range []bool{true, false} {
+		testName := "authRequired=false"
+		if expectedFlag {
+			testName = "authRequired=true"
+		}
+		t.Run(testName, func(t *testing.T) {
+			var capturedReq *http.Request
+			var capturedAuthRequired bool
+			callCount := 0
 
-	verifier := func(r *http.Request, authRequired bool) (*Token, error) {
-		callCount++
-		capturedReq = r
-		capturedAuthRequired = authRequired
-		return &Token{UID: "user-1"}, nil
+			verifier := func(r *http.Request, authRequired bool) (*Token, error) {
+				callCount++
+				capturedReq = r
+				capturedAuthRequired = authRequired
+				return &Token{UID: "user-1"}, nil
+			}
+
+			wrapper, err := WrapExternalTokenVerifier(verifier, policy)
+			require.NoError(t, err)
+
+			targetReq := httptest.NewRequest(http.MethodPost, "/api/endpoint", nil)
+			tok, err := wrapper(targetReq, expectedFlag)
+			require.NoError(t, err)
+			assert.NotNil(t, tok)
+
+			assert.Equal(t, 1, callCount, "captured verifier must be called exactly once")
+			assert.Same(t, targetReq, capturedReq, "captured verifier must receive identical request pointer")
+			assert.Equal(t, expectedFlag, capturedAuthRequired, "captured verifier must receive identical authRequired flag")
+		})
 	}
-
-	wrapper, err := WrapExternalTokenVerifier(verifier, policy)
-	require.NoError(t, err)
-
-	targetReq := httptest.NewRequest(http.MethodPost, "/api/endpoint", nil)
-	tok, err := wrapper(targetReq, true)
-	require.NoError(t, err)
-	assert.NotNil(t, tok)
-
-	assert.Equal(t, 1, callCount, "captured verifier must be called exactly once")
-	assert.Same(t, targetReq, capturedReq, "captured verifier must receive identical request pointer")
-	assert.True(t, capturedAuthRequired, "captured verifier must receive identical authRequired flag")
 }
 
 func TestWrapExternalTokenVerifier_RepeatedCallsEvaluatedPerInvocation(t *testing.T) {
