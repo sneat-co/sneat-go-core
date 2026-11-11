@@ -4,11 +4,11 @@ module github.com/sneat-co/sneat-go-core
 
 go 1.26.0
 
-toolchain go1.27.3
+toolchain go1.27.4
 
 require (
 	github.com/crediterra/money v0.4.2
-	github.com/dal-go/dalgo v0.102.2
+	github.com/dal-go/dalgo v0.102.3
 	github.com/dal-go/record v0.1.5
 	github.com/stretchr/testify v1.12.1
 	github.com/strongo/analytics v0.2.12
@@ -19,7 +19,7 @@ require (
 	github.com/strongo/strongoapp v0.31.72
 	github.com/strongo/validation v0.0.17
 	go.uber.org/mock v0.6.0
-	golang.org/x/text v0.43.0
+	golang.org/x/text v0.44.0
 )
 
 require (
