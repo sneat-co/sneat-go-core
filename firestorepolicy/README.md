@@ -9,6 +9,9 @@ placement under `ext/{extension}`, `spaces/{space}/ext/{extension}`, and
 unique subset of `extensions`: those owners have placement only below
 `spaces/{space}/ext/{extension}`. Their global and user-owned paths remain
 denied. Sizeus owns `spaces/{space}/ext/sizeus/sizes/{id}` and is space-only.
+Emailing (the sneat-core-modules queued-email pipeline) owns the server-only
+records at `ext/emailing/emails/{id}`; the former root `EmailAddress` stays
+unapproved.
 No root collection or legacy-write permission is added by registration.
 
 This is an additive schema-version-2 codec extension. New readers accept older
