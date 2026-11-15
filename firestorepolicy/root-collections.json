@@ -20,6 +20,7 @@
   "extensions": [
     "aicloud",
     "aigateway",
+    "askstage",
     "assetus",
     "auth",
     "bidding-tictactoe",

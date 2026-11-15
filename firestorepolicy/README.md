@@ -12,6 +12,10 @@ denied. Sizeus owns `spaces/{space}/ext/sizeus/sizes/{id}` and is space-only.
 Emailing (the sneat-core-modules queued-email pipeline) owns the server-only
 records at `ext/emailing/emails/{id}`; the former root `EmailAddress` stays
 unapproved.
+AskStage is registered with default placement, not space-only: besides its
+Space records under `spaces/{space}/ext/askstage`, it owns two global paths
+outside any Space, the public show note `ext/askstage/showStamps/{stampID}` and
+the short-address claims `ext/askstage/slugNamespaces/show/claims/{code}`.
 No root collection or legacy-write permission is added by registration.
 
 This is an additive schema-version-2 codec extension. New readers accept older
