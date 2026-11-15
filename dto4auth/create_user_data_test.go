@@ -44,4 +44,28 @@ func TestDataToCreateUser_Validate(t *testing.T) {
 			t.Fatalf("expected valid data, got error: %v", err)
 		}
 	})
+
+	t.Run("known_gender", func(t *testing.T) {
+		for _, g := range []string{"", "male", "female", "other", "undisclosed", "unknown", "nonbinary"} {
+			d := DataToCreateUser{
+				AuthAccount:  validAccount,
+				RemoteClient: validRemoteClient,
+				Gender:       g,
+			}
+			if err := d.Validate(); err != nil {
+				t.Errorf("gender %q: expected valid data, got error: %v", g, err)
+			}
+		}
+	})
+
+	t.Run("unknown_gender", func(t *testing.T) {
+		d := DataToCreateUser{
+			AuthAccount:  validAccount,
+			RemoteClient: validRemoteClient,
+			Gender:       "<script>",
+		}
+		if err := d.Validate(); err == nil {
+			t.Fatal("expected error for a gender outside dbmodels.Genders")
+		}
+	})
 }
