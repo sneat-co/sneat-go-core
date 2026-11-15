@@ -1,10 +1,12 @@
 package dto4auth
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/sneat-co/sneat-go-core/models/dbmodels"
 	"github.com/strongo/strongoapp/appuser"
+	"github.com/strongo/validation"
 )
 
 func TestDataToCreateUser_Validate(t *testing.T) {
@@ -46,7 +48,7 @@ func TestDataToCreateUser_Validate(t *testing.T) {
 	})
 
 	t.Run("known_gender", func(t *testing.T) {
-		for _, g := range []string{"", "male", "female", "other", "undisclosed", "unknown", "nonbinary"} {
+		for _, g := range append([]string{""}, dbmodels.Genders...) {
 			d := DataToCreateUser{
 				AuthAccount:  validAccount,
 				RemoteClient: validRemoteClient,
@@ -64,8 +66,18 @@ func TestDataToCreateUser_Validate(t *testing.T) {
 			RemoteClient: validRemoteClient,
 			Gender:       "<script>",
 		}
-		if err := d.Validate(); err == nil {
+		err := d.Validate()
+		if err == nil {
 			t.Fatal("expected error for a gender outside dbmodels.Genders")
+		}
+		if !validation.IsBadRequestError(err) {
+			t.Errorf("expected a bad-request error, got %T: %v", err, err)
+		}
+		if !strings.Contains(err.Error(), "gender") {
+			t.Errorf("error does not name the gender field: %v", err)
+		}
+		if strings.Contains(err.Error(), "<script>") {
+			t.Errorf("error echoes the refused value: %v", err)
 		}
 	})
 }
