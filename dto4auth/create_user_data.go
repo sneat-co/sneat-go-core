@@ -13,11 +13,13 @@ type DataToCreateUser struct {
 	AuthAccount     appuser.AccountKey
 	Email           string
 	EmailIsVerified bool
-	IanaTimezone    string
-	LanguageCode    string
-	Names           person.NameFields
-	PhotoURL        string
-	RemoteClient    dbmodels.RemoteClientInfo
+	// Gender is optional; when set it must be one of dbmodels.Genders.
+	Gender       dbmodels.Gender
+	IanaTimezone string
+	LanguageCode string
+	Names        person.NameFields
+	PhotoURL     string
+	RemoteClient dbmodels.RemoteClientInfo
 }
 
 func (v DataToCreateUser) Validate() error {
@@ -26,6 +28,10 @@ func (v DataToCreateUser) Validate() error {
 	}
 	if err := v.RemoteClient.Validate(); err != nil {
 		return fmt.Errorf("invalid remote client: %w", err)
+	}
+	// The value is not echoed: it is untrusted client text.
+	if !dbmodels.IsKnownGenderOrEmpty(v.Gender) {
+		return validation.NewErrBadRequestFieldValue("gender", "unknown gender")
 	}
 	return nil
 }
