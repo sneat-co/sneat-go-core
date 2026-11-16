@@ -331,3 +331,27 @@ func TestExternalAuth_DTOHeadersAndDALBypassCannotMintAuthority(t *testing.T) {
 	assert.Same(t, ordinaryToken, survivingToken, "SpaceAccessAuthorizedByCaller preserves existing parent context authToken pointer")
 	assert.Equal(t, "ordinary-user-789", survivingToken.UID)
 }
+
+// A verified token with a blank or whitespace UID must yield 401, never a panic (#195).
+func TestVerifyRequestAndCreateUserContext_BlankUID(t *testing.T) {
+	for _, uid := range []string{"", "   ", "\t\n"} {
+		for _, authRequired := range []bool{true, false} {
+			orig := GetAuthTokenFromHttpRequest
+			t.Cleanup(func() { GetAuthTokenFromHttpRequest = orig })
+			GetAuthTokenFromHttpRequest = func(*http.Request, bool) (*sneatauth.Token, error) {
+				return &sneatauth.Token{UID: uid}, nil
+			}
+			w := httptest.NewRecorder()
+			r := httptest.NewRequest(http.MethodGet, "/api/resource", nil)
+			options := verify.Request(verify.AuthenticationRequired(authRequired))
+
+			var err error
+			require.NotPanics(t, func() {
+				_, err = VerifyRequestAndCreateUserContext(w, r, options)
+			})
+			require.Error(t, err)
+			assert.True(t, errors.Is(err, facade.ErrUnauthorized))
+			assert.Equal(t, http.StatusUnauthorized, w.Code)
+		}
+	}
+}
