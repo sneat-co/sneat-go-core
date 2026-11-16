@@ -14,6 +14,7 @@ import (
 	"github.com/strongo/logus"
 	"io"
 	"net/http"
+	"strings"
 )
 
 var errBadOrigin = errors.New("bad origin")
@@ -67,6 +68,11 @@ var VerifyRequestAndCreateUserContext = func(
 		return
 	}
 	if token := sneatauth.AuthTokenFromContext(ctx); token != nil {
+		if strings.TrimSpace(token.UID) == "" {
+			err = fmt.Errorf("%w: auth token has a blank user ID", facade.ErrUnauthorized)
+			httpserver.HandleError(ctx, err, from, w, r)
+			return
+		}
 		ctxWithUser = facade.NewContextWithUserID(ctx, token.UID)
 	}
 	//if ctxWithUser, err = authContext.userContext(r.Context(), options.AuthenticationRequired()); err != nil {
