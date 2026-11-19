@@ -19,7 +19,7 @@ the short-address claims `ext/askstage/slugNamespaces/show/claims/{code}`.
 Videostreaming is registered with default placement, not space-only: it owns
 the global channel records at
 `ext/videostreaming/platforms/{platform}/channels/{channelID}` with
-`destinations` (encrypted stream keys), `backgrounds` and `events` below.
+`destinations` (encrypted stream keys), `backgrounds` and `streamEvents` below.
 Channels are global by design (founder ruling, 2026-11-19: "not at space");
 the registry has no global-only mode, so its Space and user placement is
 allowed but unused. Its records are server-only in the Firebase rules.
