@@ -40,6 +40,7 @@ func TestVideostreamingExtensionPlacement(t *testing.T) {
 		{"destination", record.NewKeyWithParentAndID(channel, "destinations", "dV3r9x"), true},
 		{"background", record.NewKeyWithParentAndID(channel, "backgrounds", "bg_k2Pz"), true},
 		{"event", record.NewKeyWithParentAndID(channel, "events", "ev1"), true},
+		{"unknown extension", record.NewKeyWithParentAndID(record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "unknown-videostreaming"), "platforms", "youtube"), "channels", "x"), false},
 		{"unapproved videostreaming root", record.NewKeyWithID("videostreaming", "x"), false},
 		{"unapproved channels root", record.NewKeyWithID("channels", "UCa1B2c3D4e5F6g7H8i9J0kL"), false},
 	}

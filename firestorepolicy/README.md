@@ -16,6 +16,13 @@ AskStage is registered with default placement, not space-only: besides its
 Space records under `spaces/{space}/ext/askstage`, it owns two global paths
 outside any Space, the public show note `ext/askstage/showStamps/{stampID}` and
 the short-address claims `ext/askstage/slugNamespaces/show/claims/{code}`.
+Videostreaming is registered with default placement, not space-only: it owns
+the global channel records at
+`ext/videostreaming/platforms/{platform}/channels/{channelID}` with
+`destinations` (encrypted stream keys), `backgrounds` and `events` below.
+Channels are global by design (founder ruling, 2026-11-19: "not at space");
+the registry has no global-only mode, so its Space and user placement is
+allowed but unused. Its records are server-only in the Firebase rules.
 No root collection or legacy-write permission is added by registration.
 
 This is an additive schema-version-2 codec extension. New readers accept older
