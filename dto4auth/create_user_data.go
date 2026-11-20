@@ -13,6 +13,8 @@ type DataToCreateUser struct {
 	AuthAccount     appuser.AccountKey
 	Email           string
 	EmailIsVerified bool
+	// AgeGroup is optional; when set it must be one of dbmodels.AgeGroups.
+	AgeGroup string
 	// Gender is optional; when set it must be one of dbmodels.Genders.
 	Gender       dbmodels.Gender
 	IanaTimezone string
@@ -32,6 +34,9 @@ func (v DataToCreateUser) Validate() error {
 	// The value is not echoed: it is untrusted client text.
 	if !dbmodels.IsKnownGenderOrEmpty(v.Gender) {
 		return validation.NewErrBadRequestFieldValue("gender", "unknown gender")
+	}
+	if !dbmodels.IsKnownAgeGroupOrEmpty(v.AgeGroup) {
+		return validation.NewErrBadRequestFieldValue("ageGroup", "unknown age group")
 	}
 	return nil
 }
