@@ -7,6 +7,8 @@ type Token struct {
 	UID    string `json:"uid,omitempty"`
 	Issuer string `json:"issuer,omitempty"`
 	// IsAdmin is true only for an explicitly verified boolean admin claim.
+	// It is not the Sneat admin rule: decide admin access with
+	// IsPlatformAdmin, never with this field.
 	IsAdmin bool `json:"isAdmin,omitempty"`
 	// Email is the verified credential's email claim, as issued.
 	Email string `json:"email,omitempty"`

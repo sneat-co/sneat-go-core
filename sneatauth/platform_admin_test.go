@@ -17,14 +17,17 @@ func TestIsPlatformAdmin(t *testing.T) {
 	}{
 		{name: "nil token", token: nil, want: false},
 		{name: "google admin", token: admin(nil), want: true},
-		{name: "microsoft admin", token: admin(func(t *Token) { t.SignInProvider = SignInProviderMicrosoft }), want: true},
 		{name: "email case and spaces", token: admin(func(t *Token) { t.Email = "  Alex@Sneat.CO " }), want: true},
 		{name: "no UID", token: admin(func(t *Token) { t.UID = "" }), want: false},
+		{name: "blank UID", token: admin(func(t *Token) { t.UID = "  " }), want: false},
 		{name: "unverified email", token: admin(func(t *Token) { t.EmailVerified = false }), want: false},
 		{name: "former gmail admin", token: admin(func(t *Token) { t.Email = "alexander.trakhimenok@gmail.com" }), want: false},
 		{name: "other email", token: admin(func(t *Token) { t.Email = "mallory@sneat.co" }), want: false},
 		{name: "lookalike email", token: admin(func(t *Token) { t.Email = "alex@sneat.co.evil.example" }), want: false},
+		{name: "unicode long s folds to s", token: admin(func(t *Token) { t.Email = "alex@ſneat.co" }), want: false},
+		{name: "same-length non-ascii", token: admin(func(t *Token) { t.Email = "alex@sneat.cö"[:len(PlatformAdminEmail)] }), want: false},
 		{name: "empty email", token: admin(func(t *Token) { t.Email = "" }), want: false},
+		{name: "microsoft provider", token: admin(func(t *Token) { t.SignInProvider = "microsoft.com" }), want: false},
 		{name: "password provider", token: admin(func(t *Token) { t.SignInProvider = "password" }), want: false},
 		{name: "custom token provider", token: admin(func(t *Token) { t.SignInProvider = "custom" }), want: false},
 		{name: "no provider", token: admin(func(t *Token) { t.SignInProvider = "" }), want: false},
@@ -40,8 +43,8 @@ func TestIsPlatformAdmin(t *testing.T) {
 }
 
 func TestHasTrustedEmail(t *testing.T) {
-	if !HasTrustedEmail(&Token{UID: "u", Email: "someone@example.com", EmailVerified: true, SignInProvider: SignInProviderMicrosoft}) {
-		t.Fatal("verified Microsoft email must be trusted")
+	if !HasTrustedEmail(&Token{UID: "u", Email: "someone@example.com", EmailVerified: true, SignInProvider: SignInProviderGoogle}) {
+		t.Fatal("verified Google email must be trusted")
 	}
 	if HasTrustedEmail(&Token{UID: "u", Email: "  ", EmailVerified: true, SignInProvider: SignInProviderGoogle}) {
 		t.Fatal("blank email must not be trusted")
