@@ -12,10 +12,10 @@ denied. Sizeus owns `spaces/{space}/ext/sizeus/sizes/{id}` and is space-only.
 Emailing (the sneat-core-modules queued-email pipeline) owns the server-only
 records at `ext/emailing/emails/{id}`; the former root `EmailAddress` stays
 unapproved.
-AskStage is registered with default placement, not space-only: besides its
-Space records under `spaces/{space}/ext/askstage`, it owns two global paths
-outside any Space, the public show note `ext/askstage/showStamps/{stampID}` and
-the short-address claims `ext/askstage/slugNamespaces/show/claims/{code}`.
+AskMic is registered with default placement, not space-only: besides its
+Space records under `spaces/{space}/ext/askmic`, it owns two global paths
+outside any Space, the public show note `ext/askmic/showStamps/{stampID}` and
+the short-address claims `ext/askmic/slugNamespaces/show/claims/{code}`.
 Videostreaming is registered with default placement, not space-only: it owns
 the global channel records at
 `ext/videostreaming/platforms/{platform}/channels/{channelID}` with
