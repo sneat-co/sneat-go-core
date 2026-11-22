@@ -10,28 +10,28 @@ import (
 	"github.com/dal-go/record"
 )
 
-// AskStage owns Space records and two global paths outside any Space: the
-// public show note ext/askstage/showStamps/{stampID} and the short-address
-// claims ext/askstage/slugNamespaces/show/claims/{code}. It must therefore not
+// AskMic owns Space records and two global paths outside any Space: the
+// public show note ext/askmic/showStamps/{stampID} and the short-address
+// claims ext/askmic/slugNamespaces/show/claims/{code}. It must therefore not
 // be space-only.
-func TestAskstageExtensionPlacement(t *testing.T) {
+func TestAskmicExtensionPlacement(t *testing.T) {
 	r, _, err := DefaultRootRegistry()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !slices.Contains(r.Extensions, "askstage") {
-		t.Fatal("askstage is not a registered extension")
+	if !slices.Contains(r.Extensions, "askmic") {
+		t.Fatal("askmic is not a registered extension")
 	}
-	if slices.Contains(r.SpaceOnlyExtensions, "askstage") {
-		t.Fatal("askstage must not be space-only: it owns global paths")
+	if slices.Contains(r.SpaceOnlyExtensions, "askmic") {
+		t.Fatal("askmic must not be space-only: it owns global paths")
 	}
 	policy, err := r.RootPolicy()
 	if err != nil {
 		t.Fatal(err)
 	}
-	global := record.NewKeyWithID("ext", "askstage")
+	global := record.NewKeyWithID("ext", "askmic")
 	space := record.NewKeyWithID("spaces", "space1")
-	spaceExt := record.NewKeyWithParentAndID(space, "ext", "askstage")
+	spaceExt := record.NewKeyWithParentAndID(space, "ext", "askmic")
 	tests := []struct {
 		name    string
 		key     *record.Key
@@ -41,8 +41,8 @@ func TestAskstageExtensionPlacement(t *testing.T) {
 		{"global show code claim", record.NewKeyWithParentAndID(record.NewKeyWithParentAndID(global, "slugNamespaces", "show"), "claims", "k7f2xm"), true},
 		{"space record", spaceExt, true},
 		{"space show record", record.NewKeyWithParentAndID(spaceExt, "shows", "show1"), true},
-		{"unknown extension", record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "unknown-askstage"), "showStamps", "stamp1"), false},
-		{"unapproved askstage root", record.NewKeyWithID("askstage", "show1"), false},
+		{"unknown extension", record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "unknown-askmic"), "showStamps", "stamp1"), false},
+		{"unapproved askmic root", record.NewKeyWithID("askmic", "show1"), false},
 		{"unapproved showStamps root", record.NewKeyWithID("showStamps", "stamp1"), false},
 	}
 	for _, tc := range tests {
