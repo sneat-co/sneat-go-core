@@ -279,7 +279,7 @@ func TestValidateArgs_edgeCases(t *testing.T) {
 
 	// Required string slice that is empty
 	reqSliceDef := ActionDef{
-		ID: "test.req",
+		ID:   "test.req",
 		Args: []ArgDef{{Name: "items", Type: ArgTypeStringSlice, Required: true}},
 	}
 	if _, err := reqSliceDef.ValidateArgs(map[string]any{"items": []string{}}); err == nil {
@@ -293,4 +293,3 @@ func TestNextRune_atEnd(t *testing.T) {
 		t.Errorf("expected 0 for nextRune at end of slice")
 	}
 }
-

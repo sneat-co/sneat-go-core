@@ -276,4 +276,3 @@ func TestRuleMatch_edgeCases(t *testing.T) {
 		t.Errorf("expected 'trail$', got %v", args["text"])
 	}
 }
-

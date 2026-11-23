@@ -38,8 +38,8 @@ func TestPermissions_Validate(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "invalid created fields",
-			v: Permissions{const4acl.PermittedToView: with.CreatedFields{}},
+			name:    "invalid created fields",
+			v:       Permissions{const4acl.PermittedToView: with.CreatedFields{}},
 			wantErr: true,
 		},
 	}
