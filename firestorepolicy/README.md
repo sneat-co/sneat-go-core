@@ -12,10 +12,10 @@ denied. Sizeus owns `spaces/{space}/ext/sizeus/sizes/{id}` and is space-only.
 Emailing (the sneat-core-modules queued-email pipeline) owns the server-only
 records at `ext/emailing/emails/{id}`; the former root `EmailAddress` stays
 unapproved.
-AMAStage is registered with default placement, not space-only: besides its
-Space records under `spaces/{space}/ext/amastage`, it owns two global paths
-outside any Space, the public show note `ext/amastage/showStamps/{stampID}` and
-the short-address claims `ext/amastage/slugNamespaces/show/claims/{code}`.
+QnAStage is registered with default placement, not space-only: besides its
+Space records under `spaces/{space}/ext/qnastage`, it owns two global paths
+outside any Space, the public show note `ext/qnastage/showStamps/{stampID}` and
+the short-address claims `ext/qnastage/slugNamespaces/show/claims/{code}`.
 Videostreaming is registered with default placement, not space-only: it owns
 the global channel records at
 `ext/videostreaming/platforms/{platform}/channels/{channelID}` with
