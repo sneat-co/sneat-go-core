@@ -10,28 +10,28 @@ import (
 	"github.com/dal-go/record"
 )
 
-// AMAStage owns Space records and two global paths outside any Space: the
-// public show note ext/amastage/showStamps/{stampID} and the short-address
-// claims ext/amastage/slugNamespaces/show/claims/{code}. It must therefore not
+// QnAStage owns Space records and two global paths outside any Space: the
+// public show note ext/qnastage/showStamps/{stampID} and the short-address
+// claims ext/qnastage/slugNamespaces/show/claims/{code}. It must therefore not
 // be space-only.
-func TestAmastageExtensionPlacement(t *testing.T) {
+func TestQnastageExtensionPlacement(t *testing.T) {
 	r, _, err := DefaultRootRegistry()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !slices.Contains(r.Extensions, "amastage") {
-		t.Fatal("amastage is not a registered extension")
+	if !slices.Contains(r.Extensions, "qnastage") {
+		t.Fatal("qnastage is not a registered extension")
 	}
-	if slices.Contains(r.SpaceOnlyExtensions, "amastage") {
-		t.Fatal("amastage must not be space-only: it owns global paths")
+	if slices.Contains(r.SpaceOnlyExtensions, "qnastage") {
+		t.Fatal("qnastage must not be space-only: it owns global paths")
 	}
 	policy, err := r.RootPolicy()
 	if err != nil {
 		t.Fatal(err)
 	}
-	global := record.NewKeyWithID("ext", "amastage")
+	global := record.NewKeyWithID("ext", "qnastage")
 	space := record.NewKeyWithID("spaces", "space1")
-	spaceExt := record.NewKeyWithParentAndID(space, "ext", "amastage")
+	spaceExt := record.NewKeyWithParentAndID(space, "ext", "qnastage")
 	tests := []struct {
 		name    string
 		key     *record.Key
@@ -41,8 +41,8 @@ func TestAmastageExtensionPlacement(t *testing.T) {
 		{"global show code claim", record.NewKeyWithParentAndID(record.NewKeyWithParentAndID(global, "slugNamespaces", "show"), "claims", "k7f2xm"), true},
 		{"space record", spaceExt, true},
 		{"space show record", record.NewKeyWithParentAndID(spaceExt, "shows", "show1"), true},
-		{"unknown extension", record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "unknown-amastage"), "showStamps", "stamp1"), false},
-		{"unapproved amastage root", record.NewKeyWithID("amastage", "show1"), false},
+		{"unknown extension", record.NewKeyWithParentAndID(record.NewKeyWithID("ext", "unknown-qnastage"), "showStamps", "stamp1"), false},
+		{"unapproved qnastage root", record.NewKeyWithID("qnastage", "show1"), false},
 		{"unapproved showStamps root", record.NewKeyWithID("showStamps", "stamp1"), false},
 	}
 	for _, tc := range tests {
