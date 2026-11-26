@@ -8,16 +8,16 @@ toolchain go1.27.4
 
 require (
 	github.com/crediterra/money v0.4.2
-	github.com/dal-go/dalgo v0.102.3
+	github.com/dal-go/dalgo v0.102.6
 	github.com/dal-go/record v0.1.5
 	github.com/stretchr/testify v1.12.1
-	github.com/strongo/analytics v0.2.12
-	github.com/strongo/delaying v0.2.10
+	github.com/strongo/analytics v0.2.13
+	github.com/strongo/delaying v0.2.11
 	github.com/strongo/gotwilio v0.0.0-20160123000810-f024bbefe80f
-	github.com/strongo/logus v0.4.8
-	github.com/strongo/slice v0.3.14
-	github.com/strongo/strongoapp v0.31.72
-	github.com/strongo/validation v0.0.17
+	github.com/strongo/logus v0.4.9
+	github.com/strongo/slice v0.3.15
+	github.com/strongo/strongoapp v0.31.74
+	github.com/strongo/validation v0.0.18
 	go.uber.org/mock v0.6.0
 	golang.org/x/text v0.44.0
 )
