@@ -16,6 +16,7 @@ on:
     branches:
       - '**'
     paths:
+      - '.github/renovate.json'
       - '.github/workflows/**.yml'
       - '**/go.*'
       - '**/*.go'

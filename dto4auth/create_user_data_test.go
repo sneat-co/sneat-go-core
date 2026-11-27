@@ -81,3 +81,32 @@ func TestDataToCreateUser_Validate(t *testing.T) {
 		}
 	})
 }
+
+func TestDataToCreateUser_Validate_AgeGroup(t *testing.T) {
+	validAccount := appuser.AccountKey{Provider: "google", ID: "uid-1"}
+	validRemoteClient := dbmodels.RemoteClientInfo{HostOrApp: "unit-test", RemoteAddr: "127.0.0.1"}
+	t.Run("known_age_group", func(t *testing.T) {
+		for _, g := range append([]string{""}, dbmodels.AgeGroups...) {
+			d := DataToCreateUser{AuthAccount: validAccount, RemoteClient: validRemoteClient, AgeGroup: g}
+			if err := d.Validate(); err != nil {
+				t.Errorf("ageGroup %q: expected valid data, got error: %v", g, err)
+			}
+		}
+	})
+	t.Run("unknown_age_group", func(t *testing.T) {
+		d := DataToCreateUser{AuthAccount: validAccount, RemoteClient: validRemoteClient, AgeGroup: "<script>"}
+		err := d.Validate()
+		if err == nil {
+			t.Fatal("expected error for an age group outside dbmodels.AgeGroups")
+		}
+		if !validation.IsBadRequestError(err) {
+			t.Errorf("expected a bad-request error, got %T: %v", err, err)
+		}
+		if !strings.Contains(err.Error(), "ageGroup") {
+			t.Errorf("error does not name the ageGroup field: %v", err)
+		}
+		if strings.Contains(err.Error(), "<script>") {
+			t.Errorf("error echoes the refused value: %v", err)
+		}
+	})
+}
