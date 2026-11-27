@@ -107,6 +107,15 @@ func SpaceAccessAuthorizedByCaller(ctx context.Context) ContextWithUser {
 	return NewContextWithUser(ctx, spaceAccessAuthorizedByCallerContext{})
 }
 
+// IsSpaceAccessAuthorizedByCaller reports whether user is the context
+// SpaceAccessAuthorizedByCaller returns. A space worker that refuses a blank
+// user ID (an unauthenticated caller) uses it to tell that refusal apart from
+// the caller-authorised opt-out, whose user ID is deliberately empty too.
+func IsSpaceAccessAuthorizedByCaller(user UserContext) bool {
+	_, ok := user.(spaceAccessAuthorizedByCallerContext)
+	return ok
+}
+
 func GetUserContext(ctx context.Context) UserContext {
 	return ctx.Value(&userContextKey).(UserContext)
 }
