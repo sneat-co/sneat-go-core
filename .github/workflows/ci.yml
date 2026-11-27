@@ -102,3 +102,10 @@ jobs:
         set -euo pipefail
         GOWORK=off go run github.com/sneat-co/cicd/cmd/check-go-native-firestore-sites@40765b99ee6f9b1d2fefe8cee3e1a7a09934d67e --root "$(git rev-parse --show-toplevel)" --repository "$GITHUB_REPOSITORY" --manifest .ci/native-firestore-sites.json
       code_coverage: true
+      allowed_imports: |
+        # sneat-go-core owns the Sneat test profile: sneatcoretesting wraps
+        # dalgo2memory, and these core packages test with it directly.
+        github.com/sneat-co/sneat-go-core/facade github.com/dal-go/dalgo/adapters/dalgo2memory
+        github.com/sneat-co/sneat-go-core/firestorepolicy github.com/dal-go/dalgo/adapters/dalgo2memory
+        github.com/sneat-co/sneat-go-core/slugs github.com/dal-go/dalgo/adapters/dalgo2memory
+        github.com/sneat-co/sneat-go-core/sneatcoretesting github.com/dal-go/dalgo/adapters/dalgo2memory
