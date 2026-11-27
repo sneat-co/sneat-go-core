@@ -26,7 +26,29 @@ import (
 // once, here, rather than repeated (and potentially gotten wrong) at every
 // call site in every repo.
 func NewInMemoryTestDB(options ...dalgo2memory.Option) dal.DB {
-	return dalgo2memory.New(dalgo2memory.FirestoreProfile(), options...)
+	return dalgo2memory.New(SneatProfile(), options...)
+}
+
+// SneatProfile is the dalgo2memory profile of Sneat's production backend:
+// Firestore. It brings Firestore's transaction semantics and, from dalgo
+// with profile-set time precision (dal-go/dalgo#248), Firestore's
+// microsecond timestamps, so a time kept elsewhere at full precision and
+// compared with its stored copy fails in a test as it fails in production.
+// dalgo itself is backend-neutral and keeps times exactly without a named
+// backend; naming it is Sneat's responsibility, made here once.
+//
+// Use it where a test builds its own database:
+// dalgo2memory.New(sneatcoretesting.SneatProfile(), ...). NewInMemoryTestDB
+// and SetupMemoryDB use it already.
+func SneatProfile() dalgo2memory.Profile {
+	return dalgo2memory.FirestoreProfile()
+}
+
+// WithSneatProfile is SneatProfile as an Option: it resets a database built
+// with another profile to Sneat's backend bundle (options apply after the
+// profile, last-wins).
+func WithSneatProfile() dalgo2memory.Option {
+	return dalgo2memory.WithFirestoreProfile()
 }
 
 // NewMemoryDB creates a strict in-memory database for Sneat tests.

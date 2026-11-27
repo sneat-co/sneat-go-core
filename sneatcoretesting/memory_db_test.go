@@ -81,3 +81,36 @@ func TestNewStrictSchemaMemoryDB_RejectsUndefinedCollections(t *testing.T) {
 		t.Fatal("strict schema test DB accepted an undefined collection")
 	}
 }
+
+// SneatProfile and WithSneatProfile are Firestore's bundle: a read after a
+// write in a read-write transaction is rejected, as on Firestore, even after
+// an option that allowed it (WithSneatProfile resets it, last-wins).
+func TestSneatProfile_IsFirestore(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	readAfterWrite := func(db dal.DB) error {
+		return db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+			key := record.NewKeyWithID("c", "a")
+			if err := tx.Set(ctx, record.NewRecordWithData(key, map[string]any{"v": 1})); err != nil {
+				return err
+			}
+			read := map[string]any{}
+			return tx.Get(ctx, record.NewRecordWithData(key, &read))
+		})
+	}
+	interleaved := dalgo2memory.WithInterleavedReadsAndWritesInTransaction()
+	if err := readAfterWrite(dalgo2memory.New(sneatcoretesting.SneatProfile(), interleaved)); err != nil {
+		t.Fatalf("control: interleaved reads were not allowed: %v", err)
+	}
+	for name, db := range map[string]dal.DB{
+		"SneatProfile":      dalgo2memory.New(sneatcoretesting.SneatProfile()),
+		"WithSneatProfile":  dalgo2memory.New(sneatcoretesting.SneatProfile(), interleaved, sneatcoretesting.WithSneatProfile()),
+		"NewInMemoryTestDB": sneatcoretesting.NewInMemoryTestDB(),
+	} {
+		t.Run(name, func(t *testing.T) {
+			if readAfterWrite(db) == nil {
+				t.Error("a read after a write succeeded: not Firestore's transaction ordering")
+			}
+		})
+	}
+}
