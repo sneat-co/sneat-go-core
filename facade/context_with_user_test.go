@@ -79,3 +79,27 @@ func TestSpaceAccessAuthorizedByCaller_SpaceWorkerSkipsMembershipGate(t *testing
 		t.Error("SpaceAccessAuthorizedByCaller's context must not trip the space worker's membership gate")
 	}
 }
+
+// Only the caller-authorised context reports the opt-out: an ordinary user,
+// a blank user ID and a nil user do not, so a worker can refuse those while
+// still honouring SpaceAccessAuthorizedByCaller.
+func TestIsSpaceAccessAuthorizedByCaller(t *testing.T) {
+	if !IsSpaceAccessAuthorizedByCaller(SpaceAccessAuthorizedByCaller(context.Background()).User()) {
+		t.Error("SpaceAccessAuthorizedByCaller's user must report the opt-out")
+	}
+	for name, user := range map[string]UserContext{
+		"user":  NewUserContext("u1"),
+		"blank": blankUser{},
+		"nil":   nil,
+	} {
+		if IsSpaceAccessAuthorizedByCaller(user) {
+			t.Errorf("%s: reported the caller-authorised opt-out", name)
+		}
+	}
+}
+
+// blankUser is an ordinary user context whose ID is blank (an unauthenticated
+// caller), as opposed to the caller-authorised opt-out.
+type blankUser struct{}
+
+func (blankUser) GetUserID() string { return " " }
