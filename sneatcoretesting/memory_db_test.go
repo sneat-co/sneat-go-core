@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
@@ -82,34 +83,66 @@ func TestNewStrictSchemaMemoryDB_RejectsUndefinedCollections(t *testing.T) {
 	}
 }
 
-// SneatProfile and WithSneatProfile are Firestore's bundle: a read after a
-// write in a read-write transaction is rejected, as on Firestore, even after
-// an option that allowed it (WithSneatProfile resets it, last-wins).
+// SneatProfile and WithSneatProfile are Firestore's bundle, not just any
+// profile that orders reads before writes: a read-write transaction whose
+// read is overtaken by another transaction's commit retries (optimistic
+// concurrency), where a single-writer database would make the other wait.
+// WithSneatProfile also resets a database built with another profile.
 func TestSneatProfile_IsFirestore(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
-	readAfterWrite := func(db dal.DB) error {
-		return db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
-			key := record.NewKeyWithID("c", "a")
-			if err := tx.Set(ctx, record.NewRecordWithData(key, map[string]any{"v": 1})); err != nil {
+	base := ctx
+	key := record.NewKeyWithID("c", "a")
+	// attempts runs a transaction that reads key while another transaction
+	// writes it, and returns how often the first one ran.
+	attempts := func(t *testing.T, db dal.DB) int {
+		t.Helper()
+		if err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+			return tx.Set(ctx, record.NewRecordWithData(key, map[string]any{"v": 0}))
+		}); err != nil {
+			t.Fatal(err)
+		}
+		runs := 0
+		err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+			runs++
+			read := map[string]any{}
+			if err := tx.Get(ctx, record.NewRecordWithData(key, &read)); err != nil {
 				return err
 			}
-			read := map[string]any{}
-			return tx.Get(ctx, record.NewRecordWithData(key, &read))
+			if runs == 1 {
+				done := make(chan error, 1)
+				go func() {
+					// A separate transaction, not one nested in this callback.
+					done <- db.RunReadwriteTransaction(base, func(ctx context.Context, tx dal.ReadwriteTransaction) error {
+						return tx.Set(ctx, record.NewRecordWithData(key, map[string]any{"v": 2}))
+					})
+				}()
+				select {
+				case err := <-done: // the other commit went through: ours must retry
+					if err != nil {
+						return err
+					}
+				case <-time.After(300 * time.Millisecond): // it waits for us: one writer
+				}
+			}
+			return tx.Set(ctx, record.NewRecordWithData(key, map[string]any{"v": 1}))
 		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return runs
 	}
-	interleaved := dalgo2memory.WithInterleavedReadsAndWritesInTransaction()
-	if err := readAfterWrite(dalgo2memory.New(sneatcoretesting.SneatProfile(), interleaved)); err != nil {
-		t.Fatalf("control: interleaved reads were not allowed: %v", err)
+	if got := attempts(t, dalgo2memory.New(dalgo2memory.SingleWriterProfile())); got != 1 {
+		t.Fatalf("control: a single-writer transaction ran %d times, want 1", got)
 	}
 	for name, db := range map[string]dal.DB{
 		"SneatProfile":      dalgo2memory.New(sneatcoretesting.SneatProfile()),
-		"WithSneatProfile":  dalgo2memory.New(sneatcoretesting.SneatProfile(), interleaved, sneatcoretesting.WithSneatProfile()),
+		"WithSneatProfile":  dalgo2memory.New(dalgo2memory.SingleWriterProfile(), sneatcoretesting.WithSneatProfile()),
 		"NewInMemoryTestDB": sneatcoretesting.NewInMemoryTestDB(),
 	} {
 		t.Run(name, func(t *testing.T) {
-			if readAfterWrite(db) == nil {
-				t.Error("a read after a write succeeded: not Firestore's transaction ordering")
+			if got := attempts(t, db); got != 2 {
+				t.Errorf("an overtaken read-write transaction ran %d times, want 2 (Firestore retries it)", got)
 			}
 		})
 	}
