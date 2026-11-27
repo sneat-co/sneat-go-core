@@ -4,9 +4,7 @@
     "github>sneat-co/sneat-renovate-go",
     "github>sneat-co/cicd"
   ],
-  "gomod": {
-    "postUpdateOptions": [
-      "gomodTidy"
-    ]
-  }
+  "postUpdateOptions": [
+    "gomodTidy"
+  ]
 }
