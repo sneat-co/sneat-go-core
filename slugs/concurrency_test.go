@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/slugs"
 	"github.com/sneat-co/sneat-go-core/sneatcoretesting"
+	"github.com/sneat-co/sneat-go-core/sneatmemdb"
 )
 
 // TestClaim_ConcurrentClaimsYieldOneWinner verifies
@@ -82,7 +82,7 @@ func TestClaim_ConcurrentClaimsYieldOneWinner(t *testing.T) {
 		case o.err == nil:
 			successes++
 			winner = o.targetID
-		case slugs.IsSlugTaken(o.err) || dalgo2memory.IsTransactionConflict(o.err):
+		case slugs.IsSlugTaken(o.err) || sneatmemdb.IsTransactionConflict(o.err):
 			conflicts++
 		default:
 			t.Errorf("unexpected error for %s: %v", o.targetID, o.err)

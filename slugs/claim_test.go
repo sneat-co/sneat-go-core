@@ -5,10 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/sneat-co/sneat-go-core/slugs"
 	"github.com/sneat-co/sneat-go-core/sneatcoretesting"
+	"github.com/sneat-co/sneat-go-core/sneatmemdb"
 )
 
 // TestClaim_SecondClaimIsRefused verifies AC:second-claim-is-refused: the
@@ -205,7 +205,7 @@ func TestClaim_ReservedSlugIsRefusedDistinctly(t *testing.T) {
 // undefined collections, so the insert is rejected by the collection guard
 // long before anything could be duplicated.
 func TestClaim_NonDuplicateFailureIsNotReportedAsTaken(t *testing.T) {
-	db := sneatcoretesting.NewInMemoryTestDB(dalgo2memory.WithSchema(false))
+	db := sneatcoretesting.NewInMemoryTestDB(sneatmemdb.WithSchema(false))
 	ctx := context.Background()
 
 	err := db.RunReadwriteTransaction(ctx, func(ctx context.Context, tx dal.ReadwriteTransaction) error {

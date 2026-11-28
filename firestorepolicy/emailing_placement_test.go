@@ -8,16 +8,16 @@ import (
 	"testing"
 
 	"github.com/dal-go/dalgo/access"
-	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/record"
+	"github.com/sneat-co/sneat-go-core/sneatmemdb"
 )
 
 // Queued email records live at ext/emailing/emails/{id}, owned by the
 // sneat-core-modules emailing package. The former root EmailAddress stays
 // unapproved.
 func TestEmailingExtensionPlacement(t *testing.T) {
-	raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+	raw := sneatmemdb.New()
 	db, err := ProtectRootCollections(raw)
 	if err != nil {
 		t.Fatal(err)

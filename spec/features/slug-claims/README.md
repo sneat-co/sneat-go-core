@@ -229,10 +229,11 @@ caller's transaction, so a rename cannot half-happen.
   automatic collision suffixes — which is deliberately **not** changed; `spaceus`
   gains a public slug alongside its ID).
 - **Testing** — `concurrent-claims-yield-one-winner`, `claim-and-record-commit-together`
-  and `rename-is-atomic` are proved against `dalgo2memory`'s opt-in
-  `WithOptimisticConcurrency()` mode (`dal-go/dalgo` v0.65.0), in which read-write
-  transactions genuinely interleave, buffer their reads and writes locally, and
-  fail at commit with `ErrTransactionConflict` if another transaction committed a
+  and `rename-is-atomic` are proved against `sneatcoretesting.NewInMemoryTestDB()`
+  (backed by `sneatmemdb`), which applies Sneat's Firestore profile with
+  optimistic concurrency: read-write transactions genuinely interleave, buffer
+  their reads and writes locally, and fail at commit with
+  `sneatmemdb.ErrTransactionConflict` if another transaction committed a
   conflicting write in the meantime — giving both real contention and real
   rollback, not a single global lock a test would pass against regardless.
 

@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"reflect"
+	"testing"
+
 	"github.com/dal-go/dalgo/access"
-	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/record"
 	"github.com/dal-go/record/update"
-	"reflect"
-	"testing"
+	"github.com/sneat-co/sneat-go-core/sneatmemdb"
 )
 
 func TestLegacyWritableRootsRequiredAndObservationPreserved(t *testing.T) {
@@ -86,7 +87,7 @@ func TestEveryLegacyRootWriteEligibility(t *testing.T) {
 					}
 				}
 			}
-			raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+			raw := sneatmemdb.New()
 			ctx := access.WithPolicy(context.Background(), access.MustPolicy("permissive-caller", access.Root(access.Allow(access.ReadWrite))))
 			row := func() record.Record {
 				return record.NewRecordWithData(key, &struct {
@@ -156,7 +157,7 @@ func TestEveryLegacyRootWriteEligibility(t *testing.T) {
 // The approved game identity permits its new namespace while retaining old
 // match records for observation with no write authority.
 func TestBiddingTicTacToeNamespaceCutover(t *testing.T) {
-	raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+	raw := sneatmemdb.New()
 	db, err := ProtectRootCollections(raw)
 	if err != nil {
 		t.Fatal(err)
@@ -199,7 +200,7 @@ func TestBiddingTicTacToeNamespaceCutover(t *testing.T) {
 }
 
 func TestApprovedCoordinationNamespaceCutovers(t *testing.T) {
-	raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+	raw := sneatmemdb.New()
 	db, err := ProtectRootCollections(raw)
 	if err != nil {
 		t.Fatal(err)
@@ -239,7 +240,7 @@ func TestReferrersExtensionPlacementPreservesCallerPolicy(t *testing.T) {
 	if len(comparison.Legacy) != 0 || len(comparison.Unexpected) != 1 || comparison.Unexpected[0] != "referrers" {
 		t.Fatal(comparison)
 	}
-	raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+	raw := sneatmemdb.New()
 	db, err := ProtectRootCollections(&directPolicyDB{DB: raw})
 	if err != nil {
 		t.Fatal(err)
