@@ -7,16 +7,16 @@ import (
 	"testing"
 
 	"github.com/dal-go/dalgo/access"
-	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/record"
 	"github.com/dal-go/record/update"
+	"github.com/sneat-co/sneat-go-core/sneatmemdb"
 )
 
 // Placement is mandatory even when a request-bound policy permits all writes;
 // extension registration does not confer caller ownership or client access.
 func TestQueryDockMandatoryPlacementAndCallerIsolation(t *testing.T) {
-	raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+	raw := sneatmemdb.New()
 	db, err := ProtectRootCollections(raw)
 	if err != nil {
 		t.Fatal(err)

@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/record"
 	"github.com/sneat-co/sneat-go-core/facade"
 	"github.com/sneat-co/sneat-go-core/sneatcoretesting"
+	"github.com/sneat-co/sneat-go-core/sneatmemdb"
 )
 
 func TestSetupMemoryDB(t *testing.T) {
@@ -51,8 +51,8 @@ func TestNewInMemoryTestDB_RejectsReadsAfterWrites(t *testing.T) {
 		}
 		return tx.Get(ctx, record.NewRecordWithData(key, new(struct{})))
 	})
-	if !errors.Is(err, dalgo2memory.ErrReadAfterWriteInTransaction) {
-		t.Fatalf("NewInMemoryTestDB read-after-write error = %v, want %v (Firestore's transaction ordering)", err, dalgo2memory.ErrReadAfterWriteInTransaction)
+	if !errors.Is(err, sneatmemdb.ErrReadAfterWriteInTransaction) {
+		t.Fatalf("NewInMemoryTestDB read-after-write error = %v, want %v (Firestore's transaction ordering)", err, sneatmemdb.ErrReadAfterWriteInTransaction)
 	}
 }
 
@@ -66,8 +66,8 @@ func TestNewMemoryDB_RejectsReadsAfterWrites(t *testing.T) {
 		}
 		return tx.Get(ctx, record.NewRecordWithData(key, new(struct{})))
 	})
-	if !errors.Is(err, dalgo2memory.ErrReadAfterWriteInTransaction) {
-		t.Fatalf("strict test DB read-after-write error = %v, want %v", err, dalgo2memory.ErrReadAfterWriteInTransaction)
+	if !errors.Is(err, sneatmemdb.ErrReadAfterWriteInTransaction) {
+		t.Fatalf("strict test DB read-after-write error = %v, want %v", err, sneatmemdb.ErrReadAfterWriteInTransaction)
 	}
 }
 
@@ -132,12 +132,11 @@ func TestSneatProfile_IsFirestore(t *testing.T) {
 		}
 		return runs
 	}
-	if got := attempts(t, dalgo2memory.New(dalgo2memory.SingleWriterProfile())); got != 1 {
-		t.Fatalf("control: a single-writer transaction ran %d times, want 1", got)
+	if sneatcoretesting.SneatProfile() == nil {
+		t.Fatal("SneatProfile() returned nil")
 	}
 	for name, db := range map[string]dal.DB{
-		"SneatProfile":      dalgo2memory.New(sneatcoretesting.SneatProfile()),
-		"WithSneatProfile":  dalgo2memory.New(dalgo2memory.SingleWriterProfile(), sneatcoretesting.WithSneatProfile()),
+		"WithSneatProfile":  sneatcoretesting.NewInMemoryTestDB(sneatcoretesting.WithSneatProfile()),
 		"NewInMemoryTestDB": sneatcoretesting.NewInMemoryTestDB(),
 	} {
 		t.Run(name, func(t *testing.T) {

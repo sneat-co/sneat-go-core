@@ -10,10 +10,10 @@ import (
 	"testing"
 
 	"github.com/dal-go/dalgo/access"
-	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/record"
 	"github.com/dal-go/record/update"
+	"github.com/sneat-co/sneat-go-core/sneatmemdb"
 )
 
 func TestRegistrySnapshotAndComparison(t *testing.T) {
@@ -107,7 +107,7 @@ func TestPolicyPlacementMatrixAndReadPassThrough(t *testing.T) {
 	}
 }
 func TestMandatoryPolicyTransactionsAndBatchAtomicity(t *testing.T) {
-	raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+	raw := sneatmemdb.New()
 	db, err := ProtectRootCollections(raw)
 	if err != nil {
 		t.Fatal(err)
@@ -149,14 +149,14 @@ func TestPolicyConstructionFailures(t *testing.T) {
 	if _, _, err := DefaultRootRegistry(); err == nil {
 		t.Fatal("bad artifact accepted")
 	}
-	if _, err := ProtectRootCollections(dalgo2memory.New(dalgo2memory.FirestoreProfile())); err == nil {
+	if _, err := ProtectRootCollections(sneatmemdb.New()); err == nil {
 		t.Fatal("bad artifact bypassed")
 	}
 	rootRegistryJSON = old
 	oldCompiler := newRootAccessPolicy
 	newRootAccessPolicy = func(string, ...access.Rule) (*access.AccessPolicy, error) { return nil, errors.New("compiler failed") }
 	t.Cleanup(func() { newRootAccessPolicy = oldCompiler })
-	if _, err := ProtectRootCollections(dalgo2memory.New(dalgo2memory.FirestoreProfile())); err == nil {
+	if _, err := ProtectRootCollections(sneatmemdb.New()); err == nil {
 		t.Fatal("compiler error bypassed")
 	}
 	newRootAccessPolicy = oldCompiler
@@ -185,7 +185,7 @@ func (d *directPolicyDB) InsertMulti(ctx context.Context, rows []record.Record, 
 }
 
 func TestGeneratedKeysAndDirectWriteSession(t *testing.T) {
-	raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+	raw := sneatmemdb.New()
 	db, err := ProtectRootCollections(raw)
 	if err != nil {
 		t.Fatal(err)

@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/dal-go/dalgo/access"
-	"github.com/dal-go/dalgo/adapters/dalgo2memory"
 	"github.com/dal-go/dalgo/dal"
 	"github.com/dal-go/record"
+	"github.com/sneat-co/sneat-go-core/sneatmemdb"
 )
 
 type firestoreNamedDB struct{ dal.DB }
@@ -18,7 +18,7 @@ func (firestoreNamedDB) Adapter() dal.Adapter { return dal.NewAdapter("firestore
 
 func TestProtectSneatDBAndContextOverride(t *testing.T) {
 	ctx := context.Background()
-	raw := dalgo2memory.New(dalgo2memory.FirestoreProfile())
+	raw := sneatmemdb.New()
 	if _, err := ProtectSneatDB(nil); err == nil {
 		t.Fatal("nil accepted")
 	}
